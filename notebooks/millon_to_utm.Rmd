@@ -1,0 +1,345 @@
+---
+title: "Millon-Geodesic"
+author: "Rudolf Cesaretti"
+date: "January 18, 2020"
+output: html_document
+---
+#Setup
+
+```{r Load Libraries, include=FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rgdal) 
+library(raster)
+library(rasterVis)
+library(ggplot2)
+library(rgeos)
+library(mapview)
+library(leaflet)
+library(broom)
+library(sp)
+library(spdep) 
+library(maptools)
+library(ggspatial)
+library(dplyr)
+
+#rm(list = ls())
+```
+
+```{r Import the Shapefiles}
+#Millon Space TMP Grid
+basegrid_M <- readOGR('/Users/annesherfield/Documents/SCHOOL/4. Current TMP Projects/Finished.Shapefiles/Millon to UTM and Back/Data/basegrid.shp')
+basegrid_M.df = df_spatial(basegrid_M)
+
+#UTM TMP Grid
+Base_Map_UTM <- readOGR('/Users/annesherfield/Documents/SCHOOL/4. Current TMP Projects/Finished.Shapefiles/Millon to UTM and Back/Data/Base_Map.shp')
+Base_Map_UTM.df = df_spatial(Base_Map_UTM)
+```
+
+```{r Remove Duplicate Points}
+#Remove the duplicate values from the UTM map so the only points left are the SE corners of each grid square
+Base_Map_UTM.df_duplicatesRM = Base_Map_UTM.df %>% 
+  group_by(map_grid) %>% 
+  distinct(x, y) %>%
+  slice(which.min(y)) %>%
+  ungroup()
+
+#Plot the UTM shapefile to check that there's only one point per grid square
+plot(Base_Map_UTM.df_duplicatesRM$x, Base_Map_UTM.df_duplicatesRM$y, xlab = "Easting", ylab = "Northing")
+text(Base_Map_UTM.df_duplicatesRM$x, Base_Map_UTM.df_duplicatesRM$y, labels = Base_Map_UTM.df_duplicatesRM$map_grid, cex = 0.5, pos = 1)
+
+#Remove duplicate values from the Millon space shapefile so all that's left are the SE corners of each grid square
+basegrid_M.df_duplicatesRM = basegrid_M.df %>% 
+  filter(coordinate_id == 4)
+```
+
+```{r Merge The Shapefiles to get the Coordinate Pairs}
+#Change the column names so they match
+colnames(Base_Map_UTM.df_duplicatesRM)[3] <- "square"
+
+#Merge the dataframes
+combined_df = merge(basegrid_M.df_duplicatesRM, Base_Map_UTM.df_duplicatesRM, by='square')
+
+#Change column names on merged dataframe
+colnames(combined_df)[14] <- "X_UTM"
+colnames(combined_df)[15] <- "Y_UTM"
+colnames(combined_df)[2] <- "E_Millon"
+colnames(combined_df)[3] <- "N_Millon"
+combined_df = combined_df[,-c(4:11)]
+```
+
+```{r Setup LM Variables}
+# Oct. 2019, Ian Robertson
+#################################################################$$
+  # extract columns containing coordinate pairs
+  UTM <- as.matrix(combined_df[, 6:7])
+  tmpGrid <- as.matrix(combined_df[, 2:3])
+```
+
+
+#Transforming Millon to Long-Lat 
+
+##Regression Model
+
+```{r Linear Regression Model}
+# create the model(s)
+  # note unusual formula; both sides = 2 column matrix
+  affTrans1 <- lm(UTM ~ tmpGrid) # for transforming Millon -> Long-Lat 
+  affTrans1
+  summary(affTrans1)
+```
+
+```{r Calculating New Coordinates}
+  # basic use of model #### transforming Millon -> Long-Lat (affTrans1)
+  
+  # the easy way to calculate new coordinates (using origin of Millon grid (0,0) as example)
+  c(1, 0, 0) %*% affTrans1$coefficients
+  print(c(1, 0, 0) %*% affTrans1$coefficients, digits = 15) # to access more digits
+  
+  # doing it manually
+  xPrime <- 0 * affTrans1$coefficients[2, 1] + 
+    0 * affTrans1$coefficients[3, 1] + 
+    affTrans1$coefficients[1, 1]
+  
+  yPrime <- 0 * affTrans1$coefficients[2, 2] + 
+    0 * affTrans1$coefficients[3, 2] + 
+    affTrans1$coefficients[1, 2]
+  
+  # compare
+    print(c(1, 0, 0) %*% affTrans1$coefficients, digits = 15)
+  # to
+    print(xPrime, digits = 20) # ignore col name
+    print(yPrime, digits = 20) # ignore col name
+  
+# applying model to a matrix of coordinates #### transforming Millon -> Long-Lat (affTrans1)
+  # this will process all locations at once    
+    UTM_Est <- cbind(1, tmpGrid) %*% affTrans1$coefficients
+    head(UTM_Est)
+```
+
+```{r Create Georeferencing Matrix}
+# create formal transformation matrix (for QGIS, ArcGIS, etc.) #### transforming Millon -> Long-Lat (affTrans1)
+  
+  # I *believe* that the following "key" accurately descibes
+  # the organization of the matrix
+  
+  # parameters:    
+    # a: Scale X 
+    # e: Scale Y
+    # d: Rotation X
+    # b: Rotation Y
+    # c: Translation X
+    # f: Translation Y
+  
+  # matrix:  
+    # a b c
+    # d e f
+  
+  affTransMat1 <- matrix(c(affTrans1$coefficients[2, 1], 
+                           affTrans1$coefficients[3, 1], 
+                           affTrans1$coefficients[1, 1], 
+                           affTrans1$coefficients[2, 2], 
+                           affTrans1$coefficients[3, 2], 
+                           affTrans1$coefficients[1, 2]), ncol = 3, byrow = TRUE)
+  
+  print(affTransMat1, digits = 15) # get access to more digits (for pasting into other software, etc.)
+```
+
+
+```{r Testing of Linear Model}
+# light testing of affTrans1 ####  transforming Millon -> Long-Lat (affTrans1)
+  
+  # the affTrans1 model attempts to minimize error across the study are
+  # calculated Long-Lat coordinates should be close, 
+  # but not identical to, the values used to create the model
+
+  plot(UTM) # original coordinates from QGIS/Google Earth imagery
+    points(UTM_Est, col = 2, pch = ".")
+    
+  # calculate distances between obs. & estimated coordinates
+  # some of these values are quite large!
+  deltaV <- sqrt((UTM[, 1] - UTM_Est[, 1])^2 + (UTM[, 2] - UTM_Est[, 2])^2)
+  hist(deltaV, breaks=10)
+    rug(deltaV, col = 2)
+```
+
+```{r Tested for Spatial Autocorrelation with Moran's I}
+combined_df2 <- cbind(deltaV,combined_df)
+
+# load necessary packages
+library(spdep)
+
+# create distance matrix in Km for all sites in 'maya'
+combined_df.d <- as.matrix(dist(cbind(combined_df2$X_UTM, combined_df2$Y_UTM)))
+
+w <- 1/combined_df.d
+diag(w) <- 0
+moran.test(combined_df2$deltaV,mat2listw(w)) 
+
+# create vector of the order of sites by terminal date
+ord <- order(combined_df2$deltaV)
+# plot and color code sites, label by site number
+plot(combined_df2[ord, 7:8], pch = 16, col = colorRampPalette(c("yellow", "red"))(nrow(combined_df2)),
+xlab = "Easting", ylab = "Northing")
+text(combined_df2[ord, 7:8], labels = combined_df2[ord, 1], cex = 0.5, pos = 1)
+```
+
+#Transforming Long-Lat to Millon
+
+##Regression Model
+
+```{r Linear Regression Model}
+# create the model(s)
+  # note unusual formula; both sides = 2 column matrix
+  affTrans2 <- lm(tmpGrid ~ UTM) # for transforming Lang-Lat -> Millon 
+  affTrans2
+  summary(affTrans2)
+```
+
+
+```{r Calculating New Coordinates}
+# basic use of model #### transforming Millon -> Long-Lat (affTrans1)
+  
+  # the easy way to calculate new coordinates (using origin of Millon grid (0,0) as example)
+  c(1, 515790.457406044, 2176163.432942322) %*% affTrans2$coefficients
+  print(c(1, 515790.457406044, 2176163.432942322) %*% affTrans2$coefficients, digits = 15) # to access more digits
+  
+  # doing it manually
+  xPrime <- 515790.457406044 * affTrans2$coefficients[2, 1] + 
+    515790.457406044 * affTrans2$coefficients[3, 1] + 
+    affTrans2$coefficients[1, 1]
+  
+  yPrime <-  2176163.432942322 * affTrans2$coefficients[2, 2] + 
+    2176163.432942322 * affTrans2$coefficients[3, 2] + 
+    affTrans2$coefficients[1, 2]
+  
+  # compare
+    print(c(1, 515790.457406044, 2176163.432942322) %*% affTrans2$coefficients, digits = 15)
+  # to
+    print(xPrime, digits = 20) # ignore col name
+    print(yPrime, digits = 20) # ignore col name
+    
+# applying model to a matrix of coordinates #### transforming Millon -> Long-Lat (affTrans1)
+  # this will process all locations at once    
+    Millon_Est <- cbind(1, UTM) %*% affTrans2$coefficients
+    head(Millon_Est)
+    
+  # compare    
+    print(c(1, 515790.457406044, 2176163.432942322) %*% affTrans2$coefficients, digits = 15)
+  # to
+    print(tmpGrid[10, ], digits = 15) # they match!
+```
+
+```{r Create Georeferencing Matrix}
+# create formal transformation matrix (for QGIS, ArcGIS, etc.) #### transforming Millon -> Long-Lat (affTrans1)
+  
+  # I *believe* that the following "key" accurately descibes
+  # the organization of the matrix
+  
+  # parameters:    
+    # a: Scale X 
+    # e: Scale Y
+    # d: Rotation X
+    # b: Rotation Y
+    # c: Translation X
+    # f: Translation Y
+  
+  # matrix:  
+    # a b c
+    # d e f
+  
+  affTransMat2 <- matrix(c(affTrans2$coefficients[2, 1], 
+                           affTrans2$coefficients[3, 1], 
+                           affTrans2$coefficients[1, 1], 
+                           affTrans2$coefficients[2, 2], 
+                           affTrans2$coefficients[3, 2], 
+                           affTrans2$coefficients[1, 2]), ncol = 3, byrow = TRUE)
+  
+  print(affTransMat2, digits = 15) # get access to more digits (for pasting into other software, etc.)
+```
+
+
+```{r Testing of Linear Model}
+# light testing of affTrans1 ####  transforming Millon -> Long-Lat (affTrans1)
+  
+  # the affTrans1 model attempts to minimize error across the study are
+  # calculated Long-Lat coordinates should be close, 
+  # but not identical to, the values used to create the model
+
+  plot(UTM) # original coordinates from QGIS/Google Earth imagery
+    points(Millon_Est, col = 2, pch = ".")
+    
+  # calculate distances between obs. & estimated coordinates
+  # some of these values are quite large!
+  deltaV <- sqrt((tmpGrid[, 1] - Millon_Est[, 1])^2 + (tmpGrid[, 2] - Millon_Est[, 2])^2)
+  hist(deltaV, breaks=10)
+    rug(deltaV, col = 2)
+```
+
+```{r Tested for Spatial Autocorrelation with Moran's I}
+combined_df3 <- cbind(deltaV,combined_df)
+
+# load necessary packages
+library(spdep)
+
+# create distance matrix in Km for all sites in 'maya'
+combined_df.d <- as.matrix(dist(cbind(combined_df3$X_UTM, combined_df3$Y_UTM)))
+
+w <- 1/combined_df.d
+diag(w) <- 0
+moran.test(combined_df3$deltaV,mat2listw(w)) 
+
+# create vector of the order of sites by terminal date
+ord <- order(combined_df3$deltaV)
+# plot and color code sites, label by site number
+plot(combined_df3[ord, 7:8], pch = 16, col = colorRampPalette(c("yellow", "red"))(nrow(combined_df3)),
+xlab = "Easting", ylab = "Northing")
+text(combined_df3[ord, 7:8], labels = combined_df3[ord, 1], cex = 0.5, pos = 1)
+```
+
+
+
+
+```{r Transforming Files}
+#import file that needs to be transformed and transform Millon to UTM:
+workingfile <- readOGR('/Users/annesherfield/Documents/SCHOOL/4. Current TMP Projects/Finished.Shapefiles/UTM.ToChange/Architecture_TMP_Point.shp')
+workingfile.df = df_spatial(workingfile)
+workingfile.mat <- as.matrix(workingfile.df[, 1:2])
+UTM_Est <- cbind(1, workingfile.mat) %*% affTrans1$coefficients
+data1 <- as.data.frame(workingfile.df[, 3:15])
+
+#import file that needs to be transformed and transform UTM to Millon:
+workingfile <- readOGR('/Users/annesherfield/Documents/SCHOOL/4. Current TMP Projects/Finished.Shapefiles/UTM.ToChange/Architecture_TMP.shp')
+workingfile.df = df_spatial(workingfile)
+workingfile.mat <- as.matrix(workingfile.df[, 1:2])
+UTM_Est <- cbind(1, workingfile.mat) %*% affTrans2$coefficients
+data1 <- as.data.frame(workingfile.df[, 3:18])
+
+
+#for below change CRS dependent on wanting Millon space or UTM
+          #For millon space put "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
+          #for UTM put +proj=utm +zone=14 ellps=WGS84
+
+
+#makes it into a point shapefile
+combined.utm <- as.data.frame(cbind(UTM_Est, workingfile.df[, 3:11]))
+my_spatial_points <- SpatialPoints(UTM_Est, proj4string = CRS("+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0") )
+
+spdf <- SpatialPointsDataFrame(coords = my_spatial_points, data = combined.utm)
+plot(spdf)
+writeOGR(spdf, dsn = '.', layer = 'point', driver = "ESRI Shapefile")
+
+#makes it into a polygon shapefile
+combined.utm2 <- as.data.frame(cbind(UTM_Est, workingfile.df[, 18]))
+poly_list <- split(combined.utm2, combined.utm2$Rid)
+poly_list <- lapply(poly_list, function(x) { x["Rid"] <- NULL; x })
+ps <- sapply(poly_list, Polygon)
+ps <- lapply(poly_list, Polygon)
+p1 <- lapply(seq_along(ps), function(i) Polygons(list(ps[[i]]), ID = names(poly_list)[i]))
+my_spatial_polys <- SpatialPolygons(p1, proj4string = CRS("+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0") )
+my_spatial_polys_df <- SpatialPolygonsDataFrame(my_spatial_polys, data.frame(Rid = unique(combined.utm2$Rid),  row.names = unique(combined.utm2$Rid)))
+writeOGR(my_spatial_polys_df, dsn = '.', layer = 'poly35', driver = "ESRI Shapefile")
+plot(my_spatial_polys_df)
+```
+
+

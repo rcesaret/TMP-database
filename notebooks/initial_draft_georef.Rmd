@@ -1,0 +1,539 @@
+---
+title: "Untitled"
+author: "Rudolf Cesaretti"
+date: "2024-11-25"
+output: html_document
+---
+
+
+```{r}
+
+# Load necessary packages
+library(sf)             # For vector data manipulation
+library(terra)          # For raster data manipulation
+library(gdalUtilities)  # For GDAL command-line utilities
+library(dplyr)          # For data manipulation
+library(ggplot2)        # For plotting
+library(tidyr)          # For data tidying
+library(purrr)          # For functional programming
+library(readr)          # For reading CSV files
+
+# Set working directory
+#setwd("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614")
+dir <- "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614"
+
+# Define file paths
+gcp_file <- "GCPs_MillonTo32614_FifthPassGeoref.csv"
+raster_file <- "TMP_Map_Topo_MillonSpace_Full.tif"
+vector_dir <- "Vector_gpkg"  # Subdirectory containing vector geopackage files
+
+# Load Ground Control Points (GCPs)
+gcps <- read_csv(paste0(dir, "/",gcp_file))
+
+
+# View the first few rows of the GCPs
+head(gcps)
+```
+
+
+```{r}
+
+# Define Millon Space custom CRS (Coordinate Reference System)
+# Since Millon Space is an arbitrary coordinate system, we can define a local CRS
+# Here we use a PROJ string with an affine transformation
+millon_crs_proj4 <- "+proj=affine +s11=1 +s12=0 +s21=0 +s22=1 +xoff=0 +yoff=0 +units=m +no_defs"
+
+# Alternatively, we can define it using WKT (Well-Known Text) if needed
+# For simplicity, we'll use the PROJ string in this script
+
+# Load Millon Space raster
+millon_raster <- rast(paste0(dir, "/",raster_file))
+crs(millon_raster) <- millon_crs_proj4  # Assign Millon Space CRS to the raster
+
+# Define the extent of the raster based on Millon Space coordinates
+xmin <- -4000
+xmax <- 4500
+ymin <- -3500
+ymax <- 3500
+
+# Set the raster extent
+ext(millon_raster) <- ext(xmin, xmax, ymin, ymax)
+
+#Calculate Pixel and Line Indices for Each GCP
+#We can compute the pixel (col) and line (row) indices for each GCP using the raster's extent and resolution.
+# Get raster resolution
+xres <- res(millon_raster)[1]
+yres <- res(millon_raster)[2]
+
+# Compute pixel and line indices
+gcps <- gcps %>%
+  mutate(
+    col = (MillonX - xmin) / xres,
+    row = (ymax - MillonY) / yres  # Note: Y coordinates decrease from top to bottom
+  ) %>%
+  mutate(
+    pixel = floor(col),
+    line = floor(row)
+  )
+
+#Format and Pass GCPs to gdal_translate()
+#The gdal_translate() function expects GCPs to be passed via the options parameter in a specific format.
+
+#Prepare GCP Options
+#We need to create a character vector where each GCP is represented as "-gcp", "pixel", "line", "X", "Y".
+
+# Prepare GCP options using lapply
+gcp_options <- unlist(
+  lapply(1:nrow(gcps), function(i) {
+    c(
+      "-gcp",
+      as.character(gcps$pixel[i]),
+      as.character(gcps$line[i]),
+      as.character(gcps$East32614[i]),
+      as.character(gcps$North32614[i])
+    )
+  })
+)
+
+# Output filename for the translated raster
+translated_raster_file <- "TMP_Map_Topo_MillonSpace_with_GCPs.tif"
+
+# Remove existing output file if it exists
+if (file.exists(translated_raster_file)) {
+  file.remove(translated_raster_file)
+}
+
+# Combine all options, including output format
+all_options <- c("-of", "GTiff", gcp_options)
+
+# Use gdal_translate to attach GCPs to the raster
+gdal_translate(
+  src_dataset = raster_file,
+  dst_dataset = translated_raster_file,
+  of = "GTiff",
+  options = gcp_options
+)
+
+# Attach GCPs to the raster using gdal_translate
+# First, we need to prepare the GCPs in the format required by gdal_translate
+# The GCPs should be in the order: pixel (x in raster), line (y in raster), X (in target CRS), Y (in target CRS)
+# Since the raster and GCPs are in Millon Space, we need to convert MillonX and MillonY to pixel coordinates
+# Assuming that MillonX and MillonY correspond directly to pixel coordinates (this may need adjustment based on your data)
+
+# Prepare GCPs for gdal_translate
+gcp_list <- gcps %>%
+  mutate(
+    pixel = MillonX,    # Assuming MillonX corresponds to pixel X coordinate
+    line = MillonY      # Assuming MillonY corresponds to pixel Y coordinate
+  ) %>%
+  select(pixel, line, East32614, North32614)
+
+# Convert GCPs to a list of strings for gdal_translate
+gcp_args <- unlist(
+  apply(gcp_list, 1, function(row) {
+    c("-gcp", as.character(row))
+  })
+)
+
+# Use gdal_translate to attach GCPs to the raster
+translated_raster_file <- "TMP_Map_Topo_MillonSpace_with_GCPs.tif"
+gdal_translate(
+  src_dataset = raster_file,
+  dst_dataset = translated_raster_file,
+  gcp = as.vector(t(gcp_list)),
+  of = "GTiff",
+  overwrite = TRUE
+)
+
+# Define a list of transformation methods to test
+transformation_methods <- list(
+  list(name = "Projective", params = list(tps = FALSE, order = NULL, r = "lanczos", warp = "projective")),
+  list(name = "Thin_Plate_Spline", params = list(tps = TRUE, order = NULL, r = "lanczos", warp = NULL)),
+  list(name = "Polynomial_1", params = list(tps = FALSE, order = 1, r = "lanczos", warp = NULL)),
+  list(name = "Polynomial_2", params = list(tps = FALSE, order = 2, r = "lanczos", warp = NULL)),
+  list(name = "Polynomial_3", params = list(tps = FALSE, order = 3, r = "lanczos", warp = NULL))
+)
+
+# Target CRS (EPSG code for UTM Zone 14N - WGS84)
+target_crs <- "EPSG:32614"
+
+# Initialize a data frame to store RMSE results
+rmse_results <- data.frame(
+  Method = character(),
+  RMSE = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Function to perform georeferencing using gdalwarp and calculate RMSE
+perform_georeferencing <- function(method) {
+  method_name <- method$name
+  params <- method$params
+  
+  # Output filename for the transformed raster
+  output_raster_file <- paste0("TMP_Map_Topo_", method_name, ".tif")
+  
+  # Perform the georeferencing using gdalwarp
+  gdalwarp(
+    srcfile = translated_raster_file,
+    dstfile = output_raster_file,
+    t_srs = target_crs,
+    r = params$r,
+    tps = params$tps,
+    order = params$order,
+    overwrite = TRUE,
+    of = "GTiff",
+    warpoptions = c("-wo", paste0("METHOD=", params$warp))
+  )
+  
+  # Load the transformed raster
+  transformed_raster <- rast(output_raster_file)
+  
+  # Extract the transformed GCPs from the raster
+  # Note: Since gdalwarp does not output the transformed GCPs directly, we need to transform the GCPs ourselves
+  # We can use the same transformation parameters to transform the original GCPs
+  
+  # For simplicity, we can read the GCPs from the transformed raster if they are preserved
+  # Alternatively, we can use the control points to compute the residuals
+  
+  # Since we cannot directly extract residuals from the raster, we'll transform the Millon Space GCPs to the target CRS
+  # using the same transformation and compare them to the known East32614 and North32614 values
+  
+  # Create an sf object from the Millon Space GCPs
+  gcp_sf <- st_as_sf(gcps, coords = c("MillonX", "MillonY"), crs = millon_crs_proj4)
+  
+  # Transform the GCPs using the same parameters
+  # Since gdalwarp uses complex transformations that are not easily replicated in sf,
+  # we can approximate this by performing the transformation using the control points
+  
+  # For the purpose of calculating RMSE, we'll read the transformed raster and extract the coordinates
+  # Alternatively, use the GDAL command gdaltransform to transform the points
+  # Here, we'll use gdaltransform via gdalUtilities
+  
+  # Prepare the input coordinates for gdaltransform
+  input_coords <- gcps %>%
+    select(MillonX, MillonY)
+  
+  # Write the input coordinates to a temporary file
+  input_coords_file <- tempfile(fileext = ".txt")
+  write.table(input_coords, file = input_coords_file, row.names = FALSE, col.names = FALSE, sep = " ")
+  
+  # Use gdaltransform to transform the coordinates
+  transformed_coords <- gdaltransform(
+    s_srs = millon_crs_proj4,
+    t_srs = target_crs,
+    coords = input_coords_file,
+    gcp = as.vector(t(gcp_list)),
+    order = params$order,
+    tps = params$tps,
+    rpc = FALSE,
+    to = NULL
+  )
+  
+  # Read the transformed coordinates
+  transformed_coords_df <- read.table(text = transformed_coords, col.names = c("East32614_trans", "North32614_trans", "Z"))
+  
+  # Combine with the original GCPs to calculate residuals
+  residuals_df <- cbind(gcps, transformed_coords_df)
+  
+  # Calculate residuals
+  residuals_df <- residuals_df %>%
+    mutate(
+      dX = East32614_trans - East32614,
+      dY = North32614_trans - North32614,
+      residual = sqrt(dX^2 + dY^2)
+    )
+  
+  # Calculate RMSE
+  rmse <- sqrt(mean(residuals_df$residual^2))
+  
+  # Append RMSE to results data frame
+  rmse_results <<- rbind(rmse_results, data.frame(Method = method_name, RMSE = rmse))
+  
+  # Save residuals data for visualization
+  residuals_file <- paste0("residuals_", method_name, ".csv")
+  write.csv(residuals_df, residuals_file, row.names = FALSE)
+  
+  # Return the method name and RMSE
+  list(Method = method_name, RMSE = rmse)
+}
+
+# Perform georeferencing for each method and collect RMSE results
+results <- lapply(transformation_methods, perform_georeferencing)
+
+# View RMSE results
+print(rmse_results)
+
+# Plot RMSE results
+ggplot(rmse_results, aes(x = Method, y = RMSE)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  theme_minimal() +
+  labs(title = "RMSE for Different Transformation Methods", x = "Transformation Method", y = "RMSE (meters)")
+
+# Visualize error distribution for each method
+# We'll create error distribution maps for each method
+for (method in transformation_methods) {
+  method_name <- method$name
+  residuals_file <- paste0("residuals_", method_name, ".csv")
+  residuals_df <- read_csv(residuals_file)
+  
+  # Create a scatter plot of residuals
+  ggplot(residuals_df, aes(x = East32614, y = North32614, color = residual)) +
+    geom_point() +
+    scale_color_viridis_c() +
+    theme_minimal() +
+    labs(title = paste("Error Distribution -", method_name),
+         x = "Easting (m)", y = "Northing (m)", color = "Residual (m)") +
+    ggsave(filename = paste0("Error_Distribution_", method_name, ".png"), width = 8, height = 6)
+}
+
+# Suggest additional performance metrics
+# We can calculate the following:
+# - Maximum residual
+# - Standard deviation of residuals
+# - Median residual
+additional_metrics <- rmse_results %>%
+  left_join(
+    lapply(transformation_methods, function(method) {
+      method_name <- method$name
+      residuals_file <- paste0("residuals_", method_name, ".csv")
+      residuals_df <- read_csv(residuals_file)
+      data.frame(
+        Method = method_name,
+        MaxResidual = max(residuals_df$residual),
+        StdResidual = sd(residuals_df$residual),
+        MedianResidual = median(residuals_df$residual)
+      )
+    }) %>% bind_rows(),
+    by = "Method"
+  )
+
+# Print additional performance metrics
+print(additional_metrics)
+
+# Save metrics to CSV
+write.csv(additional_metrics, "Transformation_Performance_Metrics.csv", row.names = FALSE)
+
+# For the purpose of this script, select one method arbitrarily
+# Let's select "Thin_Plate_Spline" as the best performing method (you can change this based on RMSE)
+best_method_name <- "Thin_Plate_Spline"
+best_raster_file <- paste0("TMP_Map_Topo_", best_method_name, ".tif")
+
+# Load the transformed raster using the best method
+best_transformed_raster <- rast(best_raster_file)
+
+# Transform vector data using the equivalent vector method
+# Since we used Thin Plate Spline for raster, we'll use a TPS transformation for vectors
+# We need to compute the TPS transformation based on the GCPs and apply it to the vector data
+
+# Prepare the source and target coordinates
+source_coords <- gcps %>%
+  select(MillonX, MillonY)
+
+target_coords <- gcps %>%
+  select(East32614, North32614)
+
+# Fit TPS models for X and Y separately
+library(fields)
+
+tps_model_x <- Tps(as.matrix(source_coords), target_coords$East32614)
+tps_model_y <- Tps(as.matrix(source_coords), target_coords$North32614)
+
+# List all vector geopackage files in the directory
+vector_files <- list.files(path = vector_dir, pattern = "\\.gpkg$", full.names = TRUE)
+
+# Function to transform vector data using TPS
+transform_vector_data <- function(vector_file) {
+  # Read the vector data
+  vector_data <- st_read(vector_file)
+  
+  # Ensure the CRS is set to Millon Space
+  st_crs(vector_data) <- millon_crs_proj4
+  
+  # Extract coordinates
+  coords <- st_coordinates(vector_data)
+  
+  # Apply TPS transformation
+  transformed_x <- predict(tps_model_x, newdata = coords[, 1:2])
+  transformed_y <- predict(tps_model_y, newdata = coords[, 1:2])
+  
+  # Create new geometry with transformed coordinates
+  transformed_coords <- cbind(transformed_x, transformed_y)
+  
+  # Create a new sf object with transformed geometry
+  transformed_geometry <- st_sfc(st_geometry(vector_data), crs = target_crs)
+  st_geometry(transformed_geometry) <- st_geometry(st_multipoint(transformed_coords))
+  
+  # Update the vector data with transformed geometry
+  vector_data_transformed <- vector_data
+  st_geometry(vector_data_transformed) <- transformed_geometry
+  
+  # Save the transformed vector data
+  output_vector_file <- file.path("Transformed_Vector_Data", basename(vector_file))
+  st_write(vector_data_transformed, output_vector_file, delete_dsn = TRUE)
+  
+  # Return the output filename
+  output_vector_file
+}
+
+# Create output directory for transformed vector data
+dir.create("Transformed_Vector_Data", showWarnings = FALSE)
+
+# Transform all vector files
+transformed_vector_files <- lapply(vector_files, transform_vector_data)
+
+# Evaluate error in georeferenced transformations
+# For evaluation, we can check the transformed GCPs against known values
+
+# Transform the GCPs using the TPS models
+transformed_gcp_x <- predict(tps_model_x, newdata = as.matrix(source_coords))
+transformed_gcp_y <- predict(tps_model_y, newdata = as.matrix(source_coords))
+
+# Create a data frame with transformed GCPs
+transformed_gcps <- gcps %>%
+  mutate(
+    East32614_trans = transformed_gcp_x,
+    North32614_trans = transformed_gcp_y,
+    dX = East32614_trans - East32614,
+    dY = North32614_trans - North32614,
+    residual = sqrt(dX^2 + dY^2)
+  )
+
+# Calculate RMSE for the vector transformation
+rmse_vector <- sqrt(mean(transformed_gcps$residual^2))
+cat("RMSE for vector transformation:", rmse_vector, "meters\n")
+
+# Compare with RMSE of the raster transformation
+cat("RMSE for raster transformation (", best_method_name, "):", rmse_results$RMSE[rmse_results$Method == best_method_name], "meters\n")
+
+# If the RMSE values are similar, the vector transformation is consistent with the raster transformation
+
+# Save transformed GCPs for record
+write.csv(transformed_gcps, "Transformed_GCPs_Vector.csv", row.names = FALSE)
+```
+
+
+```{r}
+# Define GCPs
+# Each GCP: pixel (x), line (y), lon (x_geo), lat (y_geo)
+g<- list(
+  c(7131, 23812, 513002.8316, 2174304.372),
+  c(7131, 22280, 513135.4067, 2174671.709),
+  c(6982, 22180, 513074.3038, 2174714.994),
+  c(6787, 22475, 513006.1014, 2174654.609)
+)
+
+g_args <- unlist(lapply(g, function(gcp) {
+  c("-gcp", gcp)
+}))
+
+gdal_translate(src_dataset = millon_raster,
+               dst_dataset = "output_raster_with_gcp.tif",
+               gcp = GCPs, a_srs = millon_crs_proj4)
+
+
+GCPs = gcps %>% select(pixel, line, MillonX, MillonY)
+GCPs = gcps %>% select(pixel, line, East32614, North32614)
+GCPs = as.matrix(GCPs)
+
+writeRaster(
+  millon_raster,
+  filename = "TMP_Map_Topo_MillonSpace_Full_v2.tif",
+  filetype = "GTiff")
+)
+```
+,C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614/
+  overwrite = TRUE,
+  options = c("COMPRESS=ZSTD","PREDICTOR=2","BIGTIFF=YES"
+
+7131	23812	513002.8316	2174304.372
+7268	22280	513135.4067	2174671.709
+6982	22180	513074.3038	2174714.994
+6787	22475	513006.1014	2174654.609
+
+# Python
+
+```{python}
+
+
+import csv
+from osgeo import gdal, osr
+
+# Define the input and output files
+gcp_file_path = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614/GCPs.csv"  # Replace with your GCP CSV file path
+input_tiff = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614/TMP_Map_Topo_MillonSpace_Full_v2.tif"  # Replace with your input GeoTIFF file path
+output_tiff = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614/TMP_Map_Topo_MillonSpace_Full_v2_GCP.tif"  # Output GeoTIFF file path
+
+# Read the GCPs from the CSV file
+gcps = []
+with open(gcp_file_path, "r") as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        gcps.append(gdal.GCP(float(row["East32614"]), float(row["North32614"]), 0, float(row["pixel"]), float(row["line"])))
+
+# Open the source GeoTIFF file
+src_ds = gdal.Open(input_tiff, gdal.GA_ReadOnly)
+if not src_ds:
+    raise FileNotFoundError(f"Cannot open file {input_tiff}")
+
+# Create a copy of the dataset to modify
+driver = gdal.GetDriverByName("GTiff")
+dst_ds = driver.CreateCopy(output_tiff, src_ds, strict=0)
+
+# Define the spatial reference for the GCPs
+srs = osr.SpatialReference()
+srs.ImportFromEPSG(32614)  # EPSG:32614 is WGS 84 / UTM zone 14N
+
+# Attach GCPs with spatial reference as WKT
+dst_ds.SetGCPs(gcps, srs.ExportToWkt())
+
+
+# Save and close datasets
+dst_ds.FlushCache()
+dst_ds = None
+src_ds = None
+
+print(f"GCPs successfully attached and saved to {output_tiff}")
+
+# Open the modified GeoTIFF to verify GCPs
+verify_ds = gdal.Open(output_tiff, gdal.GA_ReadOnly)
+attached_gcps = verify_ds.GetGCPs()
+
+# Print details of the attached GCPs
+print(f"Number of GCPs attached: {len(attached_gcps)}")
+for gcp in attached_gcps:
+    print(f"Pixel: {gcp.GCPPixel}, Line: {gcp.GCPLine}, X: {gcp.GCPX}, Y: {gcp.GCPY}")
+
+# Check the GCP spatial reference
+gcp_srs = verify_ds.GetGCPProjection()
+print(f"GCP Projection: {gcp_srs}")
+
+
+################################################
+
+##################################################
+
+import csv
+from osgeo import gdal, osr
+
+# Define the input (GeoTIFF with GCPs) and output files
+input_tiff = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614/TMP_Map_Topo_MillonSpace_Full_v2_GCP.tif"  # Input GeoTIFF with GCPs
+output_georeferenced_tiff = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614/TMP_Map_Topo_MillonSpace_Full_v2_GCP_georef32614.tif"  # Final georeferenced output
+
+# Use gdal.Warp for georeferencing and resampling
+gdal.Warp(
+    output_georeferenced_tiff,
+    input_tiff,
+    format="GTiff",
+    dstSRS="EPSG:32614",  # Target projection
+    tps=True,  # Use Thin Plate Spline transformation
+    resampleAlg="lanczos"  # Lanczos resampling
+)
+
+print(f"Georeferenced file saved to: {output_georeferenced_tiff}")
+
+```
+
+
+
+
+

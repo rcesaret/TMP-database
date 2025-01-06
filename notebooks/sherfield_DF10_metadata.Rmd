@@ -1,0 +1,1611 @@
+---
+title: "DF10 Metadata"
+author: "Anne Sherfield"
+date: "4/28/2022"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(dplyr)
+library(tidyr)
+library(naniar)
+library(ggplot2)
+library(ggpubr)
+theme_set(theme_pubr())
+```
+
+Goal of this version is to make a more accessible version of the TMP survey data. Some changes were made to the variables and values between DF9 and DF10. These changes are detailed in this document. Further changes and problems identified during this project are also detailed alongside steps for future work that could be undertaken to create a more accurate version of the TMP data.
+
+# Creation of DF10
+## New Database Structure
+
+The aim of the structure of the new database (DF10) was to reduce the number of tables involved and the amount of 0 data. The image below shows the structure of the new relational database and how the tables created will interact.
+
+```{r, echo=FALSE}
+knitr::include_graphics("structure.png")
+```
+
+## Variable Changes
+
+### Variables that were Removed
+
+Original variable 13, last major Teotihuacan building phase (lastBuildPhase) was removed from DF10. According to Robertson and Cowgill 2012, this field was supposed to have been based on a sensitive reading of the SSRs. However, few SSRs discussed this question explicitly, and in practice coders relied almost entirely on a very mechanical interpretation of sherd counts, which could have been done as well or better by looking at data fields 205-217, and still better by looking at the "interpretations" maps of Millon et al. (1973). In addition, a programming error in creating DF8 (the predecessor to DF9) changed all the "missing data" values for data field 13 to zeros, thereby losing the few (if any) sites judged to have no major Teotihuacan building phase later than Patlachique.
+
+Original variable 290, insubstantial structures count (insubstantialCount) was removed from DF10. This field was accidentally added by a research assistant who did not realize that the red rectangles on the TMP map are conventional symbols and not estimates of the number of structures (Robertson and Cowgill 2012).
+
+Original variable 18, (stoneCut) was removed. This variable contained no artifacts or additional information as all values for this variable were 0.
+
+Original variable 80 (complexUnit) and 82 (macroComplexUnit) were removed because this was duplicate information repeating the site unit (i.e. N12S3) of that collection unit.
+
+### Variables whose Names were Changed
+Some variable names were changed in order to avoid duplicate variable names. The variable 'drains' was found in two of the DF9 crosstab tables: archMaterials and lithicGround. The variable 'drains' in the archMaterials table was changed to drainSitu to represent that this variable represents drains identified in situ during survey. The variable 'drains' in the lithicGround table was changed to drainSurface to represent that this variable represents drain remnants found on the surface during survey. The variables funcIntPaTz, funcIntMcTl, and funcIntXlMt were found in two tables: complex and complexMacro. The variables were changed to MfuncIntPaTz, MfuncIntMcTl, and MfuncIntXlMt to represent that they are interpretations for a macro complex.
+
+Similarly, the variable 'wallFixtures' was found in both archMaterial and lithicGround. The 'wallFixtures' in archMaterial was changed to 'wallFixSitu' and the 'wallFixtures' in lithicGround was changed to 'wallFixSurf.'
+
+The variable 'jaguey' was also present in both condition and archMaterial. The 'jagueys' in archMaterials was not changed. The 'jaguey' in condition was changed to 'jagueyMod' because this variable represents recently man-made jagueys not archaeological remnants.
+
+One subset of the database variables are total counts of sherds from each time period. An issue with these variables that will be discussed in more detail later has left many of the variables out of the artifact table in DF10. However, five variables were kept under new names because there are no other variables dated to that time period. Therefore, I can be sure that keeping these total counts will not result in a double counting of artifacts in the database. The only variable that might be causing double counting with this variable would be the variable PMic in granular ware but as discussed above granular ware phasing is unreliable. The new variable 'PreCl' was previously called 'totPrec.' 'Cuan' was previously called 'totCuan.' 'Tezo' was previously called 'totTezo.' 'Maza' was previously called 'totMaza.' 'Azte' was previously called 'totAzte.'
+
+### Variables where the Values Changed
+Some variables were removed from the database because they contained no artifacts while other artifact variables were combined for various reasons after consultation with ASU Teotihuacan Research Lab staff and researchers. Each change and the reason for the change is detailed below.
+
+A new variable titled 'obisidianBifaces' was generated. This variable is the result of a merge of two original variables: 'obsidianPoints' and 'obisidianKnives.' This change was suggested in Cowgill and Robertson's Electronic File Guide for DF9 in 2012 because the point/knife distinction is "probably not very accurately reflected in DF9 counts."
+
+A new variable titled 'fineGreenstone' was generated. This variable is the result of a merge of two original variables: 'jade' and 'serpentine.' This is also following the suggestion of Cowgill and Robertson 2012 who state "many, but not all, of the objects coded as jade are more likely serpentine, and...perhaps often fuchsite, pending re-examination."
+
+A new variable called 'censerLate' was generated out of a merge of 4 previous variables: 'censerOxto,' 'censerXome,' 'censerMaza,' and 'censerAzte.' Huster advised that "Oxto-Xom-Maza censers are nearly identical so any subdivisions made by early analysts is probably meaningless."
+
+A new variable called 'granular' was generated by merging 5 previous variables: 'granPMic,' 'granMicc,' 'granTlam,' 'granXola,' and 'granMete.' Huster advised that 'ceramic phasing of granular ware is unreliable today' so all previous granular ware variables have been merged.
+
+A new variable called 'coyotlatelco' was generated by merging two previous variables: 'totOxto' and 'totXome.' This change was suggested in Cowgill and Robertson 2012 because "the Oxtoticpac phase is highly controversial and its very existence has been questioned." Additionally, Huster's opinion is that the "most successful subdivisions of the epiclassic are based on the proportion of Variables of ceramics not on the presence or absence of diagnostic ceramic Variables. Therefore, assigning ceramics to one period or another is an unreliable practice."
+
+Additionally one variables needed to be updated to reflect the increase storage capacity of modern computers. The old variable areaSite was given in multiples of 10 meters squared, i.e a value of 45 would mean 450 meters squared. The variable has now been changed to no longer be a multiple of ten but just the square meters area of the collection unit. 
+
+For all cases when multiple variables were merged, if -1 was reported in any of the merged variables the -1 value was retained in the new variable when all other variables contained 0 or -1. If the other variable had a count/value above 0, that count/value was retained and the -1 was replaced. This was done by hand in excel before the csv was imported into R.
+
+### Addition of Variable Hierarchy
+With the data out of a cross-tab format, this process will be discussed more later, it is possible to calculate artifact counts more easily for the user using set combinations of variable names. The user can do this independently by choosing their own variables of interest but for the sake of some quick calculations on the summary table, a variable hierarchy was added to the artifact table. This hierarchy basically groups variables into combinations of interest based on material type or function. All of the original variable categories are maintained at the lowest of the three levels of hierarchy but the variables were reduced into two more general levels. The new variable table can be seen below.
+
+```{r}
+Hierarchy <- read.csv("Data/TableNewHierarchy.csv", sep = ",")
+Hierarchy
+```
+
+
+
+## Data with -1 Value
+DF9 included two values -1 and 0 whose meaning should be addressed. First, many of the variables, but not all, see 0 as a known absence in the data. Alterations from this meaning to 0 are found in some of the coded data and can be seen in those explanary tables. However, all these values have been changed from 0 in DF10, so across the board 0 only means a known absence in the data. Due to the removal of crosstab structure, all 0 data is totally removed from the database. Therefore, if you query the data for a specific collection unit and variable and recieve no data, you can safely assume that it is a 0. A user-friendly interface that will be built for the Access database will make this clear to the user in the future.
+
+-1 is more trickly. According to Ian Robertson, for variables that are meant to be counts of things, in most cases ‘-	1’ means that the data was not available or not fully processed at the time that the data was ‘captured’. Real counts were intended to be generated later. For variables that are coded descriptive fields, ‘-1’ probably means	either nothing recorded, absent, or not applicable depending on what the variables is meant to represent.
+
+
+For the majority of the -1s in the database, this value represents missing data. To maintain the knowledge that this data was missing without upsetting a user's artifact count calculations, I changed all -1 values to NA and created a new column in the core data tables (artifactTable, totalsTable, interpTable, and codeTable) with the value 'M' if that variable was missing for a collection unit. Some of the -1 in the intepretation table don't make much sence as missing data so they were changed to 0, this is discussed more later when discussing the creation of that table.
+
+Some divergences from this strategy where that for the variable 'celts' all -1 where changed to zero because that artifact type is very rare and not found often even during the reanaysis. Additionally for the variable 'comalPatl' I assumed all -1 were 0 values because there are currently no comals that date to that time period.
+
+Here is some simple calculations and a visualization of how much missing data is in DF10 after the changes mentioned above. A more thorough investigation of the missing data from DF9 can be found in Robertson's document DF9 Missing Data Plots.pdf. 99,581/1,035,316 total values in the database are -1, approximately 10%. In the chart below each point represents one variable and the variables are ordered by how many missing values they have. As you can see the vast majority of the data has less than 1,000 missing values.
+  
+```{r How Many Missing CU Data per Variable}
+missingCount <- read.csv("Data/MissProbTable.csv", sep = ",")
+
+#how many missing variables in total across all columns
+length(which(missingCount[ , c(2:207)] == '-1'))
+#how many variables are there in total across all columns
+length(which(missingCount[ , c(2:207)] != 'z'))
+
+#manipulate missing count data
+missingCount[missingCount == '-1'] <- NA
+for(i in 2:ncol(missingCount)) {       # for-loop over columns
+  missingCount[5051 , i] <- sum(is.na(missingCount[ , i]))
+}
+missingCount <- missingCount[5051, c(2:ncol(missingCount))]
+missingCount <- data.frame(r1=names(missingCount), t(missingCount))
+missingCount <- missingCount[order(missingCount$X5051), ]
+
+#plot missing count data.
+ggplot(missingCount, aes(x = 1:nrow(missingCount), y = X5051))+
+  geom_point()
+
+```
+  
+## Creation of Artifact Table
+As discussed previously, one of the major changes between DF9 and DF10 is changing the variables out of a cross-tab format. Instead the database will be resemble most other archaeological databases that contain long tables of artifacts that are grouped and presented via an interface. While creating longer tables, this method will reduce the overall space that the database requires by removing all 0 data. In this section the process of changing the tables out of cross-tab is documented.
+
+```{r Un-Crosstab Function}
+#create function to take the data out of the crosstab format
+UNcrtb <- function(data) {
+# if the values are identical - remove the ID column and the column made above to check
+  data <- data[ , -which(names(data) %in% c("ID","RAuto"))]
+
+# UN-CROSSTAB THE DATA
+    #makes every box in the dataframe a line in a new dataframe
+  CTLong <- data.frame(rows = rownames(data), stack(data))
+    #orders the data so each ID number is together
+  CTLong <- CTLong[order(CTLong$rows), ]
+    #convert rows from character to numeric
+  CTLong$rows <- as.numeric(CTLong$rows)
+  CTLong$values <- as.numeric(CTLong$values)
+    #remove rows with -1 or 0 as the count
+  CTLong <- CTLong[CTLong$values != 0, ]
+    #if value is -1 add Y to new column titled missing
+  index <- c('-1')
+  values <- c('M')
+  CTLong$Where <-values[match(CTLong$values, index)]
+    #change count value of missing to 0
+  CTLong$values[CTLong$values == -1] <- 0
+    #change the column names
+  names(CTLong)[1] <- "ID"
+  names(CTLong)[2] <- "Count"
+  names(CTLong)[3] <- "Variable"
+  
+  return(CTLong)
+}
+```
+
+```{r Uncrosstab Artifact Table}
+#import data
+artifactTable <- read.csv("Data/CrossTabArtifactTable.csv", sep = ",")
+
+#coerce NA into 0s for the unworkedBone column
+artifactTable[is.na(artifactTable)] <- 0
+
+#rename ID column
+colnames(artifactTable)[1] <- 'ID'
+
+#check that ID value is equivalent to row number
+test <- artifactTable
+test$RAuto <- rownames(test)
+conflicto <- test$ID %>% 
+  bind_cols(test$RAuto) %>% 
+  mutate(Conflicto = if_else(test$ID == test$RAuto, "YES", "NO"))
+
+#run uncrosstab function
+artifactTable.nottab <- UNcrtb(artifactTable)
+```
+
+```{r Add Hierarchy to Artifact Table}
+artifactCode <- read.csv("Data/ArtifactCodes.csv", sep = ",")
+
+artifactTable.nottab$Variable <- as.character(artifactTable.nottab$Variable)
+
+artifactTable.nottab <- artifactTable.nottab %>%
+  mutate(ArtCode2 = case_when(
+    startsWith(Variable, "obsidian") ~ "19",
+    startsWith(Variable, "smo") ~ "16",
+    endsWith(Variable, 'Bone') ~ "1",
+    startsWith(Variable, 'cand') ~ "7",
+    startsWith(Variable, 'censer') ~ "8",
+    startsWith(Variable, 'to') ~ "10",
+    startsWith(Variable, 'comal') ~ "11",
+    startsWith(Variable, 'fig') ~ "12",
+    startsWith(Variable, 'nubbin') ~ "14",
+    startsWith(Variable, 'olla') ~ "15",
+    startsWith(Variable, 'basalt') ~ "17",
+    startsWith(Variable, 'chert') ~ "18",
+    startsWith(Variable, 'quartz') ~ "20",
+    startsWith(Variable, 'shell') ~ "5",
+    startsWith(Variable, 'slate') ~ "24",
+    startsWith(Variable, 'fire') ~ "23",
+    startsWith(Variable, 'sculpture') ~ "23",
+    startsWith(Variable, 'ground') ~ "22",
+    startsWith(Variable, 'drain') ~ "22",
+    startsWith(Variable, 'anv') ~ "22",
+    startsWith(Variable, 'lajas') ~ "22",
+    startsWith(Variable, 'celt') ~ "22",
+    startsWith(Variable, 'pale') ~ "22",
+    endsWith(Variable, 'tones') ~ "22",
+    startsWith(Variable, 'wallFix') ~ "22",
+    startsWith(Variable, 'plum') ~ "22",
+    startsWith(Variable, 'plas') ~ "22",
+    startsWith(Variable, 'pest') ~ "22",
+    startsWith(Variable, 'mort') ~ "22",
+    startsWith(Variable, 'meta') ~ "22",
+    startsWith(Variable, 'mano') ~ "22",
+    startsWith(Variable, 'ala') ~ "21",
+    startsWith(Variable, 'fine') ~ "21",
+    startsWith(Variable, 'midd') ~ "3",
+    startsWith(Variable, 'buri') ~ "3",
+    startsWith(Variable, 'maya') ~ "13",
+    startsWith(Variable, 'huas') ~ "13",
+    startsWith(Variable, 'taj') ~ "13",
+    startsWith(Variable, 'gulf') ~ "13",
+    startsWith(Variable, 'monte') ~ "13",
+    startsWith(Variable, 'oax') ~ "13",
+    startsWith(Variable, 'foreig') ~ "13",
+    startsWith(Variable, 'maya') ~ "13",
+    endsWith(Variable, "rec") ~ "9",
+    endsWith(Variable, "uan") ~ "9",
+    endsWith(Variable, "ezo") ~ "9",
+    endsWith(Variable, "lco") ~ "9",
+    endsWith(Variable, "aza") ~ "9",
+    endsWith(Variable, "zte") ~ "9",
+    startsWith(Variable, "spindle") ~ "9",
+    startsWith(Variable, "seal") ~ "9",
+    startsWith(Variable, "ear") ~ "9",
+    startsWith(Variable, "whi") ~ "9",
+    startsWith(Variable, "flu") ~ "9",
+    startsWith(Variable, "burn") ~ "9",
+    startsWith(Variable, "cove") ~ "9",
+    startsWith(Variable, "shrd") ~ "9",
+    startsWith(Variable, "adorn") ~ "9",
+    startsWith(Variable, "mina") ~ "9",
+    startsWith(Variable, "copa") ~ "9",
+    startsWith(Variable, "matt") ~ "9",
+    startsWith(Variable, "gran") ~ "9",
+    startsWith(Variable, "ceram") ~ "9",
+    startsWith(Variable, "almen") ~ "9",
+    startsWith(Variable, "area") ~ "0",
+    startsWith(Variable, "heig") ~ "0"
+    ))
+
+artifactTable.nottab <- artifactTable.nottab %>%
+  mutate(ArtCode1 = case_when(
+    startsWith(ArtCode2, "1") ~ "1",
+    startsWith(ArtCode2, "7") ~ "2",
+    startsWith(ArtCode2, '8') ~ "2",
+    startsWith(ArtCode2, '9') ~ "2",
+    startsWith(ArtCode2, '10') ~ "2",
+    startsWith(ArtCode2, "11") ~ "2",
+    startsWith(ArtCode2, "12") ~ "2",
+    startsWith(ArtCode2, '13') ~ "2",
+    startsWith(ArtCode2, '14') ~ "2",
+    startsWith(ArtCode2, '15') ~ "2",
+    startsWith(ArtCode2, "16") ~ "2",
+    startsWith(ArtCode2, "17") ~ "4",
+    startsWith(ArtCode2, '18') ~ "4",
+    startsWith(ArtCode2, '19') ~ "4",
+    startsWith(ArtCode2, '20') ~ "4",
+    startsWith(ArtCode2, '3') ~ "3",
+    startsWith(ArtCode2, '5') ~ "5",
+    startsWith(ArtCode2, '21') ~ "6",
+    startsWith(ArtCode2, '22') ~ "6",
+    startsWith(ArtCode2, '23') ~ "6",
+    startsWith(ArtCode2, '24') ~ "6",
+    startsWith(ArtCode2, "0") ~ "0",
+    startsWith(ArtCode2, "0") ~ "0"
+    ))
+
+artifactTable.nottab <- artifactTable.nottab %>%
+  mutate(ArtCode3 = case_when(
+    startsWith(Variable, 'basalt') ~ "111",
+    startsWith(Variable, 'chert') ~ "18",
+    startsWith(Variable, 'quartz') ~ "20",
+    startsWith(Variable, 'slate') ~ "144",
+    startsWith(Variable, 'fire') ~ "142",
+    startsWith(Variable, 'sculpture') ~ "143",
+    startsWith(Variable, 'ground') ~ "141",
+    startsWith(Variable, 'anv') ~ "138",
+    startsWith(Variable, 'lajas') ~ "137",
+    startsWith(Variable, 'celt') ~ "136",
+    startsWith(Variable, 'pale') ~ "135",
+    startsWith(Variable, 'wallFix') ~ "130",
+    startsWith(Variable, 'plum') ~ "129",
+    startsWith(Variable, 'plas') ~ "128",
+    startsWith(Variable, 'pest') ~ "127",
+    startsWith(Variable, 'mort') ~ "126",
+    startsWith(Variable, 'meta') ~ "125",
+    startsWith(Variable, 'mano') ~ "124",
+    startsWith(Variable, 'ala') ~ "122",
+    startsWith(Variable, 'fine') ~ "123",
+    startsWith(Variable, 'midd') ~ "110",
+    startsWith(Variable, 'buri') ~ "109",
+    startsWith(Variable, 'huas') ~ "87",
+    startsWith(Variable, 'taj') ~ "88",
+    startsWith(Variable, 'gulf') ~ "89",
+    startsWith(Variable, 'monte') ~ "90",
+    startsWith(Variable, 'oax') ~ "91",
+    startsWith(Variable, 'foreig') ~ "92",
+    endsWith(Variable, "rec") ~ "41",
+    endsWith(Variable, "uan") ~ "42",
+    endsWith(Variable, "ezo") ~ "43",
+    endsWith(Variable, "lco") ~ "44",
+    endsWith(Variable, "aza") ~ "45",
+    endsWith(Variable, "zte") ~ "46",
+    startsWith(Variable, "spindle") ~ "47",
+    startsWith(Variable, "seal") ~ "48",
+    startsWith(Variable, "ear") ~ "49",
+    startsWith(Variable, "whi") ~ "50",
+    startsWith(Variable, "flu") ~ "51",
+    startsWith(Variable, "burn") ~ "52",
+    startsWith(Variable, "cove") ~ "53",
+    startsWith(Variable, "adorn") ~ "58",
+    startsWith(Variable, "mina") ~ "59",
+    startsWith(Variable, "copa") ~ "60",
+    startsWith(Variable, "matt") ~ "61",
+    startsWith(Variable, "gran") ~ "62",
+    startsWith(Variable, "ceram") ~ "63",
+    startsWith(Variable, "workedB") ~ "25",
+    startsWith(Variable, "unworkedB") ~ "26",
+    startsWith(Variable, "candCoa") ~ "27",
+    startsWith(Variable, "candA") ~ "28",
+    startsWith(Variable, "candE") ~ "29",
+    startsWith(Variable, "candL") ~ "30",
+    startsWith(Variable, "candM") ~ "31",
+    startsWith(Variable, "candCom") ~ "32",
+    startsWith(Variable, "censerPP") ~ "33",
+    startsWith(Variable, "censerPa") ~ "34",
+    startsWith(Variable, "censerTz") ~ "35",
+    startsWith(Variable, "censerMi") ~ "36",
+    startsWith(Variable, "censerTl") ~ "37",
+    startsWith(Variable, "censerX") ~ "38",
+    startsWith(Variable, "censerMe") ~ "39",
+    startsWith(Variable, "censerLa") ~ "40",
+    startsWith(Variable, "shrdSta") ~ "54",
+    startsWith(Variable, "shrdPl") ~ "55",
+    startsWith(Variable, "shrdStu") ~ "56",
+    startsWith(Variable, "shrdInc") ~ "57",
+    startsWith(Variable, "toC") ~ "64",
+    startsWith(Variable, "toR") ~ "65",
+    startsWith(Variable, "comalPa") ~ "66",
+    startsWith(Variable, "comalTz") ~ "67",
+    startsWith(Variable, "comalMi") ~ "68",
+    startsWith(Variable, "comalTl") ~ "69",
+    startsWith(Variable, "comalXo") ~ "70",
+    startsWith(Variable, "comalMe") ~ "71",
+    startsWith(Variable, "comalOx") ~ "72",
+    startsWith(Variable, "comalPO") ~ "73",
+    startsWith(Variable, "figH") ~ "74",
+    startsWith(Variable, "figPP") ~ "75",
+    startsWith(Variable, "figPa") ~ "76",
+    startsWith(Variable, "figTz") ~ "77",
+    startsWith(Variable, "figMi") ~ "78",
+    startsWith(Variable, "figTl") ~ "79",
+    startsWith(Variable, "figXo") ~ "80",
+    startsWith(Variable, "figMe") ~ "81",
+    startsWith(Variable, "figTo") ~ "82",
+    startsWith(Variable, "figAz") ~ "83",
+    startsWith(Variable, "figPu") ~ "84",
+    startsWith(Variable, "mayaL") ~ "85",
+    startsWith(Variable, "mayaH") ~ "86",
+    startsWith(Variable, "nubbinPa") ~ "93",
+    startsWith(Variable, "nubbinAp") ~ "94",
+    startsWith(Variable, "nubbinIn") ~ "95",
+    startsWith(Variable, "nubbinFl") ~ "96",
+    startsWith(Variable, "nubbinAt") ~ "97",
+    startsWith(Variable, "nubbinXo") ~ "98",
+    startsWith(Variable, "nubbinMe") ~ "99",
+    startsWith(Variable, "ollaPa") ~ "100",
+    startsWith(Variable, "ollaWe") ~ "101",
+    startsWith(Variable, "ollaMi") ~ "102",
+    startsWith(Variable, "ollaTl") ~ "103",
+    startsWith(Variable, "ollaXo") ~ "104",
+    startsWith(Variable, "ollaMe") ~ "105",
+    startsWith(Variable, "smoT") ~ "106",
+    startsWith(Variable, "smoX") ~ "107",
+    startsWith(Variable, "smoM") ~ "108",
+    startsWith(Variable, "obsidianBl") ~ "112",
+    startsWith(Variable, "obsidianWa") ~ "113",
+    startsWith(Variable, "obsidianSc") ~ "114",
+    startsWith(Variable, "obsidianBi") ~ "115",
+    startsWith(Variable, "obsidianCo") ~ "116",
+    startsWith(Variable, "obsidianEc") ~ "117",
+    startsWith(Variable, "obsidianMa") ~ "118",
+    startsWith(Variable, "obsidianUt") ~ "119",
+    startsWith(Variable, "obsidianNo") ~ "120",
+    startsWith(Variable, "shellWo") ~ "121",
+    startsWith(Variable, "ham") ~ "131",
+    startsWith(Variable, "sli") ~ "132",
+    startsWith(Variable, "smoo") ~ "133",
+    startsWith(Variable, "whet") ~ "134",
+    startsWith(Variable, "drainS") ~ "139",
+    startsWith(Variable, "drainC") ~ "140",
+    startsWith(Variable, "almen") ~ "145",
+    startsWith(Variable, "areaSi") ~ "146",
+    startsWith(Variable, "areaSt") ~ "148",
+    startsWith(Variable, "heig") ~ "147"
+  ))
+
+
+artifactTable.nottab <- as.data.frame(cbind(artifactTable.nottab$ArtCode1, artifactTable.nottab$ArtCode2, artifactTable.nottab$ArtCode3, artifactTable.nottab$ID, artifactTable.nottab$Count, artifactTable.nottab$Where))
+
+colnames(artifactTable.nottab) <- c('ArtCode1','ArtCode2','ArtCode3','ID','Count', 'Where')
+```
+
+
+## Creation of Coded Values Table
+Half of the data collected by the TMP was not count data but rather coded data describing the condition and quantity of observed material culture at each collection unit. This type of data cannot be kept in the same datatable as the count data. Thus a new, parallel table was created for these coded variables. These variables could not remain in a new provenience table because that would have unnecessarily retained many of the 0 values of the coded variables.
+
+The existing 15 code tables (DS altering features, wallCoreOther, materials, archFeatures, constructQual, condition, wallCoreStone, water, wallFacing, floorMat, stoneDist, vegetation, stoneQuant, plowing, and burnedStruct) were condenced into one larger code table grouping variables where possible. The original coded values could not be merged without the creation of this larger code table because the same value (i.e. 3) was used to represent various conditions depending on what code table the variable was referencing. By condensing the variables into one table, the codes also needed to be condensed. The changes made when generating this larger code table are shown in below:
+
+```{r}
+read.csv("Data/TableExplainingCodeChanges.csv", sep = ",")
+```
+
+Recoding the variables to different numbers was done using the code below. This process did highlight some values in the coded variables that do not correspond to any value recorded in the code sheet. These problems are listed below and need to be addressed by referencing original written materials or earlier versions of the database.
+
+1) The adobe variable has two values of 41 for collection units 4900 and 4889. This is not within the scope of the materials code, nor any code of the data. I don't think it is count because all other collection units fall within the scope of the materials code. They are currently coded as '69.'
+
+2) 232 of the 5050 collection units were not listed in DF9's labAnalysts variables. 23 of the collecion units did not have any values listed for the fieldworkers variables. These are the only 2 variables in DF9 that do not have a value listed for every collection unit. I don't think this is a problem that can or needs to be fixed but it is important to note this diversion from typical in DF9. Two tables, labAnalystsMissingInfo and fieldWorkersMissingInfo identifies which collection units lack values for both of these variables.
+
+```{r Changing Coded Values}
+#the same process was repeated for each original code table. I only included comments for the first code table but the code is largely duplicated for each table with changes in values.
+
+#altering features table
+    #input table of all variables to which the code table altering features is applicable
+alterFeat <- read.csv("ChangeCodeValues/altering features.csv", sep = ",")
+    #change the values for each variable in turn to the new codes
+alterFeat$recentBuild <- recode(alterFeat$recentBuild, '-1'='-1', '0'='0', '5'='14', '4'='15', '1'='4', '3'='1', '2'='12')
+alterFeat$erosion <- recode(alterFeat$erosion, '-1'='-1', '0'='0', '5'='14', '4'='15', '1'='4', '3'='1', '2'='12')
+alterFeat$pitMisc <- recode(alterFeat$pitMisc, '-1'='-1', '0'='0', '5'='14', '4'='15', '1'='4', '3'='1', '2'='12')
+alterFeat$archaeoExcRest <- recode(alterFeat$archaeoExcRest, '-1'='-1', '0'='0', '5'='14', '4'='15', '1'='4', '3'='1', '2'='12')
+alterFeat$landLeveling <- recode(alterFeat$landLeveling, '-1'='-1', '0'='0', '5'='14', '4'='15', '1'='4', '3'='1', '2'='12')
+
+#archFeatures table
+archFeat <- read.csv("ChangeCodeValues/archfeatures.csv", sep = ",")
+archFeat$floors <- recode(archFeat$floors, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$walls <- recode(archFeat$walls, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$drainSitu <- recode(archFeat$drainSitu, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$wallFixSitu <- recode(archFeat$wallFixSitu, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$murals <- recode(archFeat$murals, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$columns <- recode(archFeat$columns, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$taludes <- recode(archFeat$taludes, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$tableros <- recode(archFeat$tableros, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$wells <- recode(archFeat$wells, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$jaguey <- recode(archFeat$jaguey, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$puestos <- recode(archFeat$puestos, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+archFeat$freeStandWall <- recode(archFeat$freeStandWall, '-1'='-1', '0'='0', '1'='54', '2'='16', '3'='51', '4'='52', '5'='53', '6'='1', '7'='99', '8'='1', '9'='99')
+
+#burnedStructures table
+burnStruct <- read.csv("ChangeCodeValues/burnedStruct.csv", sep = ",")
+burnStruct$burnedStruct <- recode(burnStruct$burnedStruct, '-1'='-1', '0'='0', '1'='1', '2'='15', '3'='16')
+
+#condition table
+condition <- read.csv("ChangeCodeValues/condition.csv", sep = ",")
+condition$fallow <- recode(condition$fallow, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$uncultivate <- recode(condition$uncultivate, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$pitCultivate <- recode(condition$pitCultivate, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$pitLoot <- recode(condition$pitLoot, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$quarrying <- recode(condition$quarrying, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$stoneClearing <- recode(condition$stoneClearing, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$terracing <- recode(condition$terracing, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$ditching <- recode(condition$ditching, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$roadOrRail <- recode(condition$roadOrRail, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$recentWall <- recode(condition$recentWall, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$stoneRows <- recode(condition$stoneRows, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$dam <- recode(condition$dam, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$jagueyMod <- recode(condition$jagueyMod, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$silting <- recode(condition$silting, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+condition$siteAlteration <- recode(condition$siteAlteration, '-1'='-1', '0'='0', '1'='11', '2'='6', '3'='12', '4'='13')
+
+#construction quality table
+constructQual <- read.csv("ChangeCodeValues/constructqual.csv", sep = ",")
+constructQual$constructQual <- recode(constructQual$constructQual, '-1'='-1', '0'='17', '1'='18', '2'='19', '3'='20', '4'='21')
+
+#floor material table
+floorMat <- read.csv("ChangeCodeValues/floormat.csv", sep = ",")
+floorMat$floorMaterial <- recode(floorMat$floorMaterial, '-1'='-1', '1'='42', '2'='35', '3'='30', '4'='31', '5'='36', '6'='37', '7'='38', '8'='39', '9'='99')
+
+#materials table
+mater <- read.csv("ChangeCodeValues/materials.csv", sep = ",")
+mater$lajas <- recode(mater$lajas, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$tepetate <- recode(mater$tepetate, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$adobe <- recode(mater$adobe, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1', '41'='69')
+mater$xalnene <- recode(mater$xalnene, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$cascajo <- recode(mater$cascajo, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$concrete <- recode(mater$concrete, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$plasterPaint <- recode(mater$plasterPaint, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$plasterUnpaint <- recode(mater$plasterUnpaint, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+mater$burntClay <- recode(mater$burntClay, '-1'='-1', '0'='0', '6'='10', '5'='8', '4'='6','2'='4','1'='2','3'='1')
+
+#plowing table
+plow <- read.csv("ChangeCodeValues/plowing.csv", sep = ",")
+plow$plowing <- recode(plow$plowing, '-1'='-1', '0'='0', '1'='16', '2'='43', '3'='44', '4'='45', '5'='46')
+
+#stone distribution table
+stoneDis <- read.csv("ChangeCodeValues/stoneDist.csv", sep = ",")
+stoneDis$stoneDist <- recode(stoneDis$stoneDist, '-1'='-1', '1'='22', '2'='23', '3'='24', '4'='25')
+
+#stone quantity table
+stoneQ <- read.csv("ChangeCodeValues/stoneQuant.csv", sep = ",")
+stoneQ$stoneQuant <- recode(stoneQ$stoneQuant, '-1'='-1', '0'='0', '9'='10', '8'='9', '7'='8', '6'='7', '5'='6', '4'='5', '3'='4', '2'='3', '1'='2')
+stoneQ$intrusiveSherd <- recode(stoneQ$intrusiveSherd, '-1'='-1', '0'='0', '9'='10', '8'='9', '7'='8', '6'='7', '5'='6', '4'='5', '3'='4', '2'='3', '1'='2')
+stoneQ$ceramicAbundance <- recode(stoneQ$ceramicAbundance, '-1'='-1', '0'='0', '9'='10', '8'='9', '7'='8', '6'='7', '5'='6', '4'='5', '3'='4', '2'='3', '1'='2')
+
+#vegetation table
+veg <- read.csv("ChangeCodeValues/vegetation.csv", sep = ",")
+veg$milpa <- recode(veg$milpa, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+veg$barley <- recode(veg$barley, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+veg$beans <- recode(veg$beans, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+veg$alfalfaCut <- recode(veg$alfalfaCut, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+veg$alfalfaUncut <- recode(veg$alfalfaUncut, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+veg$nopales <- recode(veg$nopales, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+veg$magueys <- recode(veg$magueys, '-1'='-1', '0'='0', '4'='8', '1'='4', '2'='6', '3'='1')
+
+#wall core other table
+wallOth <- read.csv("ChangeCodeValues/wallcoreother.csv", sep = ",")
+wallOth$wallCoreOthMat <- recode(wallOth$wallCoreOthMat, '-1'='-1', '0'='0', '1'='40', '2'='41', '3'='99')
+
+#wall core stone table
+wallst <- read.csv("ChangeCodeValues/wallcorestone.csv", sep = ",")
+wallst$wallCoreStone <- recode(wallst$wallCoreStone, '-1'='-1', '0'='0', '1'='26', '2'='27', '3'='1', '4'='28', '5'='29')
+
+#wall facing table
+wallfa <- read.csv("ChangeCodeValues/wallfacing.csv", sep = ",")
+wallfa$wallFacing <- recode(wallfa$wallFacing, '-1'='-1', '0'='0', '1'='30', '2'='31', '3'='32', '4'='33', '5'='42', '6'='34', '9'='99')
+
+#water table
+watertab <- read.csv("ChangeCodeValues/water.csv", sep = ",")
+watertab$cropWater <- recode(watertab$cropWater, '-1'='-1', '0'='47', '1'='48', '2'='49', '3'='50')
+
+#random other coded variables table
+othertab <- read.csv("ChangeCodeValues/OtherCoded.csv", sep = ",")
+othertab$analysisYear <- recode(othertab$analysisYear, '-1'='-1', '62'= '139', '63' = '140', '64' = '141', '65' = '142', '66' = '143', '67' = '144', '68' = '145', '69' = '146', '70' = '147', '71' = '148')
+othertab$analysisQuarter <- recode(othertab$analysisQuarter, '-1'='-1', '1'='132', '2'='133', '3'='134', '4'='135')
+othertab$slope <- recode(othertab$slope, '-1'='-1', '0'='131', '1'='11', '2'='6', '3'='12')
+othertab$collectionYear <- recode(othertab$collectionYear, '-1'='-1', '62'= '139', '63' = '140', '64' = '141', '65' = '142', '66' = '143', '67' = '144', '68' = '145', '69' = '146', '70' = '147', '71' = '148')
+othertab$collectionQuarter <- recode(othertab$collectionQuarter, '-1'='-1', '1'='132', '2'='133', '3'='134', '4'='135')
+othertab$boundInfoQual <- recode(othertab$boundInfoQual, '-1'='-1', '0'='136', '1'='137', '2'='138')
+
+#write.csv(alterFeat, file = "ChangeCodeValues/Changed/alteringfeatuers.csv")
+#write.csv(archFeat, file = "ChangeCodeValues/Changed/archfeatures.csv")
+#write.csv(burnStruct, file = "ChangeCodeValues/Changed/burnedStruct.csv")
+#write.csv(condition, file = "ChangeCodeValues/Changed/condition.csv")
+#write.csv(constructQual, file = "ChangeCodeValues/Changed/constructQual.csv")
+#write.csv(floorMat, file = "ChangeCodeValues/Changed/floormat.csv")
+#write.csv(mater, file = "ChangeCodeValues/Changed/materials.csv")
+#write.csv(plow, file = "ChangeCodeValues/Changed/plowing.csv")
+#write.csv(stoneDis, file = "ChangeCodeValues/Changed/stoneDist.csv")
+#write.csv(stoneQ, file = "ChangeCodeValues/Changed/stoneQuant.csv")
+#write.csv(veg, file = "ChangeCodeValues/Changed/vegetation.csv")
+#write.csv(wallfa, file = "ChangeCodeValues/Changed/wallfacing.csv")
+#write.csv(wallOth, file = "ChangeCodeValues/Changed/wallcoreother.csv")
+#write.csv(wallst, file = "ChangeCodeValues/Changed/wallcorestone.csv")
+#write.csv(watertab, file = "ChangeCodeValues/Changed/water.csv")
+#write.csv(othertab, file="ChangeCodeValues/Changed/OtherCoded.csv")
+```
+
+These variables were also stored in a cross-tab format in DF9 and first had to be removed from this format.
+
+```{r Uncrosstab Code Table}
+#uncrosstab the code table
+#import data
+codeTable <- read.csv("Data/CrossTabCodeTable.csv", sep = ",")
+
+#slightly different uncrosstab function
+UNcrtb2 <- function(data) {
+# if the values are identical - remove the ID column and the column made above to check
+  data <- data[ , -which(names(data) %in% c("ID","RAuto"))]
+
+# UN-CROSSTAB THE DATA
+    #makes every box in the dataframe a line in a new dataframe
+  CTLong <- data.frame(rows = rownames(data), stack(data))
+    #orders the data so each ID number is together
+  CTLong <- CTLong[order(CTLong$rows), ]
+    #convert rows from character to numeric
+  CTLong$rows <- as.numeric(CTLong$rows)
+  CTLong$values <- as.numeric(CTLong$values)
+    #remove rows with -1 or 0 as the count
+  CTLong <- CTLong[CTLong$values != 0, ]
+    #if value is -1 add Y to new column titled missing
+  index <- c('-1')
+  values <- c('M')
+  CTLong$Where <-values[match(CTLong$values, index)]
+    #change count value of missing to 0
+  CTLong$values[CTLong$values == -1] <- 0
+    #change the column names
+  names(CTLong)[1] <- "ID"
+  names(CTLong)[2] <- "Code"
+  names(CTLong)[3] <- "Variable"
+  
+  return(CTLong)
+}
+
+#check that ID value is equivalent to row number
+test <- codeTable
+test$RAuto <- rownames(test)
+conflicto <- test$ID %>% 
+  bind_cols(test$RAuto) %>% 
+  mutate(Conflicto = if_else(test$ID == test$RAuto, "YES", "NO"))
+
+#run uncrosstab function
+codeTable.nottab <- UNcrtb2(codeTable)
+```
+
+Two variables, labAnalysts and fieldworkers were added to the code table as well since keeping them in provenience would have lead to many 0 values. I checked if it was possible to reduce the 5 variables that make up the labAnalysts and the fieldworkers. The combinations of workers was too unique to be reduced in any way that reduced the code table so each of the 5 variables labeled personellecode in DF9 were changed to workLab1-3 and workFie1-5. The code for these variables remained the list of researchers in DF9 added to the longer code table discussed above. Krotser, G. Raymond was originally code 26 and his code does not appear anywhere in these tables so it was removed from the code table. Additionally, assumed all -1 were 0. Thus I assumed that there was no situation in which you know the first worker and the 2nd is missing data, what the data now says is that there was only 1 worker.
+
+```{r Cleaning and Renaming the PersonelleCode Variables}
+workLab <- read.csv("Data/ceramicworkers.csv", sep = ",")
+workLab <- workLab %>% separate(mergedpersonnelCode, c('workLab1', 'workLab2', 'workLab3'))
+
+workFie <- read.csv("Data/fieldworkers.csv", sep = ",")
+workFie <- workFie %>% separate(merged, c('workFie1', 'workFie2', 'workFie3', 'workFie4', 'workFie5'))
+
+workers <- as.data.frame(artifactTable$ID)
+colnames(workers) <- 'ID'
+workers <- left_join(workers, workLab, 
+              by = "ID")
+workers <- left_join(workers, workFie,
+                  by = 'ID')
+
+#write.csv(workers, file = "Data/workers.csv")
+```
+
+```{r Integrate workers into code table}
+#uncrosstab the workers table
+#import data
+workers <- read.csv("Data/workers.csv", sep = ",")
+
+#coerce NA into 0s for the unworkedBone column
+workers[is.na(workers)] <- 0
+
+#check that ID value is equivalent to row number
+test <- workers
+test$RAuto <- rownames(test)
+conflicto <- test$ID %>% 
+  bind_cols(test$RAuto) %>% 
+  mutate(Conflicto = if_else(test$ID == test$RAuto, "YES", "NO"))
+
+#run uncrosstab function
+workers.nottab <- UNcrtb2(workers)
+
+#change the codes to the new values
+workers.nottab$Code <- recode(workers.nottab$Code, '1'='100', '2'='101', '3'='102', '4'='103', '5'='104', '6'='105', '7'='106', '8'='107', '9'='108', '10'='109', '11'='110', '12'='111', '13'='112', '14'='113', '15'='114', '16'='115', '17'='116', '18'='117', '19'='118', '20'='119', '21'='120', '22'='121', '23'='122', '24'='123', '25'='124', '27'='125', '28'='126', '29'='127', '30'='128', '31'='129', '32'='130')
+
+#combine workers database and code database
+codeTable.nottab2 <- rbind(codeTable.nottab, workers.nottab)
+```
+
+## Creation of Provenience Table
+The provenience table consists of any information that has a largely one to one relationships with the SSN/ID number. There are only five variables that fit this requirement and have no zero data and they all have to do with the location of the collection unit: site, subsite, unit, northing, and easting. Any other variables that had a lot of zero data were added to either the general artifact table or the coded data table based on whether or not the information was coded or numeric.
+
+```{r}
+crossProv <- read.csv("Data/crosstabprov.csv")
+```
+
+## Creation of Total Table
+The variables representing total ceramic counts for each time period in Teotihuacan have some problems regarding the value's full integration into the artifact table that will be discussed below. However, we wanted to maintain these values for future users in a separate table that can be ignored or used as the analyst wishes. Below is the code used to take these values out of the cross-tab format.
+
+```{r Uncrosstab Totals Table}
+totals <- read.csv("Data/totaltable.csv", sep = ",")
+
+#create function to take the data out of the crosstab format
+UNcrtb <- function(data) {
+# if the values are identical - remove the ID column and the column made above to check
+  data <- data[ , -which(names(data) %in% c("ID","RAuto"))]
+
+# UN-CROSSTAB THE DATA
+    #makes every box in the dataframe a line in a new dataframe
+  CTLong <- data.frame(rows = rownames(data), stack(data))
+    #orders the data so each ID number is together
+  CTLong <- CTLong[order(CTLong$rows), ]
+    #convert rows from character to numeric
+  CTLong$rows <- as.numeric(CTLong$rows)
+  CTLong$values <- as.numeric(CTLong$values)
+    #remove rows with -1 or 0 as the count
+  CTLong <- CTLong[CTLong$values != 0, ]
+    #if value is -1 add Y to new column titled missing
+  index <- c('-1')
+  values <- c('M')
+  CTLong$Where <-values[match(CTLong$values, index)]
+    #change count value of missing to 0
+  CTLong$values[CTLong$values == -1] <- 0
+    #change the column names
+  names(CTLong)[1] <- "ID"
+  names(CTLong)[2] <- "Count"
+  names(CTLong)[3] <- "Variable"
+  
+  return(CTLong)
+}
+
+#check that ID value is equivalent to row number
+test <- totals
+test$RAuto <- rownames(test)
+conflicto <- test$ID %>% 
+  bind_cols(test$RAuto) %>% 
+  mutate(Conflicto = if_else(test$ID == test$RAuto, "YES", "NO"))
+
+#run uncrosstab function
+totals.nottab <- UNcrtb(totals)
+```
+
+## Creation of Interpretation Table
+All of the interpretation data created by the TMP is in code data. Therefore, the same process used for the creation of the code table above was applied to create an interpretation table. The two tables were kept distinct because of the future updates planned for the interpretations and condensing the 48 interpretation variables in DF9.
+
+There were 17 code tables in DF9 used to interpret the codes for these 48 variables (DS ArchInterpPrim, ArchInterpAltern, complexFunCivic, complexFunOther, complexFunRes, complexFunTemp, complexFunWhole, complexGenAltern, complexGenPrim, FuncInterpAltern, funcInterpPrim, McomplexFun, McomplexGen, workshopField, workshopKrotser, workshopSpence1, and workshopSpence2). These code tables have been condensed into one code tables, grouping variables where possible. The changes made when generating this larger code table are shown in below:
+
+```{r}
+read.csv("ChangeInterpCodes/TableExplainingInterpCodeChanges.csv", sep = ",")
+```
+
+Recoding the variables to different numbers was done using the code below. This process did highlight that some variables have no values for any collection unit. Those variables were removed from DF10. One coded interpretation was that 'the primary interpretation is the best assessment'. Anything coded with this value was changed to 0. Additionally, -1 values for all tables except archinterpprim (variables: arch1PMic, arch1McTl, arch1XlMe, arch1Oxto) and funcinterpprim (func1PMic, func1McTl, func1XlMe, func1Oxto) were changed to 0 assuming that -1 means there wasn't an interpretation. 
+
+```{r Changing Coded Values 2}
+#the same process was repeated for each original code table. I only included comments for the first code table but the code is largely duplicated for each table with changes in values.
+
+#archinterpaltern table
+  #input table of all variables to which the code table altering features is applicable
+archInterpAltern <- read.csv("ChangeInterpCodes/archinterpaltern.csv", sep = ",")
+    #change the values for each variable in turn to the new codes
+archInterpAltern$arch2PMic <- recode(archInterpAltern$arch2PMic, '-1'='0', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '77'='0', '88'='0', '99'='42') 
+archInterpAltern$arch2McTl <- recode(archInterpAltern$arch2McTl, '-1'='0', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '77'='0', '88'='0', '99'='42') 
+archInterpAltern$arch2XlMe <- recode(archInterpAltern$arch2XlMe, '-1'='0', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '77'='0', '88'='0', '99'='42') 
+archInterpAltern$arch2Oxto <- recode(archInterpAltern$arch2Oxto, '-1'='0', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '77'='0', '88'='0', '99'='42') 
+
+#archinterpprim table
+archInterpPrim <- read.csv("ChangeInterpCodes/archinterpprim.csv", sep = ",")
+archInterpPrim$arch1PMic <- recode(archInterpPrim$arch1PMic, '-1'='-1', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '99'='42') 
+archInterpPrim$arch1McTl <- recode(archInterpPrim$arch1McTl, '-1'='-1', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '99'='42') 
+archInterpPrim$arch1XlMe <- recode(archInterpPrim$arch1XlMe, '-1'='-1', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '99'='42') 
+archInterpPrim$arch1Oxto <- recode(archInterpPrim$arch1Oxto, '-1'='-1', '0'='0', '2'='2', '1'='2', '4'='1', '7'='21', '3'='7', '5'='26', '6'='27', '8'='24', '9'='24', '10'='24', '15'='32', '11'='15', '14'='31', '12'='14', '13'='33', '16'='32', '17'='35', '18'='34', '19'='8', '20'='40', '21'='39', '99'='42') 
+
+#complexfuncivic
+complexFunCivic <- read.csv("ChangeInterpCodes/complexfuncivic.csv", sep = ",")
+complexFunCivic$funcCivPaTz <- recode(complexFunCivic$funcCivPaTz,  '-1'='0', '0'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '9'='42')
+complexFunCivic$funcCivMcTl <- recode(complexFunCivic$funcCivMcTl,  '-1'='0', '0'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '9'='42') 
+complexFunCivic$funcCivXlMt <- recode(complexFunCivic$funcCivXlMt,  '-1'='0', '0'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '9'='42')
+                                      
+#complexfunother
+complexFunOther <- read.csv("ChangeInterpCodes/complexfunother.csv", sep = ",")
+complexFunOther$funcOthXlMt <- recode(complexFunOther$funcOthXlMt,  '0'='0', '-1'='0', '11'='45', '1'='11', '2'='44', '12'='46', '3'='12', '4'='13', '5'='16', '6'='16', '7'='16', '8'='16', '9'='35', '10'='19', '99'='42')
+
+#complexfunres
+complexFunRes <- read.csv("ChangeInterpCodes/complexfunres.csv", sep = ",")
+complexFunRes$funcResPaTz <- recode(complexFunRes$funcResPaTz,  '0'='0', '-1'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '9'='42')
+complexFunRes$funcResMcTl <- recode(complexFunRes$funcResMcTl,  '0'='0', '-1'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '9'='42')
+complexFunRes$funcResXlMt <- recode(complexFunRes$funcResXlMt,  '0'='0', '-1'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '9'='42')
+
+#complexfuntemp
+complexFunTemp <- read.csv("ChangeInterpCodes/complexfuntemp.csv", sep = ",")
+complexFunTemp$funcTmpPaTz <- recode(complexFunTemp$funcTmpPaTz,  '0'='0', '-1'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '7'='48', '8'='28', '9'='29')
+complexFunTemp$funcTmpMcTl <- recode(complexFunTemp$funcTmpMcTl,  '0'='0', '-1'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '7'='48', '8'='28', '9'='29')
+complexFunTemp$funcTmpXlMt <- recode(complexFunTemp$funcTmpXlMt,  '0'='0', '-1'='0', '1'='43', '2'='43', '3'='43', '4'='43', '5'='43', '6'='43', '7'='48', '8'='28', '9'='29')
+
+#complexfunwhole
+complexFunWhole <- read.csv("ChangeInterpCodes/complexfunwhole.csv", sep = ",")
+complexFunWhole$funcIntPaTz <- recode(complexFunWhole$funcIntPaTz,  '0'='49', '-1'='0', '1'='50', '2'='51', '3'='52', '4'='52', '5'='52', '6'='52', '7'='52', '8'='52', '9'='42')
+complexFunWhole$funcIntMcTl <- recode(complexFunWhole$funcIntMcTl,  '0'='49', '-1'='0', '1'='50', '2'='51', '3'='52', '4'='52', '5'='52', '6'='52', '7'='52', '8'='52', '9'='42')
+complexFunWhole$funcIntXlMt <- recode(complexFunWhole$funcIntXlMt,  '0'='49', '-1'='0', '1'='50', '2'='51', '3'='52', '4'='52', '5'='52', '6'='52', '7'='52', '8'='52', '9'='42')
+
+#complexgenaltern
+complexGenAltern <- read.csv("ChangeInterpCodes/complexgenaltern.csv", sep = ",")
+complexGenAltern$archInt2PaTz <- recode(complexGenAltern$archInt2PaTz,  '0'='0', '-1'='0', '1'='53', '2'='54', '3'='55', '4'='56', '5'='57', '6'='45', '7'='58', '8'='0', '9'='42')
+complexGenAltern$archInt2McTl <- recode(complexGenAltern$archInt2McTl,  '0'='0', '-1'='0', '1'='53', '2'='54', '3'='55', '4'='56', '5'='57', '6'='45', '7'='58', '8'='0', '9'='42')
+complexGenAltern$archInt2XlMt <- recode(complexGenAltern$archInt2XlMt,  '0'='0', '-1'='0', '1'='53', '2'='54', '3'='55', '4'='56', '5'='57', '6'='45', '7'='58', '8'='0', '9'='42')
+
+#complexgenprim
+complexGenPrim <- read.csv("ChangeInterpCodes/complexgenprim.csv", sep = ",")
+complexGenPrim$archInt1PaTz <- recode(complexGenPrim$archInt1PaTz,  '0'='0', '-1'='0', '1'='53', '2'='54', '3'='55', '4'='56', '5'='57', '6'='45', '7'='58', '8'='59', '9'='42')
+complexGenPrim$archInt1McTl <- recode(complexGenPrim$archInt1McTl,  '0'='0', '-1'='0', '1'='53', '2'='54', '3'='55', '4'='56', '5'='57', '6'='45', '7'='58', '8'='59', '9'='42')
+complexGenPrim$archInt1XlMt <- recode(complexGenPrim$archInt1XlMt,  '0'='0', '-1'='0', '1'='53', '2'='54', '3'='55', '4'='56', '5'='57', '6'='45', '7'='58', '8'='59', '9'='42')
+
+#funcinterpaltern
+funcInterpAltern <- read.csv("ChangeInterpCodes/funcinterpaltern.csv", sep = ",")
+funcInterpAltern$func2PMic <- recode(funcInterpAltern$func2PMic,  '0'='0', '-1'='0', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '41'='38', '42'='10', '43'='23', '77'='0', '99'='42')
+funcInterpAltern$func2PMic <- recode(funcInterpAltern$func2PMic,  '12a'='12', '30a'='30')
+funcInterpAltern$func2McTl <- recode(funcInterpAltern$func2McTl,  '0'='0', '-1'='0', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '41'='38', '42'='10', '43'='23', '77'='0', '99'='42')
+funcInterpAltern$func2McTl <- recode(funcInterpAltern$func2McTl,  '12a'='12', '30a'='30')
+funcInterpAltern$func2XlMe <- recode(funcInterpAltern$func2XlMe,  '0'='0', '-1'='0', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '41'='38', '42'='10', '43'='23', '77'='0', '99'='42')
+funcInterpAltern$func2XlMe <- recode(funcInterpAltern$func2XlMe,  '12a'='12', '30a'='30')
+funcInterpAltern$func2Oxto <- recode(funcInterpAltern$func2Oxto,  '0'='0', '-1'='0', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '41'='38', '42'='10', '43'='23', '70'='0', '77'='0', '99'='42')
+funcInterpAltern$func2Oxto <- recode(funcInterpAltern$func2Oxto,  '12a'='12', '30a'='30')
+
+#funcinterpaltern
+funcInterpPrim <- read.csv("ChangeInterpCodes/funcinterpprim.csv", sep = ",")
+funcInterpPrim$func1PMic <- recode(funcInterpPrim$func1PMic,  '0'='0', '-1'='-1', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '14'='27', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '40'='37', '41'='38', '42'='10', '43'='23', '99'='42', '6'='18')
+funcInterpPrim$func1PMic <- recode(funcInterpPrim$func1PMic,  '12a'='12', '30a'='30')
+funcInterpPrim$func1McTl <- recode(funcInterpPrim$func1McTl,  '0'='0', '-1'='-1', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '14'='27', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '40'='37', '41'='38', '42'='10', '43'='23', '99'='42', '6'='18')
+funcInterpPrim$func1McTl <- recode(funcInterpPrim$func1McTl,  '12a'='12', '30a'='30')
+funcInterpPrim$func1XlMe <- recode(funcInterpPrim$func1XlMe,  '0'='0', '-1'='-1', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '14'='27', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '40'='37', '41'='38', '42'='10', '43'='23', '99'='42', '6'='18')
+funcInterpPrim$func1XlMe <- recode(funcInterpPrim$func1XlMe,  '12a'='12', '30a'='30')
+funcInterpPrim$func1Oxto <- recode(funcInterpPrim$func1Oxto,  '0'='0', '-1'='-1', '25'='12a', '12'='25', '16'='29', '22'='16',  '7'='22',  '3'='6', '4'='3', '2'='4', '1'='5', '20'='30a', '30'='20', '17'='30', '23'='17', '24'='11', '26'='13', '27'='15', '14'='27', '28'='14', '31'='31', '35'='32', '37'='33', '38'='35', '39'='36', '40'='37', '41'='38', '42'='10', '43'='23', '99'='42', '6'='18')
+funcInterpPrim$func1Oxto <- recode(funcInterpPrim$func1Oxto,  '12a'='12', '30a'='30')
+
+#mcomplexfun
+McomplexFun <- read.csv("ChangeInterpCodes/mcomplexfun.csv", sep = ",")
+McomplexFun$MfuncIntPaTz <- recode(McomplexFun$MfuncIntPaTz,  '0'='49', '-1'='0',  '2'='51',  '8'='52', '9'='42')
+McomplexFun$MfuncIntMcTl <- recode(McomplexFun$MfuncIntMcTl,  '0'='49', '-1'='0',  '2'='51',  '8'='52', '9'='42')
+McomplexFun$MfuncIntXlMt <- recode(McomplexFun$MfuncIntXlMt,  '0'='49', '-1'='0',  '2'='51',  '8'='52', '9'='42')
+
+#mcomplexgen
+McomplexGen <- read.csv("ChangeInterpCodes/mcomplexgen.csv", sep = ",")
+McomplexGen$presPaTz <- recode(McomplexGen$presPaTz,  '0'='0', '-1'='0',  '1'='60',  '2'='61')
+McomplexGen$presMcTl <- recode(McomplexGen$presMcTl,  '0'='0', '-1'='0',  '1'='60',  '2'='61')
+McomplexGen$presXlMt <- recode(McomplexGen$presXlMt,  '0'='0', '-1'='0',  '1'='60',  '2'='61')
+
+#workshopfield
+workshopField <- read.csv("ChangeInterpCodes/workshopfield.csv", sep = ",")
+workshopField$groundstoneField <- recode(workshopField$groundstoneField,  '0'='0', '-1'='0',  '1'='62',  '2'='63', '3'='64', '4'='65')
+workshopField$obsidianField <- recode(workshopField$obsidianField,  '0'='0', '-1'='0',  '1'='62',  '2'='63', '3'='64', '4'='65')
+workshopField$ceramicField <- recode(workshopField$ceramicField,  '0'='0', '-1'='0',  '1'='62',  '2'='63', '3'='64', '4'='65')
+
+#workshopkrotser
+workshopKrotser <- read.csv("ChangeInterpCodes/workshopkrotser.csv", sep = ",")
+workshopKrotser$ceramicKrotser <- recode(workshopKrotser$ceramicKrotser,  '0'='0', '-1'='0',  '1'='43')
+workshopKrotser$figurineConcBarbour <- recode(workshopKrotser$figurineConcBarbour,  '0'='0', '-1'='0',  '1'='43')
+
+#workshopSpence1
+workshopSpence1 <- read.csv("ChangeInterpCodes/workshopspence1.csv", sep = ",")
+workshopSpence1$obsidianSpencePhase1 <- recode(workshopSpence1$obsidianSpencePhase1,  '0'='0', '-1'='0',  '1'='66', '2'='67', '3'='68', '4'='69')
+
+#workshopSpence1
+workshopSpence2 <- read.csv("ChangeInterpCodes/workshopspence2.csv", sep = ",")
+workshopSpence2$obsidianSpencePhase2 <- recode(workshopSpence2$obsidianSpencePhase2,  '0'='0', '-1'='0',  '1'='66', '2'='67', '3'='68', '4'='69')
+
+#neighborhoodChar
+neighborhoodChar <- read.csv("ChangeInterpCodes/neighbor.csv", sep = ",")
+neighborhoodChar$neighborhoodChar <- recode(neighborhoodChar$neighborhoodChar,  '0'='0', '-1'='0',  '1'='70', '7'='71', '8'='72', '9'='42')
+
+
+#export the tables
+#write.csv(archInterpAltern, file = "ChangeInterpCodes/Changed/archInterpAltern.csv")
+#write.csv(archInterpPrim, file = "ChangeInterpCodes/Changed/archInterpPrim.csv")
+#write.csv(complexFunCivic, file = "ChangeInterpCodes/Changed/complexFunCivic.csv")
+#write.csv(complexFunOther, file = "ChangeInterpCodes/Changed/complexFunOther.csv")
+#write.csv(complexFunRes, file = "ChangeInterpCodes/Changed/complexFunRes.csv")
+#write.csv(complexFunTemp, file = "ChangeInterpCodes/Changed/complexFunTemp.csv")
+#write.csv(complexFunWhole, file = "ChangeInterpCodes/Changed/complexFunWhole.csv")
+#write.csv(complexGenAltern, file = "ChangeInterpCodes/Changed/complexGenAltern.csv")
+#write.csv(complexGenPrim, file = "ChangeInterpCodes/Changed/complexGenPrim.csv")
+#write.csv(funcInterpAltern, file = "ChangeInterpCodes/Changed/funcInterpAltern.csv")
+#write.csv(funcInterpPrim, file = "ChangeInterpCodes/Changed/funcInterpPrim.csv")
+#write.csv(McomplexFun, file = "ChangeInterpCodes/Changed/McomplexFun.csv")
+#write.csv(McomplexGen, file = "ChangeInterpCodes/Changed/McomplexGen.csv")
+#write.csv(workshopField, file = "ChangeInterpCodes/Changed/workshopField.csv")
+#write.csv(workshopKrotser, file = "ChangeInterpCodes/Changed/workshopKrotser.csv")
+#write.csv(workshopSpence1, file = "ChangeInterpCodes/Changed/workshopSpence1.csv")
+#write.csv(workshopSpence2, file = "ChangeInterpCodes/Changed/workshopSpence2.csv")
+#write.csv(neighborhoodChar, file = "ChangeInterpCodes/Changed/neighborhoodChar.csv")
+```
+
+There are two additional interpretation variables that necessitate a little more discussion because they are not technically coded data: complexNum and macroComplexNum. These variables are numerical designations that are supposed to indicate which complex or macrocomplex the collection unit is assigned to. Making another table for these two variables seemed excessive so I've placed them in the interpretations table and started the count at 100. Values 100 through 112 are the 13 identified complexes while value 113 is the one identified macrocomplex.
+
+```{r}
+otherInterp <- read.csv("Data/otherinterp.csv", sep = ",")
+otherInterp$complexNum <- recode(otherInterp$complexNum,  '0'='0', '-1'='0',  '1'='100', '2'='101', '3'='102', '4'='103', '5'='104', '6'='105', '7'='106', '8'='107', '9'='108', '10'='109', '11'='110', '12'='111', '13'='112')
+otherInterp$macroComplexNum <- recode(otherInterp$macroComplexNum,  '0'='0', '-1'='0',  '1'='113')
+
+
+#export the tables
+#write.csv(otherInterp, file = "ChangeInterpCodes/Changed/otherInterp.csv")
+```
+
+These variables were also stored in a cross-tab format in DF9 and first had to be removed from this format.
+
+```{r Uncrosstab Code Table 2}
+#uncrosstab the code table
+#import data
+interpTable <- read.csv("Data/interptable.csv", sep = ",")
+
+#slightly different uncrosstab function
+UNcrtb2 <- function(data) {
+# if the values are identical - remove the ID column and the column made above to check
+  data <- data[ , -which(names(data) %in% c("ID","RAuto"))]
+
+# UN-CROSSTAB THE DATA
+    #makes every box in the dataframe a line in a new dataframe
+  CTLong <- data.frame(rows = rownames(data), stack(data))
+    #orders the data so each ID number is together
+  CTLong <- CTLong[order(CTLong$rows), ]
+    #convert rows from character to numeric
+  CTLong$rows <- as.numeric(CTLong$rows)
+  CTLong$values <- as.numeric(CTLong$values)
+    #remove rows with -1 or 0 as the count
+  CTLong <- CTLong[CTLong$values != 0, ]
+    #if value is -1 add Y to new column titled missing
+  index <- c('-1')
+  values <- c('M')
+  CTLong$Where <-values[match(CTLong$values, index)]
+    #change count value of missing to 0
+  CTLong$values[CTLong$values == -1] <- 0
+    #change the column names
+  names(CTLong)[1] <- "ID"
+  names(CTLong)[2] <- "Code"
+  names(CTLong)[3] <- "Variable"
+  
+  return(CTLong)
+}
+
+#check that ID value is equivalent to row number
+test <- interpTable
+test$RAuto <- rownames(test)
+conflicto <- test$ID %>% 
+  bind_cols(test$RAuto) %>% 
+  mutate(Conflicto = if_else(test$ID == test$RAuto, "YES", "NO"))
+
+#run uncrosstab function
+interpTable.nottab <- UNcrtb2(interpTable)
+```
+
+# Further Analysis and Possible Future Changes
+In the process of creating the new version of this database, some problems and questions emerged. They are documented in the following sections.
+
+## Total Counts Problem
+```{r}
+tots <- read.csv("Data/totaltable.csv")
+art <- read.csv("Data/CrossTabArtifactTable.csv")
+art[art == "-1"] <- 0
+tots[tots == "-1"] <- 0
+```
+
+As discussed above, total counts were kept in this version of the database but relegated to their own table so that they wouldn't affect the calculations made by the software. This is because ASU Teo Staff suspects potential, uncontrollable double counting because this was present in the REANS procedures/files. Each total count has a subset of other variables that should further subdivide the count. For example, ollas have one variable for the total olla sherd count and then 6 variables of olla sherd count from different time periods. All of these subdivisions of the material type should sum to a number equal or less than the total value. This is not always the case, as you will see below. Here I perform calculations that count how many collection units for each type of material culture there is a discrepancy between the total and subdivision counts where the subdivision count is higher than the total count. I also show a distribution graph of how much these subdivision counts differ from the total value. Thi is done for every total count in the database. For these calculations all -1 values are turned into 0.
+
+#### totAll
+totAll is supposed to include 22 variables: totPrec, totCuan, totTezo, totPatl, totTzac, totMicc, totTlam, totXola, totMete, totOxto, totXome, totMaza, totAzte, burner3P, adornos, coverHandled, toTot, foreignTot, minatures, copas, matteWare, ceramicDisk. 2291 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 22 variables and the total count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totAll <- as.data.frame(tots$totAll)
+sumtotAll <- as.data.frame(tots[, c(9:14, 16, 21) ])
+sumtotAll <- cbind(sumtotAll, art[ , c(64:70, 116:119, 121, 123)])
+sumtotAll <- as.data.frame(rowSums(sumtotAll))
+
+#calculating how many values are as expected and as not expected
+difference.totAll <- cbind(totAll, sumtotAll)
+difference.totAll$diff <- difference.totAll$`tots$totAll` - difference.totAll$`rowSums(sumtotAll)`
+difference.totAll$simDiff <- difference.totAll$diff
+difference.totAll$simDiff[difference.totAll$simDiff > 0] <- 1
+difference.totAll$simDiff[difference.totAll$simDiff < 0] <- '-1'
+table(difference.totAll$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totAll$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totAll")+
+  xlim(NA, 50)
+```
+
+The metadata is unclear whether or not 5 other variables (shrdStampled, shrdPlanoR, shrdStucco, shrdIncised, and censerTot) are included in totAll. Current consensus in the lab is that these additional variables are probably double counted in some of the other categories. Nevertheless, for completeness sake, I redid the calculations with these variables included below. 2911 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 27 variables and the total count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+```{r}
+#preparing the correct selection of the data for comparison
+totAll2 <- as.data.frame(tots$totAll)
+sumtotAll2 <- as.data.frame(tots[, c(9:16, 21) ])
+sumtotAll2 <- cbind(sumtotAll2, art[ , c(64:70, 104:107, 116:119, 121, 123)])
+sumtotAll2 <- as.data.frame(rowSums(sumtotAll2))
+
+#calculating how many values are as expected and as not expected
+difference.totAll2 <- cbind(totAll2, sumtotAll2)
+difference.totAll2$diff <- difference.totAll2[, 1] - difference.totAll2[, 2]
+difference.totAll2$simDiff <- difference.totAll2$diff
+difference.totAll2$simDiff[difference.totAll2$simDiff > 0] <- 1
+difference.totAll2$simDiff[difference.totAll2$simDiff < 0] <- '-1'
+table(difference.totAll2$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totAll2$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totAll with shrd variables")+
+  xlim(NA, 50)
+```
+
+#### totPatl
+totPatl is supposed to include 3 variables: ollaPatl, nubbinPatl, and comalPatl. 11 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 3 variables and the total Patl count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totPatl <- as.data.frame(tots$totPatl)
+sumtotPatl <- as.data.frame(art[, c(83, 89, 97) ])
+sumtotPatl <- as.data.frame(rowSums(sumtotPatl))
+
+#calculating how many values are as expected and as not expected
+difference.totPatl <- cbind(totPatl, sumtotPatl)
+difference.totPatl$diff <- difference.totPatl[, 1] - difference.totPatl[, 2]
+difference.totPatl$simDiff <- difference.totPatl$diff
+difference.totPatl$simDiff[difference.totPatl$simDiff > 0] <- 1
+difference.totPatl$simDiff[difference.totPatl$simDiff < 0] <- '-1'
+table(difference.totPatl$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totPatl$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totPatl")+
+  xlim(NA, 50)
+```
+
+#### totTzac
+totTzac is supposed to include 1 variable: comalTzac. 0 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 1 variable and the total Tzac count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totTzac <- as.data.frame(tots$totTzac)
+sumtotTzac <- as.data.frame(art[, c(90) ])
+sumtotTzac <- as.data.frame(rowSums(sumtotTzac))
+
+#calculating how many values are as expected and as not expected
+difference.totTzac <- cbind(totTzac, sumtotTzac)
+difference.totTzac$diff <- difference.totTzac[, 1] - difference.totTzac[, 2]
+difference.totTzac$simDiff <- difference.totTzac$diff
+difference.totTzac$simDiff[difference.totTzac$simDiff > 0] <- 1
+difference.totTzac$simDiff[difference.totTzac$simDiff < 0] <- '-1'
+table(difference.totTzac$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totTzac$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totTzac")+
+  xlim(NA, 50)
+```
+
+#### totMicc
+totMicc is supposed to include 2 variables: ollaMicc and comalMicc. 14 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 2 variables and the total Micc count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totMicc <- as.data.frame(tots$totMicc)
+sumtotMicc <- as.data.frame(art[, c(85, 91) ])
+sumtotMicc <- as.data.frame(rowSums(sumtotMicc))
+
+#calculating how many values are as expected and as not expected
+difference.totMicc <- cbind(totMicc, sumtotMicc)
+difference.totMicc$diff <- difference.totMicc[, 1] - difference.totMicc[, 2]
+difference.totMicc$simDiff <- difference.totMicc$diff
+difference.totMicc$simDiff[difference.totMicc$simDiff > 0] <- 1
+difference.totMicc$simDiff[difference.totMicc$simDiff < 0] <- '-1'
+table(difference.totMicc$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totMicc$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totMicc")+
+  xlim(NA, 50)
+```
+
+#### totTlam
+totTlam is supposed to include 3 variables: ollaTlam, comalTlam, and smoTlam. 13 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 3 variables and the total Tlam count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totTlam <- as.data.frame(tots$totTlam)
+sumtotTlam <- as.data.frame(art[, c(86, 92, 80) ])
+sumtotTlam <- as.data.frame(rowSums(sumtotTlam))
+
+#calculating how many values are as expected and as not expected
+difference.totTlam <- cbind(totTlam, sumtotTlam)
+difference.totTlam$diff <- difference.totTlam[, 1] - difference.totTlam[, 2]
+difference.totTlam$simDiff <- difference.totTlam$diff
+difference.totTlam$simDiff[difference.totTlam$simDiff > 0] <- 1
+difference.totTlam$simDiff[difference.totTlam$simDiff < 0] <- '-1'
+table(difference.totTlam$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totTlam$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totTlam")+
+  xlim(NA, 50)
+```
+
+#### totXola
+totXola is supposed to include 4 variables: ollaXola, comalXola, nubbinXola, and smoXola. 43 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 4 variables and the total Xola count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totXola <- as.data.frame(tots$totXola)
+sumtotXola <- as.data.frame(art[, c(81, 87, 93, 102) ])
+sumtotXola <- as.data.frame(rowSums(sumtotXola))
+
+#calculating how many values are as expected and as not expected
+difference.totXola <- cbind(totXola, sumtotXola)
+difference.totXola$diff <- difference.totXola[, 1] - difference.totXola[, 2]
+difference.totXola$simDiff <- difference.totXola$diff
+difference.totXola$simDiff[difference.totXola$simDiff > 0] <- 1
+difference.totXola$simDiff[difference.totXola$simDiff < 0] <- '-1'
+table(difference.totXola$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totXola$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totXola")+
+  xlim(NA, 50)
+```
+
+#### totMete
+totMete is supposed to include 4 variables: ollaMete, comalMete, nubbinMete, and smoMete. 13 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 4 variables and the total Mete count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+totMete <- as.data.frame(tots$totMete)
+sumtotMete <- as.data.frame(art[, c(88, 94, 103, 82) ])
+sumtotMete <- as.data.frame(rowSums(sumtotMete))
+
+#calculating how many values are as expected and as not expected
+difference.totMete <- cbind(totMete, sumtotMete)
+difference.totMete$diff <- difference.totMete[, 1] - difference.totMete[, 2]
+difference.totMete$simDiff <- difference.totMete$diff
+difference.totMete$simDiff[difference.totMete$simDiff > 0] <- 1
+difference.totMete$simDiff[difference.totMete$simDiff < 0] <- '-1'
+table(difference.totMete$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.totMete$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("totMete")+
+  xlim(NA, 50)
+```
+
+#### shellTot
+shellTot is supposed to include 1 variable: shellWorked. 5 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 1 variable and the total shell count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+shellTot <- as.data.frame(tots$shellTot)
+sumshellTot <- as.data.frame(art[, c(40) ])
+sumshellTot <- as.data.frame(rowSums(sumshellTot))
+
+#calculating how many values are as expected and as not expected
+difference.shellTot <- cbind(shellTot, sumshellTot)
+difference.shellTot$diff <- difference.shellTot[, 1] - difference.shellTot[, 2]
+difference.shellTot$simDiff <- difference.shellTot$diff
+difference.shellTot$simDiff[difference.shellTot$simDiff > 0] <- 1
+difference.shellTot$simDiff[difference.shellTot$simDiff < 0] <- '-1'
+table(difference.shellTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.shellTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("shellTot")+
+  xlim(NA, 50)
+```
+
+#### figTot
+figTot is supposed to include 11 variable: figHead, figPPat, figPatl, figTzac, figMicc, figTlam, figXola, figMete, figTolt, figAzte, and figPupp. 359 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 11 variables and the total figurine count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+figTot <- as.data.frame(tots$figTot)
+sumfigTot <- as.data.frame(art[, c(42:52) ])
+sumfigTot <- as.data.frame(rowSums(sumfigTot))
+
+#calculating how many values are as expected and as not expected
+difference.figTot <- cbind(figTot, sumfigTot)
+difference.figTot$diff <- difference.figTot[, 1] - difference.figTot[, 2]
+difference.figTot$simDiff <- difference.figTot$diff
+difference.figTot$simDiff[difference.figTot$simDiff > 0] <- 1
+difference.figTot$simDiff[difference.figTot$simDiff < 0] <- '-1'
+table(difference.figTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.figTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("figTot")+
+  xlim(NA, 50)
+```
+
+#### candTot
+candTot is supposed to include 6 variable: candCoat, candAtoy, candEXol, candLXol, candMete, and candComm. 468 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 6 variables and the total candelero count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+candTot <- as.data.frame(tots$candTot)
+sumcandTot <- as.data.frame(art[, c(58:63) ])
+sumcandTot <- as.data.frame(rowSums(sumcandTot))
+
+#calculating how many values are as expected and as not expected
+difference.candTot <- cbind(candTot, sumcandTot)
+difference.candTot$diff <- difference.candTot[, 1] - difference.candTot[, 2]
+difference.candTot$simDiff <- difference.candTot$diff
+difference.candTot$simDiff[difference.candTot$simDiff > 0] <- 1
+difference.candTot$simDiff[difference.candTot$simDiff < 0] <- '-1'
+table(difference.candTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.candTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("candTot")+
+  xlim(NA, 50)
+```
+
+#### obsidianTot
+obsidianTot is supposed to include 10 variables: obsidianBlades, obsidianWaste, obsidianScraper, obsidianPoints, obsidianCores, obsidianKnives, obsidianEccentrics, obsidianMaguey, obsidianUtFlake, and obsidianNodules. 341 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 10 variables and the total obsidian count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+obsidianTot <- as.data.frame(tots$obsidianTot)
+sumobsidianTot <- as.data.frame(art[, c(24:32) ])
+sumobsidianTot <- as.data.frame(rowSums(sumobsidianTot))
+
+#calculating how many values are as expected and as not expected
+difference.obsidianTot <- cbind(obsidianTot, sumobsidianTot)
+difference.obsidianTot$diff <- difference.obsidianTot[, 1] - difference.obsidianTot[, 2]
+difference.obsidianTot$simDiff <- difference.obsidianTot$diff
+difference.obsidianTot$simDiff[difference.obsidianTot$simDiff > 0] <- 1
+difference.obsidianTot$simDiff[difference.obsidianTot$simDiff < 0] <- '-1'
+table(difference.obsidianTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.obsidianTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("obsidianTot")+
+  xlim(NA, 50)
+```
+
+#### basaltTot
+basaltTot is supposed to include 1 variable: basaltTools. 16 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 1 variable and the total basalt count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+basaltTot <- as.data.frame(tots$basaltTot)
+sumbasaltTot <- as.data.frame(art[, c(33) ])
+sumbasaltTot <- as.data.frame(rowSums(sumbasaltTot))
+
+#calculating how many values are as expected and as not expected
+difference.basaltTot <- cbind(basaltTot, sumbasaltTot)
+difference.basaltTot$diff <- difference.basaltTot[, 1] - difference.basaltTot[, 2]
+difference.basaltTot$simDiff <- difference.basaltTot$diff
+difference.basaltTot$simDiff[difference.basaltTot$simDiff > 0] <- 1
+difference.basaltTot$simDiff[difference.basaltTot$simDiff < 0] <- '-1'
+table(difference.basaltTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.basaltTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("basaltTot")+
+  xlim(NA, 50)
+```
+
+#### slateTot
+slateTot is supposed to include 1 variable: slatePainted. 3 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 1 variable and the total slate count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+slateTot <- as.data.frame(tots$slateTot)
+sumslateTot <- as.data.frame(art[, c(36) ])
+sumslateTot <- as.data.frame(rowSums(sumslateTot))
+
+#calculating how many values are as expected and as not expected
+difference.slateTot <- cbind(slateTot, sumslateTot)
+difference.slateTot$diff <- difference.slateTot[, 1] - difference.slateTot[, 2]
+difference.slateTot$simDiff <- difference.slateTot$diff
+difference.slateTot$simDiff[difference.slateTot$simDiff > 0] <- 1
+difference.slateTot$simDiff[difference.slateTot$simDiff < 0] <- '-1'
+table(difference.slateTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.slateTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("slateTot")+
+  xlim(NA, 50)
+```
+
+#### censerTot
+censerTot is supposed to include 10 variables: censerPPat, censerPatl, censerTzac, censerMicc, censerTlam, censerXola, censerMete, censerOxto, censerXome, censerMaza, and censerAzte. 399 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 10 variables and the total censer count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+censerTot <- as.data.frame(tots$censerTot)
+sumcenserTot <- as.data.frame(art[, c(71:78) ])
+sumcenserTot <- as.data.frame(rowSums(sumcenserTot))
+
+#calculating how many values are as expected and as not expected
+difference.censerTot <- cbind(censerTot, sumcenserTot)
+difference.censerTot$diff <- difference.censerTot[, 1] - difference.censerTot[, 2]
+difference.censerTot$simDiff <- difference.censerTot$diff
+difference.censerTot$simDiff[difference.censerTot$simDiff > 0] <- 1
+difference.censerTot$simDiff[difference.censerTot$simDiff < 0] <- '-1'
+table(difference.censerTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.censerTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("censerTot")+
+  xlim(NA, 50)
+```
+
+#### toTot
+toTot is supposed to include 1 variable: toCoarse. 3 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 1 variable and the total thin orange count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+toTot <- as.data.frame(tots$toTot)
+sumtoTot <- as.data.frame(art[, c(79) ])
+sumtoTot <- as.data.frame(rowSums(sumtoTot))
+
+#calculating how many values are as expected and as not expected
+difference.toTot <- cbind(toTot, sumtoTot)
+difference.toTot$diff <- difference.toTot[, 1] - difference.toTot[, 2]
+difference.toTot$simDiff <- difference.toTot$diff
+difference.toTot$simDiff[difference.toTot$simDiff > 0] <- 1
+difference.toTot$simDiff[difference.toTot$simDiff < 0] <- '-1'
+table(difference.toTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.toTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("toTot")+
+  xlim(NA, 50)
+```
+
+#### smoTot
+smoTot is supposed to include 3 variables: smoTlam, smoXola, and smoMete. 21 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 3 variables and the total smo count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+smoTot <- as.data.frame(tots$smoTot)
+sumsmoTot <- as.data.frame(art[, c(80:82) ])
+sumsmoTot <- as.data.frame(rowSums(sumsmoTot))
+
+#calculating how many values are as expected and as not expected
+difference.smoTot <- cbind(smoTot, sumsmoTot)
+difference.smoTot$diff <- difference.smoTot[, 1] - difference.smoTot[, 2]
+difference.smoTot$simDiff <- difference.smoTot$diff
+difference.smoTot$simDiff[difference.smoTot$simDiff > 0] <- 1
+difference.smoTot$simDiff[difference.smoTot$simDiff < 0] <- '-1'
+table(difference.smoTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.smoTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("smoTot")+
+  xlim(NA, 50)
+```
+
+#### ollaTot
+ollaTot is supposed to include 6 variables: ollaPatl, ollaWedge, ollaMicc, ollaTlam, ollaXola, and ollaMete. 340 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 6 variables and the total olla count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+ollaTot <- as.data.frame(tots$ollaTot)
+sumollaTot <- as.data.frame(art[, c(83:88) ])
+sumollaTot <- as.data.frame(rowSums(sumollaTot))
+
+#calculating how many values are as expected and as not expected
+difference.ollaTot <- cbind(ollaTot, sumollaTot)
+difference.ollaTot$diff <- difference.ollaTot[, 1] - difference.ollaTot[, 2]
+difference.ollaTot$simDiff <- difference.ollaTot$diff
+difference.ollaTot$simDiff[difference.ollaTot$simDiff > 0] <- 1
+difference.ollaTot$simDiff[difference.ollaTot$simDiff < 0] <- '-1'
+table(difference.ollaTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.ollaTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("ollaTot")+
+  xlim(NA, 50)
+```
+
+#### comalTot
+comalTot is supposed to include 8 variables: comalPatl, comalTzac, comalMicc, comalTlam, comalXola, comalMete, comalOxto, and comalPOxt. 15 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 8 variables and the total comal count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+comalTot <- as.data.frame(tots$comalTot)
+sumcomalTot <- as.data.frame(art[, c(89:96) ])
+sumcomalTot <- as.data.frame(rowSums(sumcomalTot))
+
+#calculating how many values are as expected and as not expected
+difference.comalTot <- cbind(comalTot, sumcomalTot)
+difference.comalTot$diff <- difference.comalTot[, 1] - difference.comalTot[, 2]
+difference.comalTot$simDiff <- difference.comalTot$diff
+difference.comalTot$simDiff[difference.comalTot$simDiff > 0] <- 1
+difference.comalTot$simDiff[difference.comalTot$simDiff < 0] <- '-1'
+table(difference.comalTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.comalTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("comalTot")+
+  xlim(NA, 50)
+```
+
+#### nubbinTot
+nubbinTot is supposed to include 7 variables: nubbinPatl, nubbinApet, nubbinInset, nubbinFlush, nubbinAtoy, nubbinXola, and nubbinMete. 26 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 7 variables and the total nubbin count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+nubbinTot <- as.data.frame(tots$nubbinTot)
+sumnubbinTot <- as.data.frame(art[, c(97:103) ])
+sumnubbinTot <- as.data.frame(rowSums(sumnubbinTot))
+
+#calculating how many values are as expected and as not expected
+difference.nubbinTot <- cbind(nubbinTot, sumnubbinTot)
+difference.nubbinTot$diff <- difference.nubbinTot[, 1] - difference.nubbinTot[, 2]
+difference.nubbinTot$simDiff <- difference.nubbinTot$diff
+difference.nubbinTot$simDiff[difference.nubbinTot$simDiff > 0] <- 1
+difference.nubbinTot$simDiff[difference.nubbinTot$simDiff < 0] <- '-1'
+table(difference.nubbinTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.nubbinTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("nubbinTot")+
+  xlim(NA, 50)
+```
+
+#### foreignTot
+foreignTot is supposed to include 8 variables: mayaLow, mayaHigh, huastec, tajin, gulfCoast, monteAlban, oaxaca, and foreignOther. 11 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 8 variables and the total foreign ware count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+foreignTot <- as.data.frame(tots$foreignTot)
+sumforeignTot <- as.data.frame(art[, c(108:115) ])
+sumforeignTot <- as.data.frame(rowSums(sumforeignTot))
+
+#calculating how many values are as expected and as not expected
+difference.foreignTot <- cbind(foreignTot, sumforeignTot)
+difference.foreignTot$diff <- difference.foreignTot[, 1] - difference.foreignTot[, 2]
+difference.foreignTot$simDiff <- difference.foreignTot$diff
+difference.foreignTot$simDiff[difference.foreignTot$simDiff > 0] <- 1
+difference.foreignTot$simDiff[difference.foreignTot$simDiff < 0] <- '-1'
+table(difference.foreignTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.foreignTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("foreignTot")+
+  xlim(NA, 50)
+```
+
+#### granTot
+granTot is supposed to include 5 variables: granPMic, granMicc, granTlam, granXola, and granMete. 13 cases have more artifacts listed in these individual groups than in the total variable. The chart below shows the distribution of the difference between the 5 variables and the total granular ware count for all collection units. The x-axis is cut off at positive 50 because the positive values are not a problem and keep one from seeing the distribution of negative numbers clearly.
+
+```{r}
+#preparing the correct selection of the data for comparison
+granTot <- as.data.frame(tots$granTot)
+sumgranTot <- as.data.frame(art[, c(120) ])
+sumgranTot <- as.data.frame(rowSums(sumgranTot))
+
+#calculating how many values are as expected and as not expected
+difference.granTot <- cbind(granTot, sumgranTot)
+difference.granTot$diff <- difference.granTot[, 1] - difference.granTot[, 2]
+difference.granTot$simDiff <- difference.granTot$diff
+difference.granTot$simDiff[difference.granTot$simDiff > 0] <- 1
+difference.granTot$simDiff[difference.granTot$simDiff < 0] <- '-1'
+table(difference.granTot$simDiff)
+
+#plot distribution of how off the collection units are from the total
+test <- as.data.frame(difference.granTot$diff)
+names(test)[1] <- "diff"
+df <- test %>%
+  group_by(diff) %>%
+  summarise(counts = n())
+ggplot(df, aes(x = diff, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  theme_pubclean()+
+  ggtitle("granTot")+
+  xlim(NA, 50)
+```
+
+## Potential Future Changes
+
+1) Should we combine ollaPatl and ollaWedge into a new variable called earlyOlla? This was suggested in the DF9 metadata by Cowgill and Robertson. Angela suggests that the default was to code wedge rim ollas as Mic and at some point either the process was changed or an analyst made a different code. This could be tested by looking at how these values vary alongside the analyst and date analyzed variables. Further, the olla totals changed dramatically during REANS so these values would likely not be used by many researchers.
+
+2) There is no information about the variable unworkedBone in the 2012 DF9 metadata document by Cowgill and Robertson. Angela suggests the values in this column came from Starbuck 1978 catalog of worked bone, this should be checked.
+
+3) Cowgill and Robertson 2012 states that the values for nubbinPatl "may be correct or may be in error." We should have someone in San Juan find one and take a photo and/or see if there are any noted in REANS. If none can be found, we can assume these values are meaningless.
+
+4) Almena variable needs to be upated to reflect the new values gathered by Mike et al in the almena database.
+
+5) Height variable. In the 2012 metadata document Cowgill and Robertson states that "Height ranges reported include “flat” (1,997), 0.1-0.95 m (1,102), 1.0-1.95m (770), 2.0-2.95 m (250), 3.0-9.85 m (289), and 10 over 9.5 m." First of all these counts are not representative of the values in DF9 and now DF10. There were 1999 0 values not 1997. Additionally, the values in DF9 and DF10 are whole numbers (1, 2, 3, etc) up to 99 not decimals like the 2012 metadata suggests. If this was just a distaste/inability to use decimals in earlier database technology, it can easily be changed but should get some confirmation that this is the case.
+
+6) The variable areaStructure only contains values up to 9,999 because that's all that could be recorded in earlier versions of the database. This variable should be updated with new areas that from from the digitized structure shapefile.
+
+7) Similarly the variable areaSite can be updated to more precise measures using the collection unit shapefile.
+
+8) There are 4 values in the northing and easting variables that are -1. What are they? Is their any pattern to their location in the data. At first I thought they had to do with the 4 dummy variables that may or may not be present in the database but they do not match up, i.e. one ID does not have -1 in both northing and easting, they have -1 in one and other value in the other. These missing variables can also probably be filled using GIS.
+
+9) Identify and remove the 4 dummy variables.
+
+10) Variable 18 stoneCut has no values in the versions of DF9 I have access to. However, Cowgill and Robertson 2012 state that this variable was present to some extent in 2,911 DF9 cases. Where are these cases? Is there an older version of the database with this information still intact?
+
+11) Need to incorporate the changes to the interpretation hierarchy.
+
+12) For the majority of the complex data the variables from the periods McTl and XlMt are identical meaning that these are duplicate values. Should these be merged? It would no longer mirror other interpretations if this is done.
+
+13) The missing data in both its original state (-1) and new missing column are useful to understand biases in the TMP's data collection. Some work should be done attempting to identify how missing values covary. If the covariance suggests that specific collection units were never counted before the renanalysis, this hole in the database could be addressed by returning to the collections in San Juan as well as returning to REANS. Additionally, I think analysis of covariance could allow us to confidently assign 0 values to some variables. For example, if a collection unit has 0 for variable 91 freeStandWall but -1 for variable 41 wallFacing, we can assume that the -1 is actually a 0 because there was no standing wall to analyze for its facing. Some suggestions for analyses can be found in Robertson's document DF9 Missing Data Plots.pdf.

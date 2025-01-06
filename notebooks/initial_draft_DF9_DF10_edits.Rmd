@@ -1,0 +1,1012 @@
+---
+title: "DF10 Edits"
+author: "Rudolf Cesaretti"
+date: "2024-10-24"
+output: html_document
+---
+
+
+```{r}
+rm(list = ls())
+
+```
+
+
+
+
+# Load Packages
+
+```{r}
+# Load the required package
+library(tidyverse)
+library(readxl)
+library(stringi)
+
+```
+
+
+# Set Working Directory
+
+```{r}
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/"
+```
+
+
+
+# Creation of DF10 wide-version 
+
+
+
+### Step 0: Import all CSV files from the specified directory
+
+```{r}
+
+file_list <- list.files(
+  path = paste0(DIR, "DF10_Sherfield_csv"),
+  pattern = "\\.csv$", full.names = TRUE
+)
+file_names <- tools::file_path_sans_ext(basename(file_list))
+data_list <- map(file_list, ~ read_csv(.x, locale = locale(encoding = "Latin1")))
+names(data_list) <- file_names
+list2env(data_list, envir = .GlobalEnv)
+
+```
+
+
+
+
+
+### Step 1: Format totalsTable
+
+```{r}
+
+totals_table <- totalsTable %>% 
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -9999, Where),
+         New = ifelse(is.na(New), Count, New)) %>%  # Replace 0 with NA where "Where" == "M"
+  ungroup() %>% 
+  select(-Where, -Count) %>%                              # Remove "Where" column
+  pivot_wider(id_cols = ID, names_from = Variable, values_from = New, values_fill = 0) %>% 
+  mutate(ID = as.numeric(ID)) %>% 
+  arrange(ID) %>% 
+  mutate(across(everything(), ~ na_if(., -9999)))
+  # Pivot wider by ID
+```
+
+
+
+
+
+
+### Step 2: Format interpTable
+
+```{r}
+
+interp_table <- interpTable %>%
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -1, Where),
+         New = ifelse(is.na(New), Code, New)) %>%  # Replace 0 with -1 where "Where" == "M"
+  ungroup() %>% 
+  left_join(interpCodes, by = join_by("New" == "code")) %>%      # Join with interpCodes
+  select(-Code, -Where) %>%# Remove unneeded columnws
+  pivot_wider(id_cols = ID, names_from = Variable, values_from = description)  %>% # Pivot wider by ID
+  mutate(ID = as.numeric(ID)) %>% arrange(ID)
+
+```
+
+
+
+
+
+### Step 3: Format codeTable
+
+```{r}
+
+code_table <- codeTable %>%
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -1, Where),
+         New = ifelse(is.na(New), Code, New)) %>%  # Replace 0 with -1 where "Where" == "M"
+  ungroup() %>% 
+  select(-Code, -Where) %>%# Remove unneeded columnws
+  left_join(codeCodes, by = join_by("New" == "Code")) %>%      # Join with interpCodes
+  pivot_wider(id_cols = ID, names_from = Variable, 
+              values_from = Description, values_fill = "absent")  %>% # Pivot wider by ID
+  mutate(ID = as.numeric(ID)) %>% arrange(ID)
+
+```
+
+
+
+
+
+### Step 4: Format artifactTable
+
+```{r}
+
+artifact_table <- artifactTable %>%
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -9999, Where),
+         New = ifelse(is.na(New), Count, New)) %>%  # Replace 0 with NA where "Where" == "M"
+  ungroup() %>%
+  select(-Where) %>%
+  left_join(artifactCodes, by = c("ArtCode1" = "Code")) %>%
+  rename(ArtCode4 = Meaning) %>%
+  left_join(artifactCodes, by = c("ArtCode2" = "Code")) %>%
+  rename(ArtCode5 = Meaning) %>%
+  left_join(artifactCodes, by = c("ArtCode3" = "Code")) %>%
+  rename(ArtCode6 = Meaning) %>%
+  mutate(ArtCode6 = ifelse(ArtCode2 == 12 & ArtCode3 == 46, "figAzte", ArtCode6)) %>% 
+  select(ID, ArtCode6, New) %>% 
+  pivot_wider(names_from = ArtCode6, values_from = New, values_fill = 0) %>% # Pivot wider by ID
+  arrange(ID) %>% 
+  mutate(across(everything(), ~ na_if(., -9999))) # CHANGE THIS TO -1 TO CONFORM TO DF9???????
+
+
+```
+
+##### MAKE NA INTO -1??? OR LEAVE NA AND CHANGE DF9 TO NA???
+
+
+### Step 5: Join formatted tables to provTable
+
+```{r}
+
+DF10_wide <- provTable %>%
+  left_join(interp_table, by = "ID") %>%
+  left_join(code_table, by = "ID") %>%
+  left_join(artifact_table, by = "ID") %>%
+  left_join(totals_table, by = "ID")
+
+```
+
+
+
+### Step 6 : Reorder Variables to match DF9
+
+```{r}
+
+DF10_wide <- DF10_wide %>%
+  rename(SSN = ID, 
+         ceramicAnalyst1 = workLab1,
+         ceramicAnalyst2 = workLab2,
+         ceramicAnalyst3 = workLab3,
+         fieldWorker1 = workFie1,
+         fieldWorker2 = workFie2,
+         fieldWorker3 = workFie3,
+         fieldWorker4 = workFie4,
+         fieldWorker5 = workFie5,
+         totCuan = Cuan,
+         totMaza = Maza,
+         totAzte = Azte,
+         totPreCl = PreCl,
+         totTezo = Tezo,
+         totCoyo = Coyotlatelco)
+
+
+
+
+"granTot"
+
+DF10_VARS <- data.frame(Num = 1:length(names(DF10_wide)), Variable = names(DF10_wide))
+
+DF9vars <- read.csv(paste0(DIR, "DF9vars.csv"), stringsAsFactors = FALSE) %>% 
+  mutate(Variable = ifelse(Variable == "obsidianPoints", "obsidianBifaces", Variable),
+         Variable = ifelse(Variable == "chert", "Chert", Variable),
+         Variable = ifelse(Variable == "totPrec", "totPreCl", Variable),
+         Variable = ifelse(Order == 279, "granTot", Variable),
+         Variable = ifelse(Order == 280, "granular", Variable),
+         Variable = ifelse(Order == 166, "fineGreenstone", Variable),
+         Variable = ifelse(Order == 167, "workedBone", Variable),
+         Variable = ifelse(Order == 168, "unworkedBone", Variable),
+
+         Variable = ifelse(Variable == "drains", "drainSitu", Variable),
+         Variable = ifelse(Order == 188, "ceramicAnalyst1", Variable),
+         Variable = ifelse(Order == 189, "ceramicAnalyst2", Variable),
+         Variable = ifelse(Order == 190, "ceramicAnalyst3", Variable),
+         Variable = ifelse(Order == 162, "Quartz", Variable),
+         Variable = ifelse(Order == 145, "drainSurface", Variable),
+
+         Variable = ifelse(Order == 227, "censerLate", Variable),
+         Variable = ifelse(Order == 215, "totCoyo", Variable),
+         Variable = ifelse(Order == 88, "MfuncIntPaTz", Variable),
+         Variable = ifelse(Order == 89, "MfuncIntMcTl", Variable),
+         Variable = ifelse(Order == 90, "MfuncIntXlMt", Variable),
+         Variable = ifelse(Order == 34, "wallFixSitu", Variable),
+         Variable = ifelse(Order == 134, "wallFixSurf", Variable),
+         Variable = ifelse(Order == 94, "jagueyMod", Variable))
+         
+
+
+# Get the columns present in DF10_wide.csv that are also in DF9vars.csv
+common_columns <- intersect(DF9vars$Variable, colnames(DF10_wide))
+
+# Get the columns in DF10_wide.csv that are not in DF9vars.csv
+additional_columns <- setdiff(colnames(DF10_wide), DF9vars$Variable)
+
+# Arrange the columns: first the common columns in desired order, then the additional columns
+DF10_rearranged <- DF10_wide %>% select(all_of(common_columns), all_of(additional_columns))
+
+DF10_rearranged$site <- gsub(" ", "", DF10_rearranged$site)
+
+DF10_rearranged <- DF10_rearranged %>% 
+  mutate(northing = northing*10,
+         easting = easting*10)
+
+```
+
+```{r}
+DF10_archToSSN <- archToSSN
+```
+
+
+
+### Step 7: Export the wide-format table as "DF10_wide.csv"
+
+```{r}
+write.csv(DF10_rearranged, paste0(DIR, "DF10_Sherfield_csv/DF10_wide_rearranged.csv"), fileEncoding = "Latin1")
+
+write.csv(DF10_archToSSN, paste0(DIR, "DF10_Sherfield_csv/DF10_archToSSN.csv"), fileEncoding = "Latin1")
+
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+library(sf)
+millon_crs <- "+proj=affine +s11=1 +s12=0 +s21=0 +s22=1 +xoff=0 +yoff=0"
+
+CollectionUnitsPoly_Corrected_MillonSpace_v2 <- read_sf("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/CollectionUnitsPoly_Corrected_MillonSpace_v2.gpkg")
+
+CUPoly_MillonSpace_v2_Data <- CollectionUnitsPoly_Corrected_MillonSpace_v2 %>% 
+  rename(SSN = ID) %>% 
+  dplyr::select(SSN, geom) %>% 
+  left_join(DF10_rearranged, by = "SSN")
+
+st_write(CUPoly_MillonSpace_v2_Data, paste0(DIR, "CUPoly_MillonSpace_v2_Data_PRELIM.gpkg"), driver = "GPKG", overwrite=T, append=FALSE)
+```
+
+
+
+
+
+```{r}
+
+
+TMP_LocationSSN_Pts <- read_sf("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/BackToMillon/TMP_LocationSSN_Pts_BackToMillon.gpkg")
+st_crs(TMP_LocationSSN_Pts) <- millon_crs
+TMP_LocationSSN_Pts <- TMP_LocationSSN_Pts %>% dplyr::select(Name, geom)
+
+
+CollectionUnitsPoly <- read_sf("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/BackToMillon/CollectionUnitsPoly_Corrected_MillonSpace.gpkg")
+st_crs(CollectionUnitsPoly) <- millon_crs
+
+CollectionUnitsPoly2 <- CollectionUnitsPoly %>% 
+  rename(SSN = ID) %>% 
+  mutate(Site = as.character(Site)) %>% 
+  dplyr::select(SSN, Unit, Site, Subsite, Duplicates, INVALID, OVERLAP, 
+                DUPLICATE, PROBLEM, PROBLEMS_TEXT, NOTES, geom)
+
+missing_SSNs <- setdiff(DF10_rearranged$SSN, CollectionUnitsPoly2$SSN)
+
+
+# Check CRS
+st_crs(CollectionUnitsPoly2)
+st_crs(TMP_LocationSSN_Pts)
+
+st_crs(CollectionUnitsPoly2) == st_crs(TMP_LocationSSN_Pts)
+
+# Perform spatial join: attach points to polygons
+joined_sf <- st_join(CollectionUnitsPoly2, TMP_LocationSSN_Pts, join = st_contains)
+
+# View the joined data
+print(joined_sf)
+
+
+
+CollectionUnitsPoly_OrigIncorrect <- read_sf("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/CollectionUnitsPoly_OrigIncorrect_MillonSpace.gpkg")
+
+CollectionUnits_M <- read_sf("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TEO Drive - GIS Files/For tDAR/CollectionUnits_M.shp")
+
+CollectionUnitPoints_M <- read_sf("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TEO Drive - GIS Files/For tDAR/CollectionUnitPoints_M.shp")
+
+
+
+
+```
+
+
+
+
+### Step 8: Clean-Up Global Environment
+
+```{r}
+
+rm(artifact_table, artifactTable, artifactTable2, artifactCodes, code_table, 
+   codeCodes, codeTable, data_list, interp_table, interpCodes, interpTable, 
+   prov_table, provTable, totals_table, totalsTable, archToSSN, file_list,
+   file_names)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+"C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/BackToMillon/CollectionUnitsPoly_Corrected_MillonSpace.gpkg"
+
+```
+
+
+# MS Access RODBC
+
+```{r}
+library(RODBC)
+# Define the path to your Access database
+db_path <- file.path("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/DF10.April2023.accdb")
+
+# Create a connection string
+conn_str <- paste0("Driver=ERMNSQL;DBQ=", db_path)
+
+# Establish the connection
+conn <- odbcDriverConnect(conn_str)
+channel <- odbcConnect("ERMNSQL", uid="TJ McMote")
+
+library(RODBC) #load package
+DRIVERINFO <- "Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
+MDBPATH <-file.path("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/DF10.April2023.accdb") #connect database.
+PATH <- paste0(DRIVERINFO, "DBQ=", MDBPATH)
+channel <- odbcDriverConnect(PATH)
+
+channel <- odbcConnect("ERMNSQL") # if this was set up as a DSN
+
+channel<-odbcConnectAccess2007(db) #internal RODBC function
+dataSetName<-sqlFetch(channel,"TableName") #read particular table from Access database file.
+
+```
+
+
+
+# xxxxx
+
+```{r}
+library(skimr)
+library(summarytools)
+library(DataExplorer)
+
+
+DF9_wide <- read_excel(paste0(DIR, "DF9_wide.xlsx"), sheet = 1)
+
+
+skim(DF10_rearranged)
+DF10_dfSummary = dfSummary(DF10_rearranged,style="grid")
+
+get_type <- function(x) {
+  if (is.factor(x)) {
+    return("factor")
+  } else if (is.character(x)) {
+    return("character")
+  } else if (is.integer(x)) {
+    return("integer")
+  } else if (is.numeric(x)) {
+    return("numeric")
+  } else {
+    return(class(x)[1])
+  }
+}
+
+
+# Function to create metadata table
+create_metadata <- function(data) {
+  metadata <- data.frame(
+    Num = seq_along(data),
+    Name = names(data),
+    Type = sapply(data, function(x) class(x)[1]),  # Get the primary class
+    NAs = sapply(data, function(x) sum(is.na(x))),
+    Pct_NAs = sapply(data, function(x) round(sum(is.na(x)) / nrow(data) * 100, 2)),
+    NumUniqueVals = sapply(data, function(x) {
+      if (is.vector(x) || is.factor(x)) {
+        length(unique(na.omit(x)))
+      } else {
+        NA  # Not applicable for non-vector columns
+      }
+    }),
+    UniqueVals = sapply(data, function(x) {
+      if (is.vector(x) || is.factor(x)) {
+        paste(unique(na.omit(x)), collapse = " // ")
+      } else {
+        NA  # Not applicable for non-vector columns
+      }
+    }),
+    stringsAsFactors = FALSE
+  )
+  return(metadata)
+}
+DF10_metadata <- create_metadata(DF10_rearranged)
+
+write.csv(DF10_metadata, paste0(DIR, "DF10_metadata.csv"), fileEncoding = "Latin1")
+write.csv(DF10_dfSummary, paste0(DIR, "DF10_dfSummary.csv"), fileEncoding = "Latin1")
+```
+
+
+
+
+
+# Create DF9 Wide for Cross-Checking the Data
+
+
+### Step 0: Import all excel files from the specified directory
+
+```{r}
+
+file_list <- list.files(
+  path = paste0(DIR, "DF9"),
+  pattern = "\\.xlsx$", full.names = TRUE
+)
+file_names <- tools::file_path_sans_ext(basename(file_list))
+data_list <- map(file_list, read_excel)
+names(data_list) <- file_names
+list2env(data_list, envir = .GlobalEnv)
+
+```
+"admin" is the base table
+
+-- 5050-row tables --
+
+WorkingHierarchy
+`a_FuncInterp1 for digitization`
+archInterp
+archMaterial
+
+
+
+
+```{r}
+
+ceramics = cerPhTot %>% 
+  left_join(cerVessel, by = "ID") %>% 
+  left_join(cerNonVessel, by = "ID")
+
+lithics = lithicFlaked %>% 
+  left_join(lithicGround, by = "ID")
+
+artifactOther
+
+```
+
+
+
+
+
+
+complexData
+complexMacroData
+
+condition
+description
+
+location
+
+Plazas
+workshop
+
+
+
+materials
+materialsLabel
+
+
+z_archInterp1
+z_archInterp2
+z_funcInterp1
+z_funcInterp2
+z_vegetation
+HierarchyCode
+
+
+
+personnelLabel
+"personnel error check"
+fieldWorkers
+labAnalysts
+
+
+```{r}
+
+
+
+
+worker_columns <- c("fieldWorker1", "fieldWorker2", "fieldWorker3", "fieldWorker4", "fieldWorker5",
+                    "ceramicAnalyst1", "ceramicAnalyst2", "ceramicAnalyst3")
+
+
+personnel <- personnelLabel %>% 
+  mutate(FullName = paste(first_name, last_name, sep = " ")) %>% 
+  select(-last_name, -first_name) %>% 
+  mutate(FullName = stri_trans_general(FullName, "Latin-ASCII")) %>%
+  rename(code = code, FullName = FullName)
+
+code_to_name <- setNames(personnel$FullName, personnel$code)
+
+admin <- admin %>%
+  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+worker_columns <- names(archInterp)[6:9]
+
+code_to_name <- setNames(DS_ArchInterpPrim$description, DS_ArchInterpPrim$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+worker_columns <- names(archInterp)[10:13]
+
+code_to_name <- setNames(DS_ArchInterpAltern$description, DS_ArchInterpAltern$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+worker_columns <- names(archInterp)[14:17]
+
+code_to_name <- setNames(DS_FuncInterpPrim$description, DS_FuncInterpPrim$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+worker_columns <- names(archInterp)[18:21]
+
+code_to_name <- setNames(DS_FuncInterpAltern$description, DS_FuncInterpAltern$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+
+########################
+
+
+
+
+
+
+
+
+
+
+6:21
+
+
+
+#%>%
+  select(-all_of(worker_columns))
+
+
+admin_names <- admin %>%
+  mutate(across(all_of(worker_columns), ~ personnel$FullName[match(., personnel$code)], .names = "name_{col}"))
+
+  
+materials_wide <- materials %>% 
+  left_join(materialsLabel, by = "code") %>% 
+  select(-code) %>% 
+  pivot_wider(id_cols = "ID", names_from = "observation", values_from = "label")
+
+
+
+
+write_csv(ceramics, paste0(DIR, "ceramics.csv"))
+
+write_csv(lithics, paste0(DIR, "lithics.csv"))
+
+write_csv(personnel, paste0(DIR, "personnel.csv"))
+
+
+```
+
+personnel
+
+
+
+
+
+
+
+
+
+
+### Step 6: Check and reorganize totals columns (if necessary)???
+This placeholder is where you'd perform checks or reordering logic
+
+THIS WAS SKIPPED!
+
+
+
+
+
+
+
+
+
+
+
+# Architecture Raster Tiles Crop + Merge
+
+```{r}
+
+library(sf)
+library(tidyverse)
+library(terra)
+library(purrr)
+TMP_Grid <- st_read("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMP_Grid_MillonSpace.gpkg") %>% 
+  arrange(Unit)
+
+TMP_Grid_list <- TMP_Grid %>%
+  group_split(Unit)
+
+names(TMP_Grid_list) <- TMP_Grid$Unit
+
+raster_dir <- "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/3 - AnnieData-May2023/Sherfield_TeoDigitization/Millon Space Grid Units/Architectural"
+raster_files <- list.files(
+  path = raster_dir,
+  pattern = "\\Georef.tif$",  # Regex pattern to match file extensions
+  full.names = TRUE              # Return full paths
+)
+raster_list <- lapply(raster_files, rast)
+
+
+
+
+
+namez <- character(0)
+
+for (i in 1:length(raster_list)){
+  
+  raster_list[[i]] = raster_list[[i]][[1:3]]
+  namez[i] = substring(names(raster_list[[i]])[1], first = 1, last = 4)
+  
+}
+
+names(raster_list) <- namez
+
+TMP_Grid_list <- TMP_Grid_list[names(TMP_Grid_list) %in% namez]
+
+names(TMP_Grid_list) == namez
+
+
+
+
+millon_crs <- "+proj=affine +s11=1 +s12=0 +s21=0 +s22=1 +xoff=0 +yoff=0"
+
+# Assign CRS to each raster in the list using PROJ4 string
+raster_list <- map(raster_list, ~ {
+  crs(.x) <- millon_crs
+  return(.x)
+})
+
+# Assign CRS to each polygon in the list using PROJ4 string
+TMP_Grid_list <- map(TMP_Grid_list, ~ {
+  st_crs(.x) <- millon_crs
+  return(.x)
+})
+
+
+cropped <- crop(raster_list[[1]], vect(TMP_Grid_list[[1]]))
+
+
+cropped_rasters <- list()
+
+for (i in 1:length(raster_list)){
+  
+  cropped_rasters[[i]] <- crop(raster_list[[i]], vect(TMP_Grid_list[[i]]))
+  
+}
+
+names(cropped_rasters) <- namez
+
+
+# Assign CRS to each raster in the list using PROJ4 string
+cropped_rasters <- map(cropped_rasters, ~ {
+  crs(.x) <- millon_crs
+  return(.x)
+})
+
+
+target <- rast("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMP_Map_Topo_MillonSpace_Full.tif")
+
+crs(target) <- millon_crs
+
+cropped_rasters_resampled <- lapply(cropped_rasters, function(r) {
+  resample(r, target, method = "bilinear")  # 'bilinear' or 'nearest' depending on data type
+})
+
+dir = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMPCroppedUnitTilesMillonSpace/CroppedArchitecture/"
+
+for (i in seq_along(cropped_rasters)) {
+  writeRaster(cropped_rasters[[i]], filename = paste0(dir, namez[i], "_Arch_cropped.tif"), 
+              gdal = c("COMPRESS=ZSTD","PRED=2"), overwrite = TRUE)
+}
+#_resampled
+
+x = data.frame(namez = namez)
+
+write.csv(namez, paste0(dir, "namez.csv"))
+
+```
+
+
+
+
+cropped_rasters2_resampled <- lapply(cropped_rasters2, function(r) {
+  resample(r, cropped_rasters2[[1]], method = "bilinear")  # 'bilinear' or 'nearest' depending on data type
+})
+dir = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMPCroppedUnitTilesMillonSpace/CroppedArchitecture/"
+
+for (i in seq_along(cropped_rasters2_resampled)) {
+  writeRaster(cropped_rasters2_resampled[[i]], filename = paste0(dir, namez[i], "_Arch_cropped.tif"), 
+              gdal = c("COMPRESS=ZSTD","PRED=2"), overwrite = TRUE)
+}
+
+
+target_res <- res(cropped_rasters2[[1]])
+
+```{r}
+#library(sf)
+library(tidyverse)
+library(terra)
+#library(purrr)
+
+raster_dir <- "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMPCroppedUnitTilesMillonSpace/CroppedArchitecture/"
+
+cropped_files <- list.files(
+  path = raster_dir,
+  pattern = "\\.tif$",  # Regex pattern to match file extensions
+  full.names = TRUE              # Return full paths
+)
+cropped_rasters2 <- lapply(cropped_files, rast)
+
+namez <- read.csv("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMPCroppedUnitTilesMillonSpace/CroppedArchitecture/namez.csv")
+
+namez <- namez$x
+
+names(cropped_rasters2) <- namez
+
+
+millon_crs <- "+proj=affine +s11=1 +s12=0 +s21=0 +s22=1 +xoff=0 +yoff=0"
+
+# Assign CRS to each raster in the list using PROJ4 string
+cropped_rasters2 <- map(cropped_rasters2, ~ {
+  crs(.x) <- millon_crs
+  return(.x)
+})
+
+raster_collection <- sprc(cropped_rasters2)
+
+gc()
+# Merge all cropped rasters (assuming no overlaps)
+merged_raster <- merge(raster_collection)
+
+#merged_raster <- do.call(merge, list(cropped_rasters[1:3]))
+
+
+
+writeRaster(
+  r,
+  filename = output_path,
+  filetype = "GTiff",
+  overwrite = TRUE,
+  options = c("COMPRESS=ZSTD","PREDICTOR=2","BIGTIFF=YES")
+)
+TMP_Map_Topo_MillonSpace_Full.tif
+"C:/Users/TJ McMote/AppData/Roaming/QGIS/QGIS3/profiles/Rudy/python/plugins/networks/TMP_Grid_MillonSpace.gpkg"
+```
+
+
+
+
+  overwrite = TRUE,
+  options = c("COMPRESS=ZSTD","PREDICTOR=2","BIGTIFF=YES")
+#saveRDS(cropped_rasters, file = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/cropped_TMP_Arch_rasters.rds")
+
+save(cropped_rasters, file = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/cropped_TMP_Arch_rasters.rds")
+
+#cropped_rasters <- readRDS(file = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/cropped_TMP_Arch_rasters.rds")
+
+load(file = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/cropped_TMP_Arch_rasters.rds")
+
+rm(TMP_Grid, TMP_Grid_list, raster_list)
+
+
+
+
+cropped_rasters <- map2(raster_list, TMP_Grid_list, function(raster, polygon) {
+  # Crop to polygon's extent
+  cropped <- crop(raster, vect(polygon))
+  
+  return(cropped)
+})
+
+
+
+
+
+
+
+# Rasters
+
+```{r}
+library(terra)
+raster1 <- rast("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/S3W1_millon_crop.tif")
+raster2 <- rast("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TMP_Map_Topo_MillonSpace.tif")
+
+nlyr(raster1)
+
+nlyr(raster2)
+raster1_new <- raster1[[1:2]]
+merged_raster <- merge(raster1_new, raster2)
+writeRaster(merged_raster, "merged_output.tif", overwrite = TRUE)
+
+```
+
+
+
+
+
+
+
+
+
+
+# UNUSED
+
+
+Problems
+- There appear to be category errors
+
+```{r}
+
+artifactTable2 <- artifactTable %>% 
+  left_join(artifactCodes, by = c("ArtCode1" = "Code")) %>%
+  rename(ArtCode4 = Meaning) %>%
+  left_join(artifactCodes, by = c("ArtCode2" = "Code")) %>%
+  rename(ArtCode5 = Meaning) %>%
+  left_join(artifactCodes, by = c("ArtCode3" = "Code")) %>%
+  rename(ArtCode6 = Meaning) %>% 
+  select(-ID, -Count, -Where) %>% 
+  arrange(ArtCode1, ArtCode2, ArtCode3) %>% 
+  distinct() %>% 
+  mutate(ArtCode6 = ifelse(ArtCode2 == 12 & ArtCode3 == 46, "figAzte", ArtCode6))
+
+anyDuplicated(artifactTable2$ArtCode6) == 0
+  
+duplicated(artifactTable2$ArtCode6)
+
+anyDuplicated(artifactTable2$ArtCode6)
+
+
+
+
+
+write.csv(artifactTable2, "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/artifactTable2.csv")
+
+
+
+artifactCodes2 <- artifactCodes %>% 
+  left_join(artifactCodes, by = c("ArtCode1" = "Code")) #%>%
+  
+
+
+
+
+
+
+
+
+
+# Step 4: Format artifactTable
+artifact_table <- artifactTable %>%
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -9999, Where),
+         New = ifelse(is.na(New), Count, New)) %>%  # Replace 0 with NA where "Where" == "M"
+  ungroup() %>%
+  select(-Where) %>%
+  left_join(artifactCodes, by = c("ArtCode1" = "Code")) %>%
+  rename(ArtCode4 = Meaning) %>%
+  left_join(artifactCodes, by = c("ArtCode2" = "Code")) %>%
+  rename(ArtCode5 = Meaning) %>%
+  left_join(artifactCodes, by = c("ArtCode3" = "Code")) %>%
+  rename(ArtCode6 = Meaning) %>%
+  mutate(ArtCode6 = ifelse(ArtCode2 == 12 & ArtCode3 == 46, "figAzte", ArtCode6)) %>% 
+  select(ID, ArtCode6, New) %>% 
+  pivot_wider(names_from = ArtCode6, values_from = New, values_fill = 0) %>% # Pivot wider by ID
+  arrange(ID) %>% 
+  mutate(across(everything(), ~ na_if(., -9999)))
+  
+
+  
+  #arrange(ArtCode3) %>% 
+  #mutate(Variable = paste(ArtCode1, ArtCode2, ArtCode3, sep = "_")) %>%
+  #select(-ArtCode1, -ArtCode2, -ArtCode3) %>%
+
+  
+
+
+artifact_table2 = artifact_table %>% 
+  #select(-ArtCode1, -ArtCode2, -ArtCode3, -ArtCode4, -ArtCode5, -Count) %>% 
+  group_by(ID) %>% 
+  
+  mutate(ID = as.numeric(ID)) %>% 
+ # %>% 
+  mutate(across(everything(), ~ na_if(., -9999)))
+
+```
+
+  mutate(
+         across(everything(), ~ if (is.list(.)) unlist(.) else .),  # Flatten any lists
+         New = as.numeric(New)                                      # Ensure New is numeric
+    ) %>% 
+
+
+
+
+prov_table <- prov_table  # Add specific reordering logic if needed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
