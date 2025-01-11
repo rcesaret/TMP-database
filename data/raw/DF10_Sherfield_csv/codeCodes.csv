@@ -1,0 +1,108 @@
+Code,Description
+-1,missing data
+0,absent
+1,present
+2,very sparse
+3,sparse to very sparse
+4,sparse
+5,sparse to moderate
+6,moderate
+7,moderate to abundant
+8,abundant
+9,abundant to very abundant
+10,very abundant
+11,slight
+12,considerable
+13,extreme
+14,total destruction
+15,strong
+16,possible
+17,probably only perishable materials
+18,simple or below average
+19,ordinary
+20,elaborate or very fine
+21,perishable and non-perishable architecture
+22,uniform
+23,localized
+24,variable
+25,heavily modified
+26,small stones
+27,medium stones
+28,mixed size stones
+29,large stones
+30,concrete
+31,concrete plus plaster
+32,mud
+33,plaster on mud
+34,concrete plus painted plaster
+35,earth
+36,earth and concrete
+37,earth and concrete plus plaster
+38,crushed tezontli
+39,cobble paving
+40,tepetate
+41,adobes and other material
+42,material lost or uncertain
+43,"part of site in plow cultivation, but much not"
+44,"most or all in plow cultivation, but not freshly plowed"
+45,part of site freshly plowed
+46,most or all of site freshly plowed
+47,humedad
+48,temporal
+49,reigo (used if any part of site in riego)
+50,flood water
+51,one
+52,two or three
+53,four or more
+54,problematic object that could be part of one
+69,problem that needs to be addressed
+99,other
+100,"Millon, René"
+101,"Drewitt, Bruce"
+102,"Bennyhoff, James A."
+103,"Baños, Pedro"
+104,"Cowgill, George L."
+105,"Spence, Michael W."
+106,"Wallrath, Matthew"
+107,"Marino, Joseph D."
+108,"Barbour, Warren T. D."
+109,"de Lucio, Arnulfo"
+110,"de Lucio, José"
+111,"Blucher, Darlena K."
+112,"Hungerford, Daniel W."
+113,"Sutherland, Donald R."
+114,"Wilkerson, S. Jeffrey K."
+115,"Sharnoff, Steve M."
+116,"Sánchez, Silvestre"
+117,"Fletcher, Charles K."
+118,"Kolb, Charles C."
+119,"Millon, Clara"
+120,"Drewitt, Wendy"
+121,"Dow, James W."
+122,"de Lucio, Mario"
+123,"Shankman, Paul"
+124,"Dodds, Chris D."
+125,"Quisenberry, A. Jane"
+126,"West, Michael S."
+127,"Bruhns, Dan B."
+128,"Bruhns, Karen O."
+129,"Duran, Silvia G."
+130,"West, Erica"
+131,flat
+132,December (of previous year) to February
+133,March to May
+134,June to August
+135,September to November
+136,clear boundaries
+137,broken or insub
+138,broken or insub
+139,1962
+140,1963
+141,1964
+142,1965
+143,1966
+144,1967
+145,1968
+146,1969
+147,1970
+148,1971
