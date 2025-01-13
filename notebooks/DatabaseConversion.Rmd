@@ -1,0 +1,202 @@
+---
+title: "Untitled"
+author: "Rudolf Cesaretti"
+date: "2025-01-12"
+output: html_document
+---
+
+# Python
+
+source_python("path/to/your_script.py")
+
+
+```{r}
+library(reticulate)
+
+use_condaenv("TMP-database", required = TRUE)
+source_python("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/src/python/alembic_configuration.py")
+#source_python("src/python/alembic_configuration.py")
+
+```
+
+
+
+
+
+
+
+
+
+# R
+
+
+```{r}
+rm(list = ls())
+```
+
+
+I need to import a MS Access 2016 database into R, and then export it to a PostgreSQL database. This includes not only extracting the tables from an accdb file and importing them to an PostgreSQL database, it also includes extracting the primary key and ALL of the relationships from an accdb file and importing them to the PostgreSQL database. This latter part is perhaps the most important, as the resulting PostgreSQL database must be a mirror image of the original MS Access database.
+
+I am trying to figure out which packages to use to do this. Below is a list of numerous R packages for interacting with databases:
+  * RODBC
+  * odbc
+  * DBI
+  * RPostgres
+  * pgTools
+  * dm
+  * dbplyr
+  * RPostgreSQL
+  * pgTools
+  * octopus
+  * DBItest
+  * DatabaseConnector
+  * dbi.table
+  * etl
+  * maestro
+  * RODBCDBI
+  * ETLUtils
+  * SQRL
+  dettl
+
+Can you please analyze each of these is GREAT detail -- including their documentation, vignettes, and any other resources you can find -- and then draft a thorough report on the features and capabilities of each package. Your report should be particularly focused on the package functionalities for importing and exporting database relationships, as well as any other functionalities that would be especially useful or handy for the task. You should also consider the ease of use of each package, how widely they are used, whether they are qrequently updated and maintained, and the quality of the documentation. Include links to any useful vignettes, code walkthroughs or example workflows you find in your research. Finally, you should make a recommendation as to which package(s) are best suited for this task.
+
+abilities and for extracting primary keys and relationships. You should also consider the ease of use of each package, and the quality of the documentation. Finally, you should make a recommendation as to which package(s) are best suited for this task.
+
+which one(s) are best suited for this task?
+
+
+I have the following packages installed
+I need you to compare and contrast the ability of these
+
+install.packages("RODBC")
+If you are interested in using parameterized queries, you should install RODBCext as well. RODBCext is an add-on library to RODBC that adds support for parameterized queries.
+
+install.packages("RODBCext")
+
+```{r}
+library(RODBC)
+```
+install.packages("RSQLite")
+install.packages("")
+devtools::install_github("vh-d/odbc32")
+library(odbc)
+library(DBI)
+
+library(odbc32)
+library(RPostgres)
+library(pgTools)
+library(dm)
+library(dbplyr)
+library(RPostgreSQL)
+library(pgTools)
+library(octopus)
+library(DBItest)
+library()
+library()
+library()
+```{r}
+
+PG_HOST <- "localhost"
+PG_PORT <- 5432
+PG_USER <- "rudy"
+PG_PASSWORD <- "password"
+PG_DATABASE <- "test1"
+
+
+
+channel <- odbcConnect("pg", uid="rudy", pwd="password", case="postgresql")
+
+
+
+pg <- odbcDriverConnect(connection = paste0("DRIVER={PostgreSQL Unicode(x64)};Server=", PG_HOST, ";Port=", PG_PORT, ";Database=", PG_DATABASE, ";Uid=", PG_USER, ";Pwd=", PG_PASSWORD, ";"))
+
+
+library(RODBC)
+ACCESS_FILE <- file.path("C:","Projects","crewai_access_to_postgresql","access_files","DF9_MES_be.accdb")
+cnx <- odbcDriverConnect(connection = paste0("DRIVER={CData ODBC Driver for Microsoft Access};DataSource=", ACCESS_FILE, ";"))
+
+library(tidyverse)
+tables <- sqlTables(cnx) %>% filter(TABLE_TYPE == "TABLE")
+listt <- list()
+for (i in 1:length(tables$TABLE_NAME)) {
+  listt[[i]] <- sqlColumns(cnx, sqtable = tables$TABLE_NAME[i])
+}
+df9_glc_tabs_vars = bind_rows(listt) #%>% filter(T)
+                              
+write_csv(df9_glc_tabs_vars, "C:/Projects/DF9_MES_columns.csv")
+
+
+x%>% write_csv(df9_glc_tabs_vars, "C:/Projects/DF9_GLC_columns.csv")
+
+for (row in 1:nrow(tables)) {
+    cat(paste("Catalog: ", tables[row,]$TABLE_CAT,
+              ", Schema: ", tables[row,]$TABLE_SCHEM,
+              ", Table: ", tables[row,]$TABLE_NAME,
+              ", Type: ", tables[row,]$TABLE_TYPE, "\n"))
+}
+artifactCodes
+artifactTable
+codeCodes
+codeTable
+interpCodes
+interpTable
+provTable
+totalsTable
+table_archToSSN <- sqlColumns(cnx, sqtable = "archToSSN")
+table_artifactCodes <- sqlColumns(cnx, sqtable = "artifactCodes")
+table_artifactTable <- sqlColumns(cnx, sqtable = "artifactTable")
+table_codeCodes <- sqlColumns(cnx, sqtable = "codeCodes")
+table_codeTable <- sqlColumns(cnx, sqtable = "codeTable")
+table_interpCodes <- sqlColumns(cnx, sqtable = "interpCodes")
+table_interpTable <- sqlColumns(cnx, sqtable = "interpTable")
+table_provTable <- sqlColumns(cnx, sqtable = "provTable")
+table_totalsTable <- sqlColumns(cnx, sqtable = "totalsTable")
+
+x = dplyr::bind_rows(table_archToSSN, table_artifactCodes, table_artifactTable, table_codeCodes, table_codeTable, table_interpCodes, table_interpTable, table_provTable, table_totalsTable)
+
+write.csv(tables, "C:/Projects/DF10_Sherfield_tables.csv")
+write.csv(x, "C:/Projects/DF10_Sherfield_columns.csv")
+
+sqlPrimaryKeys(cnx, "archToSSN", errors= T)
+archToSSN <- sqlFetch(cnx, "archToSSN")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
