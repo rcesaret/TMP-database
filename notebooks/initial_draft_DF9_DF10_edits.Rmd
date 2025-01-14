@@ -28,7 +28,7 @@ library(stringi)
 # Set Working Directory
 
 ```{r}
-DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/"
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
 ```
 
 
@@ -42,7 +42,7 @@ DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO
 ```{r}
 
 file_list <- list.files(
-  path = paste0(DIR, "DF10_Sherfield_csv"),
+  path = paste0(DIR, "data/raw/DF10_Sherfield_csv"),
   pattern = "\\.csv$", full.names = TRUE
 )
 file_names <- tools::file_path_sans_ext(basename(file_list))
@@ -460,7 +460,7 @@ write.csv(DF10_dfSummary, paste0(DIR, "DF10_dfSummary.csv"), fileEncoding = "Lat
 ```{r}
 
 file_list <- list.files(
-  path = paste0(DIR, "DF9"),
+  path = paste0(DIR, "data/raw/DF9"),
   pattern = "\\.xlsx$", full.names = TRUE
 )
 file_names <- tools::file_path_sans_ext(basename(file_list))
@@ -536,7 +536,7 @@ labAnalysts
 
 
 
-worker_columns <- c("fieldWorker1", "fieldWorker2", "fieldWorker3", "fieldWorker4", "fieldWorker5",
+colz <- c("fieldWorker1", "fieldWorker2", "fieldWorker3", "fieldWorker4", "fieldWorker5",
                     "ceramicAnalyst1", "ceramicAnalyst2", "ceramicAnalyst3")
 
 
@@ -549,43 +549,43 @@ personnel <- personnelLabel %>%
 code_to_name <- setNames(personnel$FullName, personnel$code)
 
 admin <- admin %>%
-  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
 
 ##########################
 
-worker_columns <- names(archInterp)[6:9]
+colz <- names(archInterp)[6:9]
 
 code_to_name <- setNames(DS_ArchInterpPrim$description, DS_ArchInterpPrim$code)
 
 archInterp <- archInterp %>%
-  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
 
 ##########################
 
-worker_columns <- names(archInterp)[10:13]
+colz <- names(archInterp)[10:13]
 
 code_to_name <- setNames(DS_ArchInterpAltern$description, DS_ArchInterpAltern$code)
 
 archInterp <- archInterp %>%
-  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
 
 ##########################
 
-worker_columns <- names(archInterp)[14:17]
+colz <- names(archInterp)[14:17]
 
 code_to_name <- setNames(DS_FuncInterpPrim$description, DS_FuncInterpPrim$code)
 
 archInterp <- archInterp %>%
-  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
 
 ##########################
 
-worker_columns <- names(archInterp)[18:21]
+colz <- names(archInterp)[18:21]
 
 code_to_name <- setNames(DS_FuncInterpAltern$description, DS_FuncInterpAltern$code)
 
 archInterp <- archInterp %>%
-  mutate(across(all_of(worker_columns), ~ code_to_name[as.character(.)])) 
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
 
 ########################
 

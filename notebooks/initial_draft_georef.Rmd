@@ -5,6 +5,8 @@ date: "2024-11-25"
 output: html_document
 ---
 
+# R
+
 
 ```{r}
 
@@ -450,7 +452,7 @@ writeRaster(
 6982	22180	513074.3038	2174714.994
 6787	22475	513006.1014	2174654.609
 
-# Python
+# Python GDAL
 
 ```{python}
 
