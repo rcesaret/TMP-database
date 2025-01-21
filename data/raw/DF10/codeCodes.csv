@@ -1,0 +1,108 @@
+﻿Code,Description
+-1,missing data
+0,absent
+1,present
+2,very sparse
+3,sparse to very sparse
+4,sparse
+5,sparse to moderate
+6,moderate
+7,moderate to abundant
+8,abundant
+9,abundant to very abundant
+10,very abundant
+11,slight
+12,considerable
+13,extreme
+14,total destruction
+15,strong
+16,possible
+17,probably only perishable materials
+18,simple or below average
+19,ordinary
+20,elaborate or very fine
+21,perishable and non-perishable architecture
+22,uniform
+23,localized
+24,variable
+25,heavily modified
+26,small stones
+27,medium stones
+28,mixed size stones
+29,large stones
+30,concrete
+31,concrete plus plaster
+32,mud
+33,plaster on mud
+34,concrete plus painted plaster
+35,earth
+36,earth and concrete
+37,earth and concrete plus plaster
+38,crushed tezontli
+39,cobble paving
+40,tepetate
+41,adobes and other material
+42,material lost or uncertain
+43,"part of site in plow cultivation, but much not"
+44,"most or all in plow cultivation, but not freshly plowed"
+45,part of site freshly plowed
+46,most or all of site freshly plowed
+47,humedad
+48,temporal
+49,reigo (used if any part of site in riego)
+50,flood water
+51,one
+52,two or three
+53,four or more
+54,problematic object that could be part of one
+69,problem that needs to be addressed
+99,other
+100,Rene Millon
+101,Bruce Drewitt
+102,James A. Bennyhoff
+103,Pedro Banos
+104,George L. Cowgill
+105,Michael W. Spence
+106,Matthew Wallrath
+107,Joseph D. Marino
+108,Warren T. D. Barbour
+109,Arnulfo de Lucio
+110,Jose de Lucio
+111,Darlena K. Blucher
+112,Daniel W. Hungerford
+113,Donald R. Sutherland
+114,S. Jeffrey K. Wilkerson
+115,Steve M. Sharnoff
+116,Silvestre Sanchez
+117,Charles K. Fletcher
+118,Charles C. Kolb
+119,Clara Millon
+120,Wendy Drewitt
+121,James W. Dow
+122,Mario de Lucio
+123,Paul Shankman
+124,Chris D. Dodds
+125,A. Jane Quisenberry
+126,Michael S. West
+127,Dan B. Bruhns
+128,Karen O. Bruhns
+129,Silvia G. Duran
+130,Erica West
+131,flat
+132,December (of previous year) to February
+133,March to May
+134,June to August
+135,September to November
+136,clear boundaries
+137,broken or insub
+138,broken or insub
+139,1962
+140,1963
+141,1964
+142,1965
+143,1966
+144,1967
+145,1968
+146,1969
+147,1970
+148,1971

@@ -1,0 +1,1095 @@
+---
+title: "Untitled"
+author: "Rudolf Cesaretti"
+date: "2019-08-09"
+output: html_document
+---
+
+Please direct any questions and comments to Rudolf Cesaretti (rcesaret@asu.edu)
+
+Analyses in this 'Data Replication' script were performed in R versions 3.4.3 (2017-11-30) and 3.6.0 (2019-04-26). R-Studio is ideal for viewing and manipulating this file. 
+
+The subsections of this script, indicated by triple-pound-sign comment lines, specify which subsections they correspond to in the main text (e.g. "4.1 Data Quality") and in the online Appendix (e.g. "A1.1 Distributional Analysis")
+
+The additional R packages required in each section are indicated at the top of each section. To download the requisite packages to your library, simply un-comment-out the function "install.packages()", and make sure you have a secure connection to the internet.
+
+This file requires that the working-directory be set to a local folder that includes "main_dataset.csv", "add_taxpayers.csv", "WCS.csv", "resid_coords_geog.csv", and "TudorCounties.csv" which are included in the online supplementary materials
+
+Commands to export figures (as .png files) and tables (as .csv files) have also been commented-out
+
+## Preliminaries
+
+```{r}
+#rm(list = ls()) # clear workspace
+
+# Ensure that the working directory is set to the root of the project
+library(rprojroot)
+knitr::opts_knit$set(root.dir = find_rstudio_root_file())
+```
+
+"tidyverse", "readxl", "stringi", "DBI", "odbc", "pgTools", "RPostgres", "RPostgreSQL", "dm", "dbplyr", "etl", "dettl", "", "", "", "", 
+abshiftr
+blueprintr
+install.packages(c("deepnet", "abshiftr", "mlr3torch", "keras", "torch", "optmatch", "dbmisc", "plotscaper", "blueprintr", "panelcleaner", "rcoder", "omnibus", "fr", "dpkg", "sqlHelpers", "klaR", "shinytest2", "rticles", "pagedown", "blogdown", "chromote", "sortable", "vetiver", "webshot2", "distill", "thematic", "bigD", "shinyvalidate", "tfprobability", "swagger", "reactlog", "shinymeta", "tfhub", "plumber", "plumbertableau", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""))
+
+
+abshiftr: Reshape Disorganised Messy Data
+Helps the user to build and register schema descriptions of disorganised (messy) tables. Disorganised tables are tables that are not in a topologically coherent form, where packages such as 'tidyr' could be used for reshaping. The schema description documents the arrangement of input tables and is used to reshape them into a standardised (tidy) output format.
+
+
+
+
+### Load Required Packages
+
+```{r}
+# List of required packages
+required_pkgs <- c("MASS", "NSM3")
+#required_pkgs <- c("zoo", "lmtest", "sandwich", "ggplot2", "devtools", "broom", "plyr", "MASS", "NSM3")
+#required_pkgs <- c("zoo", "lmtest", "sandwich", "ggplot2", "devtools", "broom", "plyr")
+#required_pkgs <- c("spdep", "ncf", "maptools")
+
+# Check which packages are not yet installed
+to_install <- required_pkgs[!required_pkgs %in% installed.packages()]
+
+# Install the missing packages
+if (length(to_install) > 0) {
+  install.packages(to_install)
+}
+
+# Load all required packages
+invisible(sapply(required_pkgs, requireNamespace))
+
+# Clean up the environment
+rm(required_pkgs, to_install)
+```
+
+
+
+### Load Custom R Functions
+
+```{r}
+#Read in custom R functions located in the WD$R directory folder
+
+# Custom function R file names
+functions <- c("linear_rescale.R", "ks_test_tidy.R", "histogram_density.R", 
+               "plot_ks_ci.R", "gg_histogram_density.R", "ggplot_ks_ci.R",
+               "regression_analysis.R") 
+
+invisible(lapply(functions, function(filename) {
+  source(file.path(WD$funcs, filename))
+}))
+
+rm(functions) # Remove the vector of function filenames from the environment
+```
+
+
+
+
+### Load Data
+
+```{r}
+# Upload datasets from working directory
+main_dataset <- read.csv(file = "data/raw/main_dataset.csv", header=TRUE, sep=",")
+
+add_taxpayers <- read.csv(file = "data/raw/add_taxpayers.csv", header=TRUE, sep=",")
+
+worst_case_scenarios <- read.csv(file = "data/raw/worst_case_scenarios.csv", header=TRUE, sep=",")
+
+resid_coords_geog <- read.csv(file = "data/raw/resid_coords_geog.csv", header = TRUE, sep=",")
+
+tudor_counties <- read.csv(file = "data/raw/tudor_counties.csv", header=TRUE, sep=",")
+
+```
+
+
+
+# NEW
+
+
+## Analysis & Figures
+
+
+### 4.1 Data Quality and A1.1 Distributional Analysis
+
+
+#### Figure A1: Histograms of the Lay Subsidy data (n = 93)
+
+```{r}
+# Define output file
+png(
+  filename = "figures/Fig_A1_Hists.png",
+  width = 9,
+  height = 4,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+# Set up a 1x2 plotting layout
+par(mfrow = c(1, 2))
+
+# Plot Figure A1a
+histogram_density(
+  data = main_dataset$Log_Tax,
+  breaks = seq(2, 7, 0.2),
+  main_title = "(a)",
+  x_label = "Log Tax (£)",
+  y_label = "Frequency",
+  file_name = NULL # Plot directly
+)
+
+# Plot Figure A1b
+histogram_density(
+  data = main_dataset$Log_Taxpayers,
+  breaks = seq(4.5, 7.5, 0.2),
+  main_title = "(b)",
+  x_label = "Log Taxpayers",
+  y_label = "Frequency",
+  file_name = NULL # Plot directly
+)
+
+# Close the png device
+dev.off()
+
+# Reset plotting parameters
+par(mfrow = c(1, 1))
+```
+
+
+#### Kolmogorov-Smirnov tests for Log Tax and Log Taxpayers data (n = 93)
+
+```{r}
+
+knitr::include_graphics("figures/Fig_A1_Hists.png")
+
+x <- ks_test_tidy(main_dataset, "Log_Tax", signif_digits = 3)
+knitr::kable(x, caption = "Kolmogorov-Smirnov test for Log Tax data (n = 93)")
+
+y <- ks_test_tidy(main_dataset, "Log_Taxpayers", signif_digits = 3)
+knitr::kable(y, caption = "Kolmogorov-Smirnov test for Log Taxpayers data (n = 93)")
+
+rm(x,y)
+
+```
+
+
+#### Figure A2: Kolmogorov-Smirnov Test Plots with 95% C.I.s
+
+```{r}
+# Define output file
+png(
+  filename = "figures/Fig_A2_KS.png",
+  width = 8,
+  height = 4,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+# Set up a 1x2 plotting layout
+par(mfrow = c(1, 2))
+
+# Plot Figure A2a
+plot_ks_ci(
+  data = main_dataset$Log_Tax,
+  main_title = "(a)",
+  x_label = "Log Tax (£)",
+  y_label = "ECDF(Log Tax)",
+  file_name = NULL # Do not save individual files
+)
+
+# Plot Figure A2b
+plot_ks_ci(
+  data = main_dataset$Log_Taxpayers,
+  main_title = "(b)",
+  x_label = "Log Taxpayers",
+  y_label = "ECDF(Log Taxpayers)",
+  file_name = NULL # Do not save individual files
+)
+
+# Close the png device
+dev.off()
+
+# Reset plotting parameters
+par(mfrow = c(1, 1))
+
+knitr::include_graphics("figures/Fig_A2_KS.png")
+
+```
+
+
+
+
+#### Figure A3: Zipfian Tail of Taxpayer Count Log-Log Rank-Size Plot
+
+```{r}
+
+png(
+  filename = "figures/Fig_A3_Zipf.png",
+  width = 5,
+  height = 5,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+plot(
+  main_dataset$Log_Rank,
+  main_dataset$Log_Taxpayers,
+  main = "Zipfian Taxpayers Tail",
+  cex.main = 2,
+  pch = 16,
+  font.main = 2,
+  font.lab = 2,
+  xlab = "Log Rank",
+  ylab = "Log Taxpayers"
+)
+
+abline(
+  a = max(main_dataset$Log_Taxpayers),
+  b = -0.35,
+  col = "red",
+  lwd = 2.5
+)
+
+text(3,
+     7.15,
+     "Ln(Taxpayers) = 7.27 - 0.35(Ln(Rank))",
+     cex = 0.8,
+     font = 2)
+
+dev.off()
+
+
+knitr::include_graphics("figures/Fig_A3_Zipf.png")
+```
+
+
+#### Figure A4: Analysis of the Expanded 1524/5 Lay Subsidy Taxpayer Counts Dataset (expanded sample of towns with at least 50 taxpayers) 
+
+
+```{r}
+
+# Define output file
+png(
+  filename = "figures/Fig_A4_HistKS.png",
+  width = 8.5,
+  height = 4,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+# Set up a 1x2 plotting layout
+par(mfrow = c(1, 2))
+
+# Plot Figure A4a (Histogram with Density)
+histogram_density(
+  data = add_taxpayers$Log_Taxpayers,
+  breaks = seq(3, 8, 0.2),
+  main_title = "(a)",
+  x_label = "Log Taxpayers",
+  y_label = "Frequency",
+  file_name = NULL # Do not save individual files
+)
+
+# Plot Figure A4b (ECDF with Normal Overlay)
+plot_ks_ci(
+  data = add_taxpayers$Log_Taxpayers,
+  main_title = "(b)",
+  x_label = "Log Taxpayers",
+  y_label = "ECDF(Log Taxpayers)",
+  file_name = NULL # Do not save individual files
+)
+
+# Close the png device
+dev.off()
+
+# Reset plotting parameters
+par(mfrow = c(1, 1))
+
+
+```
+
+#### Kolmogorov-Smirnov test for Log Taxpayers (n = 134) using expanded sample of towns with at least 50 taxpayers 
+
+```{r}
+
+knitr::include_graphics("figures/Fig_A4_HistKS.png")
+
+x <- ks_test_tidy(add_taxpayers, "Log_Taxpayers", signif_digits = 3)
+knitr::kable(x, caption = "Kolmogorov-Smirnov test for Log Taxpayers (n = 134) using expanded sample of towns with at least 50 taxpayers")
+
+rm(x)
+
+```
+
+
+
+
+# NEW
+
+
+### 5.1. Results by Error-Type Subset
+
+
+```{r}
+# List of required packages
+required_pkgs <- c("zoo", "lmtest", "sandwich", "ggplot2", "devtools", "broom", "plyr", "MASS", "NSM3")
+
+# Check which packages are not yet installed
+to_install <- required_pkgs[!required_pkgs %in% installed.packages()]
+
+# Install the missing packages
+if (length(to_install) > 0) {
+  install.packages(to_install)
+}
+
+# Load all required packages
+invisible(sapply(required_pkgs, requireNamespace))
+
+# Clean up the environment
+rm(required_pkgs, to_install)
+
+```
+
+
+#### ~~~~Regreesion Results Table for all Error-Type Subsets
+
+```{r}
+
+# Define the conditions matrix
+conditions <- matrix(c(2, 2, 2, 1, 1, 2, 1, 1), nrow = 2, byrow = TRUE)
+
+# Run the analysis for the first code chunk
+results_chunk1 <- generate_regression_analysis(
+  dataset = main_dataset,
+  response = "Log_Tax",
+  predictors = c("Log_Taxpayers"),
+  conditions = conditions,
+  group_columns = NULL # No group columns needed for the first analysis
+)
+
+# Extract Table1
+Table1 <- results_chunk1$Table1
+
+```
+
+
+#### ~~~~Table 1 (dataframe): Scaling of 1524/5 Tax Paid with Taxpayer Count (in "5.1. Results by Error-Type Subset" from Main Text)
+
+
+```{r}
+print(Table1)
+write.csv(Table1, file = paste0(WD$data_p, "Scaling_Results_Table_Output.csv"))
+```
+
+
+
+#### *****Figure 1. Log-linear Regression Plot of 1524/5 Tax ~ Taxpayer scaling relation for all towns (n = 93) 
+
+```{r}
+
+png(
+  filename = "figures/Fig_1_ScalingPlot.png",
+  width = 6,
+  height = 6,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+ggplot(main_dataset,
+       aes(x = main_dataset$Log_Taxpayers, y = main_dataset$Log_Tax)) +
+  geom_point(size = 3, aes(
+    colour = factor(main_dataset$GroupN),
+    shape = factor(main_dataset$GroupN)
+  )) +
+  scale_color_manual(name = "Error Type Subsets",
+                     values = c("grey60", "black", "grey40", "grey50")) +
+  scale_shape_manual(name = "Error Type Subsets", values = c(18, 16, 15, 17)) +
+  geom_smooth(
+    fullrange = TRUE,
+    method = lm,
+    se = TRUE,
+    colour = "red",
+    size = 1
+  ) +
+  scale_x_continuous(expand = c(0, 0), limits = c(4.5, 10)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(2, 10)) +
+  coord_cartesian(xlim = c(4.5, 8), ylim = c(2, 7.5)) +
+  geom_abline(
+    mapping = NULL,
+    data = NULL,
+    slope = 1.2695,
+    intercept = -2.982366,
+    na.rm = FALSE,
+    show.legend = NA,
+    colour = "red",
+    size = 1
+  ) +
+  geom_abline(
+    mapping = NULL,
+    data = NULL,
+    slope = 1,
+    intercept = -1.4,
+    na.rm = FALSE,
+    show.legend = NA,
+    colour = "black",
+    size = 1
+  ) +
+  geom_abline(
+    mapping = NULL,
+    data = NULL,
+    slope = 1.15,
+    intercept = -2.28,
+    na.rm = FALSE,
+    show.legend = NA,
+    colour = "gold1",
+    size = 1
+  ) +
+  xlab("Log Taxpayers, 1524/5") +
+  ylab("Log Tax (£), 1524/5") +
+  theme_bw() +
+  theme(legend.justification = c(1, 0),
+        legend.position = c(0.9, 0.1)) +
+  theme(
+    legend.box.background = element_rect(colour = "black"),
+    panel.border = element_rect(colour = "black", fill = NA),
+    legend.background = element_blank()
+  ) +
+  theme(axis.text = element_text(size = 12, color = "black")) +
+  theme(axis.title.y = element_text(size = 14, face = "bold")) +
+  theme(axis.title.x = element_text(size = 14, face = "bold")) +
+  theme(legend.title = element_text(face = "bold"))
+
+dev.off()
+
+```
+
+
+#### Gaussian Residuals Cross-Checks
+
+
+##### !!!!Residuals Tests for All Cases (n = 93)
+
+```{r}
+
+fm <- lm(main_dataset$Log_Tax ~ main_dataset$Log_Taxpayers)
+fm.resid <- resid(fm)
+
+shapiro.test(fm.resid)
+
+fit<-fitdistr(fm.resid,"normal")$estimate
+ks.test(fm.resid, "pnorm",fit[1],fit[2])
+
+
+```
+
+
+
+
+##### Residuals Histogram for full dataset
+
+```{r}
+# Define output file
+png(
+  filename = "figures/Residuals_Gaussian_distrib.png",
+  width = 9,
+  height = 5,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+# Set up a 1x2 plotting layout
+par(mfrow = c(1, 2))
+
+# Plot Residuals Histogram (Histogram with Density Overlay)
+histogram_density(
+  data = fm.resid,
+  breaks = seq(-1.5, 1.5, 0.2),
+  main_title = "(a)",
+  x_label = "Residuals",
+  y_label = "Frequency",
+  file_name = NULL # Do not save individual files
+  
+)
+
+# Plot ECDF of Residuals (ECDF with Normal Overlay)
+plot_ks_ci(
+  data = fm.resid,
+  main_title = "(b)",
+  x_label = "Residuals",
+  y_label = "ECDF(Residuals)",
+  file_name = NULL # Do not save individual files
+)
+
+
+# Close the png device
+dev.off()
+
+# Reset plotting parameters
+par(mfrow = c(1, 1))
+
+```
+
+
+##### !!!!Residuals Tests for No Rural/Municipal Subset (n = 68)
+
+
+```{r}
+
+NoRur <- subset(main_dataset, Problem < 2 & Rural < 1)
+
+fm.NR <- lm(NoRur$Log_Tax ~ NoRur$Log_Taxpayers)
+fm.NR.resid <- resid(fm.NR)
+
+shapiro.test(fm.NR.resid)
+
+fit<-fitdistr(fm.NR.resid,"normal")$estimate
+ks.test(fm.NR.resid, "pnorm",fit[1],fit[2])
+```
+
+
+
+##### !!!!Residuals Tests for No Problematic Returns Subset (n = 77) 
+
+```{r}
+NoProb <- subset(main_dataset, Problem < 1 & Rural < 2)
+
+fm.NP <- lm(NoProb$Log_Tax ~ NoProb$Log_Taxpayers)
+fm.NP.resid <- resid(fm.NP)
+
+shapiro.test(fm.NP.resid)
+
+fit<-fitdistr(fm.NP.resid,"normal")$estimate
+ks.test(fm.NP.resid, "pnorm",fit[1],fit[2])
+```
+
+
+##### !!!!Residuals Tests for No Rural, No Problem Subset (n = 55)
+
+
+```{r}
+NoRurNoProb <- subset(main_dataset, Problem < 1 & Rural < 1)
+
+fm.NRNP <- lm(NoRurNoProb$Log_Tax ~ NoRurNoProb$Log_Taxpayers)
+fm.NRNP.resid <- resid(fm.NRNP)
+
+shapiro.test(fm.NRNP.resid)
+
+fit<-fitdistr(fm.NRNP.resid,"normal")$estimate
+ks.test(fm.NRNP.resid, "pnorm",fit[1],fit[2])
+```
+
+# NEW
+
+### required_pkgs3
+
+```{r}
+# List of required packages
+required_pkgs <- c("zoo", "lmtest", "sandwich", "ggplot2", "devtools", "broom", "plyr", "MASS", "NSM3")
+
+# Check which packages are not yet installed
+to_install <- required_pkgs[!required_pkgs %in% installed.packages()]
+
+# Install the missing packages
+if (length(to_install) > 0) {
+  install.packages(to_install)
+}
+
+# Load all required packages
+invisible(sapply(required_pkgs, requireNamespace))
+
+# Clean up the environment
+rm(required_pkgs, to_install)
+```
+
+### &&&&Calculation of WCSs from "WCS1: Maximal Modifier Ranges" and "A1.4 Proxy Data WCS Models"
+
+
+```{r}
+WCS_Calculations <- main_dataset[-c(7:11)]
+```
+
+
+#### &&&&A3 WCS1: Maximal Modifier Rages 
+
+```{r}
+WCS_Calculations$WCS1_4_6_mods <- linear_rescale(WCS_Calculations$Taxpayers, 4, 6, 151, 1423)
+WCS_Calculations$WCS1_4_6_pops <- round(WCS_Calculations$WCS1_4_6_mods * WCS_Calculations$Taxpayers, 0)
+WCS_Calculations$WCS1_5_7_mods <- linear_rescale(WCS_Calculations$Taxpayers, 5, 7, 151, 1423)
+WCS_Calculations$WCS1_5_7_pops <- round(WCS_Calculations$WCS1_5_7_mods * WCS_Calculations$Taxpayers, 0)
+WCS_Calculations$WCS1_5.5_7.5_mods <- linear_rescale(WCS_Calculations$Taxpayers, 5.5, 7.5, 151, 1423)
+WCS_Calculations$WCS1_5.5_7.5_pops <- round(WCS_Calculations$WCS1_5.5_7.5_mods * WCS_Calculations$Taxpayers, 0)
+WCS_Calculations$WCS1_6_8_mods <- linear_rescale(WCS_Calculations$Taxpayers, 6, 8, 151, 1423)
+WCS_Calculations$WCS1_6_8_pops <- round(WCS_Calculations$WCS1_6_8_mods * WCS_Calculations$Taxpayers, 0)
+WCS_Calculations$WCS1_7_9_mods <- linear_rescale(WCS_Calculations$Taxpayers, 7, 9, 151, 1423)
+WCS_Calculations$WCS1_7_9_pops <- round(WCS_Calculations$WCS1_7_9_mods * WCS_Calculations$Taxpayers, 0)
+```
+
+
+#### &&&&A4.1 Taxpayer Exemption Proportions - for WCS2 and WCS3
+
+```{r}
+WCS_Calculations$WCS_exemption_rate <- linear_rescale(WCS_Calculations$Taxpayers, 1.25, 2, 151, 1000)
+WCS_Calculations$WCS_exemption_rate[1:3] <- 1/(1-0.5)
+WCS_Calculations$WCS_exemption_rate_Honor <- WCS_Calculations$WCS_exemption_rate
+WCS_Calculations$WCS_exemption_rate_Honor[3] <- 1/(1-0.48)
+WCS_Calculations$WCS_exemption_rate_Honor[6] <- 1/(1-0.544)
+WCS_Calculations$WCS_exemption_rate_Honor[7] <- 1/(1-0.27)
+WCS_Calculations$WCS_exemption_rate_Honor[15] <- 1/(1-0.44)
+WCS_Calculations$WCS_exemption_rate_Honor[16] <- 1/(1-0.37)
+WCS_Calculations$WCS_exemption_rate_Honor[18] <- 1/(1-0.363)
+WCS_Calculations$WCS_exemption_rate_Honor[22] <- 1/(1-0.333)
+WCS_Calculations$WCS_exemption_rate_Honor[23] <- 1/(1-0.25)
+WCS_Calculations$WCS_exemption_rate_Honor[44] <- 1/(1-0.327)
+WCS_Calculations$WCS_exemption_rate_Honor[46] <- 1/(1-0.204)
+WCS_Calculations$WCS_exemption_rate_Honor[55] <- 1/(1-0.203)
+WCS_Calculations$WCS_exemption_rate_Honor[76] <- 1/(1-0.146)
+WCS_Calculations$WCS_exemption_rate_Honor[85] <- 1/(1-0.262)
+```
+
+#### &&&&A4.2 WCS2: Taxpayers as Households - Mean Household Size (MHS) 
+
+```{r}
+
+WCS_Calculations$WCS2_MHS <- linear_rescale(WCS_Calculations$Taxpayers, 4.75, 3.83, 151, 1000)
+WCS_Calculations$WCS2_MHS[1:3] <- 3.83
+WCS_Calculations$WCS2_mods <- WCS_Calculations$WCS2_MHS * WCS_Calculations$WCS_exemption_rate
+WCS_Calculations$WCS2_mods_Honor <- WCS_Calculations$WCS2_MHS * WCS_Calculations$WCS_exemption_rate_Honor
+WCS_Calculations$WCS2_pops  <- round(WCS_Calculations$WCS2_mods * WCS_Calculations$Taxpayers, 0)
+WCS_Calculations$WCS2_pops_Honor <- round(WCS_Calculations$WCS2_mods_Honor * WCS_Calculations$Taxpayers, 0)
+```
+
+#### &&&&A4.3 WCS3: Taxpayers as Adult Males - Sex Ratios and Age Structure
+
+```{r}
+WCS_Calculations$WCS3_sex_ratio <- linear_rescale(WCS_Calculations$Taxpayers, 2.18, 2.39, 151, 1000)
+WCS_Calculations$WCS3_sex_ratio[1:3] <- 2.39
+WCS_Calculations$WCS3_age_struct <- linear_rescale(WCS_Calculations$Taxpayers, 1.66, 1.37, 151, 1000)
+WCS_Calculations$WCS3_age_struct[1:3] <- 1.37
+WCS_Calculations$WCS3_mods <- WCS_Calculations$WCS3_age_struct * WCS_Calculations$WCS3_sex_ratio * WCS_Calculations$WCS_exemption_rate
+WCS_Calculations$WCS3_mods_Honor <- WCS_Calculations$WCS3_age_struct * WCS_Calculations$WCS3_sex_ratio * WCS_Calculations$WCS_exemption_rate_Honor
+WCS_Calculations$WCS3_pops  <- round(WCS_Calculations$WCS3_mods * WCS_Calculations$Taxpayers, 0)
+WCS_Calculations$WCS3_pops_Honor <- round(WCS_Calculations$WCS3_mods_Honor * WCS_Calculations$Taxpayers, 0)
+```
+
+
+
+
+```{r}
+#### View the WCS Calculation Table ####
+View(WCS_Calculations)
+#write.csv(WCS_Calculations, file = "WCS_Calculations_Table_Output.csv")
+```
+
+
+
+
+### Analysis and Figures from 5.3. Sensitivity Analysis and A1.6 Sensitivity Analysis
+
+
+
+#### ~~~~Full Sensitivity Analysis Script (output is a dataframe / table)
+
+```{r}
+# Define the conditions matrix
+conditions <- matrix(c(2, 2, 2, 1, 1, 2, 1, 1), nrow = 2, byrow = TRUE)
+
+# Define the group columns (from the ZA vector in the second code chunk)
+group_columns <- c("1", "2", "3", "4", "5", "6", "Taxpayers", "Dyer (2000c)", 
+                   "Dyer (2000c) Extended", "WCS1", "WCS2", "WCS3")
+
+# Run the analysis for the second code chunk
+results_chunk2 <- generate_regression_analysis(
+  dataset = WCS,
+  response = "Tax",
+  predictors = NULL, # Predictors are determined dynamically by group columns
+  conditions = conditions,
+  group_columns = group_columns
+)
+
+# Extract WCS_Table
+WCS_Table <- results_chunk2$WCS_Table
+print(WCS_Table)
+
+#################################
+
+
+WCS_Table <- data.frame()
+ZA <- c("1", "2", "3", "4", "5", "6", "Taxpayers", "Dyer (2000c)", "Dyer (2000c) Extended", "WCS1", "WCS1", "WCS1", "WCS1", "WCS1", "WCS2", "WCS2 Honor Data", "WCS3", "WCS3 Honor Data")
+ZB <- c("1", "2", "3", "4", "5", "6", "NA", "NA", "NA", "[4, 6]", "[5, 7]", "[5.5, 7.5]", "[6, 8]", "[7, 9]", "[5.94, 7.66]", "[5.5, 9.05]", "[4.52, 6.55]", "[4.22, 7.42]")
+ZC <- c(1, 2, 3, 4, 5, 6, NA, NA, NA, 1.5, 1.4, 1.36, 1.33, 1.28, 1.29, 1.65, 1.45, 1.76)
+ZD <- c("1", "2", "3", "4", "5", "6", "Raw Data", "Pop Estimates", "Pop Estimates", "Extended Modifier Ranges", "Extended Modifier Ranges", "Extended Modifier Ranges", "Extended Modifier Ranges", "Extended Modifier Ranges", "Taxpayers as Households (MHS)", "Taxpayers as Households (MHS)", "Taxpayers as Adult Males (Sex Ratios and Age Structure)", "Taxpayers as Adult Males (Sex Ratios and Age Structure)")
+for (j in 7:18) {
+	out <- data.frame()
+	Z <- colnames(WCS)[j] 
+	Z1 <- ZA[j]
+	Z2 <- ZB[j]
+	Z3 <- ZC[j]
+	Z4 <- ZD[j]
+	for (i in 1:4){
+		EE = matrix( c(2, 2, 2, 1, 1, 2, 1, 1), nrow=2, ncol=4)
+		x.sub <- subset(WCS, Problem < EE[1,i] & Rural < EE[2,i])
+		x <- log(x.sub[,j])
+		y <- log(x.sub$Tax)
+		if (j == 8) {
+			new_DF <- x.sub[rowSums(is.na(x.sub)) > 0,]
+			remove <- new_DF$Number
+			x=x[-remove]
+			y=y[-remove]
+			}
+		fm <- lm(y ~ x)
+		tidy_fm <- tidy(fm)
+		coeftest <- coeftest(fm, vcov = vcovHC(fm, "HC1"))
+		tidy_coeftest <- tidy(coeftest)
+		tidy_coeftest$term[1] <- "alpha"
+		tidy_coeftest$term[2] <- "beta"
+		tidy_coeftest$param <- c(1, 2)
+		tidy_coeftest$estimate[1] <- exp(tidy_coeftest$estimate[1])
+		if (EE[1,i] == 2 & EE[2,i] == 2){
+			tidy_coeftest$analysis <- c("All", "All")
+			tidy_coeftest$analysis_num <- c(1, 1)
+		}
+		if (EE[1,i] == 2 & EE[2,i] == 1){
+			tidy_coeftest$analysis <- c("No Rural", "No Rural")
+			tidy_coeftest$analysis_num <- c(2, 2)
+		}
+		if (EE[1,i] == 1 & EE[2,i] == 2){
+			tidy_coeftest$analysis <- c("No Problem", "No Problem")
+			tidy_coeftest$analysis_num <- c(3, 3)
+		}
+		if (EE[1,i] == 1 & EE[2,i] == 1){
+			tidy_coeftest$analysis <- c("No Rural, No Problem", "No Rural, No Problem")
+			tidy_coeftest$analysis_num <- c(4, 4)
+		}
+		tidy_coeftest$n <- c(length(x), length(x))
+		tidy_coeftest$rsquared <- c(summary(fm)$r.squared, summary(fm)$r.squared)
+		#tidy_coeftest$dataset_num <- c(1, 1)
+		
+		#set HC1 covariance matrix as an object
+		Cov<-vcovHC(fm, "HC1")
+
+		#calculate and report 95% confidence interval using HC1 covariance matrix
+		tt <-qt(c(0.025,0.975),summary(fm)$df[2])
+		se <- sqrt(diag(Cov))
+		ci <-coef(fm) + se %o% tt
+
+		tidy_coeftest$ci0.025 <- c(exp(ci[1,1]), ci[2,1])
+		tidy_coeftest$ci0.975 <- c(exp(ci[1,2]), ci[2,2])
+		out=rbind(out,tidy_coeftest)
+	}
+	WCS_analysis <- c(Z,Z,Z,Z)
+	Group <- c(Z1,Z1,Z1,Z1)
+	Modifier_Ranges <- c(Z2,Z2,Z2,Z2)
+	b_a_ratio <- c(Z3,Z3,Z3,Z3)
+	Estimation_Basis <- c(Z4,Z4,Z4,Z4)
+	analysis_num <- out$analysis_num[c(TRUE, FALSE)]
+	Subset <- out$analysis[c(TRUE, FALSE)]
+	n <- out$n[c(TRUE, FALSE)]
+	R_squared <- out$rsquared[c(TRUE, FALSE)]
+	alpha_estimate <- out$estimate[c(TRUE, FALSE)]
+	alpha_ci_0.025 <- out$ci0.025[c(TRUE, FALSE)]
+	alpha_ci_0.975 <- out$ci0.975[c(TRUE, FALSE)]
+	beta_estimate <- out$estimate[c(FALSE, TRUE)]
+	beta_ci_0.025 <- out$ci0.025[c(FALSE, TRUE)]
+	beta_ci_0.975 <- out$ci0.975[c(FALSE, TRUE)]
+	Table <- data.frame(WCS_analysis, Group, Modifier_Ranges, b_a_ratio, Estimation_Basis, analysis_num, Subset, n, R_squared, beta_estimate, beta_ci_0.025, beta_ci_0.975, alpha_estimate, alpha_ci_0.025, alpha_ci_0.975)
+	WCS_Table=rbind(WCS_Table,Table)
+}
+```
+
+#### Table (dataframe) of Full WCS Results (Tables A5 and A9 in Appendix)
+
+```{r}
+View(WCS_Table)
+#write.csv(WCS_Table, file = "Sensitivity_Analysis_Results_Table_Output.csv")
+
+
+```
+
+#### ~~~~Table of Sensitivity Analysis Regression Results Summarized by Dataset (Table 2 of main text, Table A8 of Appendix )
+
+```{r}
+WCS_Table_Mean_Summary <- ddply(WCS_Table, .(WCS_analysis), summarise,
+ mean_R_square = round(mean(R_squared), 2),
+ mean_alpha_estimate = round(mean(alpha_estimate), 3),
+ mean_alpha_ci_0.025 = round(mean(alpha_ci_0.025), 3),
+ mean_alpha_ci_0.975 = round(mean(alpha_ci_0.975), 3),
+ mean_beta_estimate = round(mean(beta_estimate), 2),
+ mean_beta_ci_0.025 = round(mean(beta_ci_0.025), 2),
+ mean_beta_ci_0.975 = round(mean(beta_ci_0.975), 2))
+WCS_Table_Mean_Summary$Group <- c("Taxpayers", "Dyer (2000c)", "Dyer (2000c) Extended", "WCS1", "WCS1", "WCS1", "WCS1", "WCS1", "WCS2", "WCS2 Honor Data", "WCS3", "WCS3 Honor Data")
+WCS_Table_Mean_Summary$Modifier_Ranges <- c("NA", "NA", "NA", "[4, 6]", "[5, 7]", "[5.5, 7.5]", "[6, 8]", "[7, 9]", "[5.94, 7.66]", "[5.5, 9.05]", "[4.52, 6.55]", "[4.22, 7.42]")
+WCS_Table_Mean_Summary$b_a_ratio <- c(NA, NA, NA, 1.5, 1.4, 1.36, 1.33, 1.28, 1.29, 1.65, 1.45, 1.76)
+WCS_Table_Mean_Summary$Estimation_Basis <- c("Raw Data", "Pop Estimates", "Pop Estimates", "Extended Modifier Ranges", "Extended Modifier Ranges", "Extended Modifier Ranges", "Extended Modifier Ranges", "Extended Modifier Ranges", "Taxpayers as Households (MHS)", "Taxpayers as Households (MHS)", "Taxpayers as Adult Males (Sex Ratios and Age Structure)", "Taxpayers as Adult Males (Sex Ratios and Age Structure)")
+WCS_Table_Mean_Summary$n <- c(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
+View(WCS_Table_Mean_Summary)
+
+
+
+
+write.csv(WCS_Table_Mean_Summary, file = "Sensitivity_Analysis_Summary_Table_Averages.csv")
+
+
+```
+
+
+
+
+#### Statistical Summary of all WCS Regressions (n = 36) (Table 3 of Main Text and Table A5 of Appendix)
+
+
+```{r}
+
+WCS_Table_Cropped <- WCS_Table[-c(1:12), ] 
+Stat_Summary_WCS <- data.frame(row.names = c("Mean", "St.Dev.", "Min", "Q1", "Median", "Q3", "Max"))
+Stat_Summary_WCS$R_square <- c(round(mean(WCS_Table_Cropped$R_squared), 2), round(sd(WCS_Table_Cropped$R_squared), 2), round(min(WCS_Table_Cropped$R_squared), 2), round(quantile(WCS_Table_Cropped$R_squared)[2], 2), round(median(WCS_Table_Cropped$R_squared), 2), round(quantile(WCS_Table_Cropped$R_squared)[4], 2), round(max(WCS_Table_Cropped$R_squared), 2))
+Stat_Summary_WCS$beta <- c(round(mean(WCS_Table_Cropped$beta_estimate), 2), round(sd(WCS_Table_Cropped$beta_estimate), 2), round(min(WCS_Table_Cropped$beta_estimate), 2), round(quantile(WCS_Table_Cropped$beta_estimate)[2], 2), round(median(WCS_Table_Cropped$beta_estimate), 2), round(quantile(WCS_Table_Cropped$beta_estimate)[4], 2), round(max(WCS_Table_Cropped$beta_estimate), 2))
+Stat_Summary_WCS$beta_ci_0.025 <- c(round(mean(WCS_Table_Cropped$beta_ci_0.025), 2), round(sd(WCS_Table_Cropped$beta_ci_0.025), 2), round(min(WCS_Table_Cropped$beta_ci_0.025), 2), round(quantile(WCS_Table_Cropped$beta_ci_0.025)[2], 2), round(median(WCS_Table_Cropped$beta_ci_0.025), 2), round(quantile(WCS_Table_Cropped$beta_ci_0.025)[4], 2), round(max(WCS_Table_Cropped$beta_ci_0.025), 2))
+Stat_Summary_WCS$beta_ci_0.975 <- c(round(mean(WCS_Table_Cropped$beta_ci_0.975), 2), round(sd(WCS_Table_Cropped$beta_ci_0.975), 2), round(min(WCS_Table_Cropped$beta_ci_0.975), 2), round(quantile(WCS_Table_Cropped$beta_ci_0.975)[2], 2), round(median(WCS_Table_Cropped$beta_ci_0.975), 2), round(quantile(WCS_Table_Cropped$beta_ci_0.975)[4], 2), round(max(WCS_Table_Cropped$beta_ci_0.975), 2))
+Stat_Summary_WCS$alpha <- c(round(mean(WCS_Table_Cropped$alpha_estimate), 3), round(sd(WCS_Table_Cropped$alpha_estimate), 3), round(min(WCS_Table_Cropped$alpha_estimate), 3), round(quantile(WCS_Table_Cropped$alpha_estimate)[2], 3), round(median(WCS_Table_Cropped$alpha_estimate), 3), round(quantile(WCS_Table_Cropped$alpha_estimate)[4], 3), round(max(WCS_Table_Cropped$alpha_estimate), 3))
+Stat_Summary_WCS$alpha_ci_0.025 <- c(round(mean(WCS_Table_Cropped$alpha_ci_0.025), 3), round(sd(WCS_Table_Cropped$alpha_ci_0.025), 3), round(min(WCS_Table_Cropped$alpha_ci_0.025), 3), round(quantile(WCS_Table_Cropped$alpha_ci_0.025)[2], 3), round(median(WCS_Table_Cropped$alpha_ci_0.025), 3), round(quantile(WCS_Table_Cropped$alpha_ci_0.025)[4], 3), round(max(WCS_Table_Cropped$alpha_ci_0.025), 3))
+Stat_Summary_WCS$alpha_ci_0.975 <- c(round(mean(WCS_Table_Cropped$alpha_ci_0.975), 3), round(sd(WCS_Table_Cropped$alpha_ci_0.975), 3), round(min(WCS_Table_Cropped$alpha_ci_0.975), 3), round(quantile(WCS_Table_Cropped$alpha_ci_0.975)[2], 3), round(median(WCS_Table_Cropped$alpha_ci_0.975), 3), round(quantile(WCS_Table_Cropped$alpha_ci_0.975)[4], 3), round(max(WCS_Table_Cropped$alpha_ci_0.975), 3))
+View(Stat_Summary_WCS)
+#write.csv(Stat_Summary_WCS, file = "SStat_Summary_WCS_Table.csv")
+
+
+```
+
+
+
+#### Sensitivity Analysis Histogram for all WCS β coefficients (n = 36) (Figure A5 of Appendix)
+
+```{r}
+
+betas <- WCS_Table_Cropped$beta_estimate
+betasNRNP <- betas[c(FALSE, FALSE, FALSE, TRUE)]
+```
+
+
+```{r}
+
+png(
+  filename = "Fig_2_Hist_betas.png",
+  width = 5,
+  height = 4,
+  units = "in",
+  res = 300,
+  bg = "white",
+  family = "",
+  restoreConsole = TRUE,
+  type = "windows"
+)
+
+hist(
+  betas,
+  breaks = seq(1, 1.2, 0.02),
+  main = "WCSs 1-3 (n = 36)",
+  col = 'grey60',
+  xlim = c(1, 1.2),
+  ylim = c(0, 10),
+  xlab = "Estimated β"
+)
+
+hist(betasNRNP, col = 'Black', add = T)
+
+dev.off()
+
+```
+
+
+# NEW
+
+### Analysis from 7. IRS and Town Size
+
+#### Analyses for Table 3. Scaling Analysis of Town Size Ranges in 1524/5 Lay Subsidy
+
+##### Analyses for Table 3A: Towns Split Into Thirds
+
+
+```{r}
+fm <- lm(main_dataset$Log_Tax[1:31] ~ main_dataset$Log_Taxpayers[1:31])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[32:62] ~ main_dataset$Log_Taxpayers[32:62])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[63:93] ~ main_dataset$Log_Taxpayers[63:93])
+summary(fm)
+exp(fm$coefficients[1])
+```
+
+
+##### Analyses for Table 3A: Stepwise Removal of Larger Towns
+
+```{r}
+
+fm <- lm(main_dataset$Log_Tax[1:93] ~ main_dataset$Log_Taxpayers[1:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[6:93] ~ main_dataset$Log_Taxpayers[6:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[11:93] ~ main_dataset$Log_Taxpayers[11:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[16:93] ~ main_dataset$Log_Taxpayers[16:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[21:93] ~ main_dataset$Log_Taxpayers[21:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[26:93] ~ main_dataset$Log_Taxpayers[26:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[31:93] ~ main_dataset$Log_Taxpayers[31:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[36:93] ~ main_dataset$Log_Taxpayers[36:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[41:93] ~ main_dataset$Log_Taxpayers[41:93])
+summary(fm)
+exp(fm$coefficients[1]) 
+
+fm <- lm(main_dataset$Log_Tax[46:93] ~ main_dataset$Log_Taxpayers[46:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[51:93] ~ main_dataset$Log_Taxpayers[51:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[56:93] ~ main_dataset$Log_Taxpayers[56:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[61:93] ~ main_dataset$Log_Taxpayers[61:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[66:93] ~ main_dataset$Log_Taxpayers[66:93])
+summary(fm)
+exp(fm$coefficients[1])
+
+fm <- lm(main_dataset$Log_Tax[71:93] ~ main_dataset$Log_Taxpayers[71:93])
+summary(fm)
+exp(fm$coefficients[1])
+```
+
+
+### Analysis from 8. Scaling Residuals and Regional Demand
+
+#### required_pkgs4
+
+
+```{r}
+library(spdep)
+library(ncf) 
+library(maptools)
+
+```
+
+#### Global Moran's I for English Town Log Regression Residuals (n = 93)
+
+```{r}
+
+# create distance matrix for all towns
+resid_coords_geog.d <- as.matrix(dist(cbind(resid_coords_geog$Lon, resid_coords_geog$Lat)))
+
+# create vector of the average tax paid per taxpayer
+ord <- order(resid_coords_geog$Resid)
+
+# plot and color code sites, label by town number
+plot(resid_coords_geog[ord, 10:9], pch = 16, col = colorRampPalette(c("yellow", "red"))(nrow(resid_coords_geog)),
+xlab = "Lon", ylab = "Lat", add=T)
+text(resid_coords_geog[ord, 10:9], labels = resid_coords_geog[ord, 2], cex = 0.7, pos = 1)
+
+# create a matrix of weights based on the inverse distances between sites
+w <- 1/resid_coords_geog.d
+diag(w) <- 0
+
+moran.test(resid_coords_geog$Resid, mat2listw(w))
+
+```
+
+
+#### Multiple OLS Regression for County-Level Regression Residuals on Demand Proxies (n = 31)
+
+```{r}
+
+fm <- lm(tudor_counties$SumLogResid ~ tudor_counties$Tax1524.5 + tudor_counties$Markets1588_km2 + tudor_counties$TownTax.TotTax)
+summary(fm)
+
+fm <- lm(tudor_counties$MaxLogResid ~ tudor_counties$Tax1524.5 + tudor_counties$Markets1588_km2 + tudor_counties$TownTax.TotTax)
+summary(fm)
+```
+
+# NOT YET USED/PLACED
+
+
+
+
+```{r}
+main_dataset$Log_Tax
+library(ggplot2)
+ggKSCI(main_dataset$Log_Tax)
+gg_plot_ks_ci(main_dataset$Log_Tax)
+ggplot_ks_ci(main_dataset$Log_Tax)
+
+ggplot_ks_ci(main_dataset$Log_Tax)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

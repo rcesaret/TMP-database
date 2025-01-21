@@ -1,0 +1,1444 @@
+-- This script generates the PostgreSQL database TMP_DF9
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS public."location"
+(
+    "SSN" smallint NOT NULL,
+    "site" character varying(3) COLLATE pg_catalog."default",
+    "subsite" character varying(4) COLLATE pg_catalog."default",
+    "unit" character varying(4) COLLATE pg_catalog."default",
+    "northing" smallint,
+    "easting" smallint,
+    CONSTRAINT location_pkey PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."description"
+(
+    "SSN" smallint NOT NULL,
+    "midden" smallint,
+    "burials" smallint,
+    "height" smallint,
+    "slope" smallint,
+    "areaSite" smallint,
+    "areaStruct" smallint,
+    "lastBuildPhase" smallint,
+    "ceramicAbundance" smallint,
+    "intrusiveSherd" smallint,
+    CONSTRAINT description_pkey PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."archInterp"
+(
+    "SSN" smallint NOT NULL,
+    "neighborhoodChar" smallint,
+    "constructQual" smallint,
+    "boundInfoQual" smallint,
+    "insubstantialCount" smallint,
+    "arch1PMic" smallint,
+    "arch1McTl" smallint,
+    "arch1XlMe" smallint,
+    "arch1Oxto" smallint,
+    "arch2PMic" smallint,
+    "arch2McTl" smallint,
+    "arch2XlMe" smallint,
+    "arch2Oxto" smallint,
+    "func1PMic" smallint,
+    "func1McTl" smallint,
+    "func1XlMe" smallint,
+    "func1Oxto" smallint,
+    "func2PMic" smallint,
+    "func2McTl" smallint,
+    "func2XlMe" smallint,
+    "func2Oxto" smallint,
+    CONSTRAINT "archInterp_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public.admin
+(
+    "SSN" smallint NOT NULL,
+    "collectionYear" smallint,
+    "collectionQuarter" smallint,
+    "analysisYear" smallint,
+    "analysisQuarter" smallint,
+    CONSTRAINT admin_pkey PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_ArchInterpPrim"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_ArchInterpPrim_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_ArchInterpAltern"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_ArchInterpAltern_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_FuncInterpPrim"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_FuncInterpPrim_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_FuncInterpAltern"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_FuncInterpAltern_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_ConstructQual"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_ConstructQual_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."lithicFlaked"
+(
+    "SSN" smallint NOT NULL,
+    "obsidianTot" smallint,
+    "obsidianBlades" smallint,
+    "obsidianWaste" smallint,
+    "obsidianScrapers" smallint,
+    "obsidianPoints" smallint,
+    "obsidianCores" smallint,
+    "obsidianKnives" smallint,
+    "obsidianEccentrics" smallint,
+    "obsidianMagueyS" smallint,
+    "obsidianUtFlake" smallint,
+    "obsidianNodules" smallint,
+    "basaltTot" smallint,
+    "basaltTools" smallint,
+    "chert" smallint,
+    "quartz" smallint,
+    CONSTRAINT "lithicFlaked_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."lithicGround"
+(
+    "SSN" smallint NOT NULL,
+    "manos" smallint,
+    "metates" smallint,
+    "mortars" smallint,
+    "pestles" smallint,
+    "plasterSmoothers" smallint,
+    "plumbBobs" smallint,
+    "wallFixtures" smallint,
+    "fireGods" smallint,
+    "sculptureFrags" smallint,
+    "hammerStones" smallint,
+    "slingStones" smallint,
+    "smoothStones" smallint,
+    "whetStones" smallint,
+    "palettes" smallint,
+    "celts" smallint,
+    "lajasReworked" smallint,
+    "anvils" smallint,
+    "drains" smallint,
+    "drainCovers" smallint,
+    "groundstoneOther" smallint,
+    "slateTot" smallint,
+    "slatePainted" smallint,
+    "alabaster" smallint,
+    "serpentine" smallint,
+    "jade" smallint,
+    CONSTRAINT "lithicGround_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."cerVessel"
+(
+    "SSN" smallint NOT NULL,
+    "ollaTot" smallint,
+    "ollaPatl" smallint,
+    "ollaWedge" smallint,
+    "ollaMicc" smallint,
+    "ollaTlam" smallint,
+    "ollaXola" smallint,
+    "ollaMete" smallint,
+    "comalTot" smallint,
+    "comalPatl" smallint,
+    "comalTzac" smallint,
+    "comalMicc" smallint,
+    "comalTlam" smallint,
+    "comalXola" smallint,
+    "comalMete" smallint,
+    "comalOxto" smallint,
+    "comalPOxt" smallint,
+    "censerTot" smallint,
+    "censerPPat" smallint,
+    "censerPatl" smallint,
+    "censerTzac" smallint,
+    "censerMicc" smallint,
+    "censerTlam" smallint,
+    "censerXola" smallint,
+    "censerMete" smallint,
+    "censerOxto" smallint,
+    "censerXome" smallint,
+    "censerMaza" smallint,
+    "censerAzte" smallint,
+    "nubbinTot" smallint,
+    "nubbinPatl" smallint,
+    "nubbinApet" smallint,
+    "nubbinInset" smallint,
+    "nubbinFlush" smallint,
+    "nubbinAtoy" smallint,
+    "nubbinXola" smallint,
+    "nubbinMete" smallint,
+    "toTot" smallint,
+    "toRegular" smallint,
+    "toCoarse" smallint,
+    "smoTot" smallint,
+    "smoTlam" smallint,
+    "smoXola" smallint,
+    "smoMete" smallint,
+    "shrdStamped" smallint,
+    "shrdPlanoR" smallint,
+    "shrdStucco" smallint,
+    "shrdIncised" smallint,
+    "foreignTot" smallint,
+    "mayaLow" smallint,
+    "mayaHigh" smallint,
+    "huastec" smallint,
+    "tajin" smallint,
+    "gulfCoast" smallint,
+    "monteAlban" smallint,
+    "oaxaca" smallint,
+    "foreignOther" smallint,
+    "adornos" smallint,
+    "minatures" smallint,
+    "copas" smallint,
+    "matteWare" smallint,
+    "granTot" smallint,
+    "granPMic" smallint,
+    "granMicc" smallint,
+    "granTlam" smallint,
+    "granXola" smallint,
+    "granMete" smallint,
+    "burner3P" smallint,
+    "coverHandled" smallint,
+    CONSTRAINT "cerVessel_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."cerPhTot"
+(
+    "SSN" smallint NOT NULL,
+    "totAll" smallint,
+    "totPrec" smallint,
+    "totCuan" smallint,
+    "totTezo" smallint,
+    "totPatl" smallint,
+    "totTzac" smallint,
+    "totMicc" smallint,
+    "totTlam" smallint,
+    "totXola" smallint,
+    "totMete" smallint,
+    "totOxto" smallint,
+    "totXome" smallint,
+    "totMaza" smallint,
+    "totAzte" smallint,
+    CONSTRAINT "cerPhTot_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."condition"
+(
+    "SSN" smallint NOT NULL,
+    "milpa" smallint,
+    "barley" smallint,
+    "beans" smallint,
+    "alfalfaCut" smallint,
+    "alfalfaUncut" smallint,
+    "nopales" smallint,
+    "magueys" smallint,
+    "fallow" smallint,
+    "uncultivate" smallint,
+    "cropWater" smallint,
+    "plowing" smallint,
+    "pitCultivate" smallint,
+    "pitLoot" smallint,
+    "pitMisc" smallint,
+    "archaeoExcRest" smallint,
+    "quarrying" smallint,
+    "stoneClearing" smallint,
+    "landLeveling" smallint,
+    "terracing" smallint,
+    "ditching" smallint,
+    "roadOrRail" smallint,
+    "recentWall" smallint,
+    "stoneRows" smallint,
+    "recentBuild" smallint,
+    "dam" smallint,
+    "jaguey" smallint,
+    "erosion" smallint,
+    "silting" smallint,
+    "siteAlteration" smallint,
+    CONSTRAINT condition_pkey PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."complexMacroData"
+(
+    "SSN" smallint NOT NULL,
+    "macroComplexUnit" character varying(4) COLLATE pg_catalog."default",
+    "macroComplexNum" smallint,
+    "presPaTz" smallint,
+    "presMcTl" smallint,
+    "presXlMt" smallint,
+    "funcIntPaTz" smallint,
+    "funcIntMcTl" smallint,
+    "funcIntXlMt" smallint,
+    CONSTRAINT "complexMacroData_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."description"
+(
+    "SSN" smallint NOT NULL,
+    "midden" smallint,
+    "burials" smallint,
+    "height" smallint,
+    "slope" smallint,
+    "areaSite" smallint,
+    "areaStruct" smallint,
+    "lastBuildPhase" smallint,
+    "ceramicAbundance" smallint,
+    "intrusiveSherd" smallint,
+    CONSTRAINT description_pkey PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."fieldWorkers"
+(
+    "SSN" smallint,
+    "personnelCode" smallint
+);
+
+CREATE TABLE IF NOT EXISTS public."labAnalysts"
+(
+    "SSN" smallint,
+    "personnelCode" smallint
+);
+
+CREATE TABLE IF NOT EXISTS public.workshop
+(
+    "SSN" smallint NOT NULL,
+    "groundstoneField" smallint,
+    "obsidianField" smallint,
+    "ceramicField" smallint,
+    "obsidianSpencePhase1" smallint,
+    "obsidianSpencePhase2" smallint,
+    "ceramicKrotser" smallint,
+    "figurineConcBarbour" smallint,
+    CONSTRAINT workshop_pkey PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."artifactOther"
+(
+    "SSN" smallint NOT NULL,
+    "workedBone" smallint,
+    "shellTot" smallint,
+    "shellWorked" smallint,
+    "unworkedBone" integer,
+    CONSTRAINT "artifactOther_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."archMaterial"
+(
+    "SSN" smallint NOT NULL,
+    "stoneQuant" smallint,
+    "stoneDist" smallint,
+    "stoneCut" smallint,
+    "lajas" smallint,
+    "tepetate" smallint,
+    "adobe" smallint,
+    "xalnene" smallint,
+    "cascajo" smallint,
+    "concrete" smallint,
+    "plasterPaint" smallint,
+    "plasterUnpaint" smallint,
+    "burntClay" smallint,
+    "almena" smallint,
+    "burnedStruct" smallint,
+    "floors" smallint,
+    "walls" smallint,
+    "drains" smallint,
+    "wallFixtures" smallint,
+    "murals" smallint,
+    "columns" smallint,
+    "taludes" smallint,
+    "tableros" smallint,
+    "floorMaterial" smallint,
+    "wallCoreStone" smallint,
+    "wallCoreOthMat" smallint,
+    "wallFacing" smallint,
+    "wells" smallint,
+    "jagueys" smallint,
+    "puestos" smallint,
+    "freeStandWall" smallint,
+    CONSTRAINT "archMaterial_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_otherArchFeatures"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_otherArchFeatures_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_materials"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_materials_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_stoneDist"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_stoneDist_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_stoneQuant"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_stoneQuant_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_FloorMat"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_FloorMat_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_wallCoreStone"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_wallCoreStone_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_wallCoreOther"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_wallCoreOther_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_wallFacing"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_wallFacing_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_archFeatures"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_archFeatures_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."complexData"
+(
+    "SSN" smallint NOT NULL,
+    "complexUnit" character varying(4) COLLATE pg_catalog."default",
+    "complexNum" smallint,
+    "archInt1PaTz" smallint,
+    "archInt1McTl" smallint,
+    "archInt1XlMt" smallint,
+    "archInt2PaTz" smallint,
+    "archInt2McTl" smallint,
+    "archInt2XlMt" smallint,
+    "funcIntPaTz" smallint,
+    "funcIntMcTl" smallint,
+    "funcIntXlMt" smallint,
+    "funcResPaTz" smallint,
+    "funcResMcTl" smallint,
+    "funcResXlMt" smallint,
+    "funcTmpPaTz" smallint,
+    "funcTmpMcTl" smallint,
+    "funcTmpXlMt" smallint,
+    "funcCivPaTz" smallint,
+    "funcCivMcTl" smallint,
+    "funcCivXlMt" smallint,
+    "funcOthXlMt" smallint,
+    CONSTRAINT "complexData_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexFunCivic"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexFunCivic_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexFunOther"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexFunOther_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexFunTemp"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexFunTemp_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexFunRes"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexFunRes_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexFunWhole"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexFunWhole_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexGenAltern"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexGenAltern_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_complexGenPrim"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_complexGenPrim_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_McomplexFun"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_McomplexFun_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_McomplexGen"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_McomplexGen_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_vegetation"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_vegetation_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_plowing"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_plowing_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_water"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_water_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_altering_features"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_altering_features_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_overall_condition"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_overall_condition_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_personnel"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_personnel_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_workshopField"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_workshopField_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_workshopKrotser"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_workshopKrotser_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_workshopSpence1"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_workshopSpence1_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_workshopSpence2"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(125) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_workshopSpence2_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."Codes_burnedStruct"
+(
+    "code" smallint NOT NULL,
+    "description" character varying(75) COLLATE pg_catalog."default",
+    CONSTRAINT "Codes_burnedStruct_pkey" PRIMARY KEY ("code")
+);
+
+CREATE TABLE IF NOT EXISTS public."cerNonVessel"
+(
+    "SSN" smallint NOT NULL,
+    "figTot" smallint,
+    "figHead" smallint,
+    "figPPat" smallint,
+    "figPatl" smallint,
+    "figTzac" smallint,
+    "figMicc" smallint,
+    "figTlam" smallint,
+    "figXola" smallint,
+    "figMete" smallint,
+    "figTolt" smallint,
+    "figAzte" smallint,
+    "figPupp" smallint,
+    "spindleWhorl" smallint,
+    "sealStamp" smallint,
+    "earSpool" smallint,
+    "whistle" smallint,
+    "flute" smallint,
+    "ceramicDisk" smallint,
+    "candTot" smallint,
+    "candCoat" smallint,
+    "candAtoy" smallint,
+    "candEXol" smallint,
+    "candLXol" smallint,
+    "candMete" smallint,
+    "candComm" smallint,
+    CONSTRAINT "cerNonVessel_pkey" PRIMARY KEY ("SSN")
+);
+
+CREATE TABLE IF NOT EXISTS public."Plazas"
+(
+    "SSN" smallint NOT NULL,
+    "PlazaNo" integer,
+    CONSTRAINT "Plazas_pkey" PRIMARY KEY ("SSN")
+);
+
+ALTER TABLE IF EXISTS public."description"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."admin"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."archInterp"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."lithicFlaked"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."lithicGround"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."cerVessel"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."cerPhTot"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."complexMacroData"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."condition"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."description"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."workshop"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."fieldWorkers"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."labAnalysts"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."artifactOther"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."archMaterial"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."complexData"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."cerNonVessel"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Plazas"
+    ADD FOREIGN KEY ("SSN")
+    REFERENCES public."location" ("SSN") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_stoneQuant"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("stoneQuant") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_stoneDist"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("stoneDist") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("stoneCut") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("lajas") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("tepetate") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("adobe") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("cascajo") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("xalnene") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("concrete") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("plasterPaint") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("plasterUnpaint") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_materials"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("burntClay") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_burnedStruct"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("burnedStruct") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("floors") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("walls") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("drains") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("wallFixtures") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("murals") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("columns") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("taludes") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_archFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("tableros") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_otherArchFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("freeStandWall") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_otherArchFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("puestos") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_otherArchFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("jagueys") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_otherArchFeatures"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("wells") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_FloorMat"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("floorMaterial") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_wallCoreStone"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("wallCoreStone") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_wallCoreOther"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("wallCoreOthMat") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_wallFacing"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archMaterial" ("wallFacing") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_ArchInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch1PMic") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_ArchInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch1McTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_ArchInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch1XlMe") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_ArchInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch1Oxto") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_ArchInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch2PMic") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_ArchInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch2McTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_ArchInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch2XlMe") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_ArchInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("arch2Oxto") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_ConstructQual"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("constructQual") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_FuncInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func1PMic") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_FuncInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func1McTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_FuncInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func1XlMe") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_FuncInterpPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func1Oxto") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_FuncInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func2PMic") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_FuncInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func2McTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_FuncInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func2XlMe") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_FuncInterpAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."archInterp" ("func2Oxto") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexGenPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("archInt1PaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexGenPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("archInt1McTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexGenPrim"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("archInt1XlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexGenAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("archInt2PaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexGenAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("archInt2McTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexGenAltern"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("archInt2XlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexFunWhole"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcIntPaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunWhole"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcIntMcTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunWhole"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcIntXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexFunRes"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcResPaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunRes"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcResMcTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunRes"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcResXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexFunTemp"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcTmpPaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunTemp"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcTmpMcTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunTemp"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcTmpXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexFunCivic"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcCivPaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunCivic"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcCivMcTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_complexFunCivic"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcCivXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_complexFunOther"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexData" ("funcOthXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_McomplexGen"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexMacroData" ("presPaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_McomplexGen"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexMacroData" ("presMcTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_McomplexGen"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexMacroData" ("presXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_McomplexFun"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexMacroData" ("funcIntPaTz") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_McomplexFun"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexMacroData" ("funcIntMcTl") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_McomplexFun"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."complexMacroData" ("funcIntXlMt") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("milpa") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("barley") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("beans") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("alfalfaCut") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("alfalfaUncut") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("nopales") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("magueys") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("uncultivate") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_vegetation"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("fallow") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_plowing"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("plowing") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_water"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("cropWater") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_altering_features"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("ditching") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_altering_features"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("terracing") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_altering_features"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("landLeveling") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_altering_features"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("stoneClearing") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_overall_condition"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."condition" ("siteAlteration") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_personnel"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."labAnalysts" ("personnelCode") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_personnel"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."fieldWorkers" ("personnelCode") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_workshopField"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."workshop" ("groundstoneField") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_workshopField"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."workshop" ("obsidianField") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_workshopField"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."workshop" ("ceramicField") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_workshopKrotser"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."workshop" ("ceramicKrotser") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public."Codes_workshopSpence1"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."workshop" ("obsidianSpencePhase1") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public."Codes_workshopSpence2"
+    ADD FOREIGN KEY ("code")
+    REFERENCES public."workshop" ("obsidianSpencePhase2") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+----------------------------------------------------------------------------------------------------
+
+
+END;

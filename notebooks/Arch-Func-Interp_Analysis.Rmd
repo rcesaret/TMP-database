@@ -1,0 +1,12 @@
+---
+title: "Prelim Analysis of Arch/Func Interpretations"
+author: "Rudolf Cesaretti"
+date: "2025-01-19"
+output: html_document
+---
+
+
+```{r}
+
+```
+

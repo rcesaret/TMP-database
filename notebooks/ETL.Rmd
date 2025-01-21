@@ -1,0 +1,259 @@
+---
+title: "Untitled"
+author: "Rudolf Cesaretti"
+date: "2025-01-19"
+output: html_document
+---
+
+# Setup
+
+```{r}
+rm(list = ls()) # clear workspace
+```
+
+
+```{r}
+# Load required libraries
+library(DBI)
+library(RPostgres)
+library(tidyverse)
+library(dm)
+```
+
+
+
+# ETL
+
+
+### TMP DF9
+
+#### Connect to Database 1
+
+```{r}
+# Database connection details
+dbname <- "TMP_DF9"
+user <- "rudy"
+password <- "password"
+host <- "localhost"  # Replace with your host if not local
+port <- 5432         # Replace with your port if not default
+
+# Establish a connection to the PostgreSQL database
+db1_con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = dbname,
+  user = user,
+  password = password,
+  host = host,
+  port = port
+)
+```
+
+
+
+
+
+```{r}
+# List all tables in the database
+db1_tables <- dbListTables(db1_con)
+db1_tables
+```
+
+
+
+```{r}
+# Initialize an empty list to store dataframes
+df_list <- list()
+
+# Extract data from each table and store it in the list
+for (table in db1_tables) {
+  query <- paste("SELECT * FROM", paste0('"', table, '"'))
+  df <- dbGetQuery(db1_con, query)
+  df_list[[table]] <- df
+}
+```
+
+```{r}
+# Use the `dm` package to manage relational data
+db1_dm <- dm_from_con(con=db1_con, table_names = db1_tables)
+
+# Inspect the relationships between tables (optional)
+db1_dm %>% dm_draw(rankdir = "TB")
+
+#
+```
+
+```{r}
+# Use the `dm` package to manage relational data
+X <- dm_from_con(con=db1_con, table_names = c("archMaterial", "Codes_FloorMat", "Codes_stoneDist", "Codes_archFeatures", "Codes_wallCoreStone", "Codes_wallCoreOther", "Codes_wallFacing", "Codes_materials"))
+
+# Inspect the relationships between tables (optional)
+X %>% dm_draw(rankdir = "TB")
+```
+
+```{r}
+# Load necessary libraries
+library(dm)
+library(dplyr)
+
+disconnected_tables <- function(dm) {
+  # Get all tables in the dm object
+  all_tables <- dm_get_tables(dm)
+  
+  # Get all foreign key relationships
+  all_fks <- dm_get_all_fks(dm)
+  
+  # Extract tables involved in relationships
+  connected_tables <- unique(c(all_fks$child_table, all_fks$parent_table))
+  
+  # Identify tables not connected via relationships
+  unconnected_tables <- setdiff(names(all_tables), connected_tables)
+  
+  # Return unconnected tables
+  return(unconnected_tables)
+}
+
+```
+
+
+
+
+
+```{r}
+dm_flatten_to_tbl
+
+# Identify main tables and code tables
+main_tables <- db1_tables[!grepl("^Codes_", db1_tables)]
+code_tables <- db1_tables[grepl("^Codes_", db1_tables)]
+#floating_tables <- disconnected_tables(db1_dm)
+main_tables
+main_tables[main_tables != "location"]
+dm_flatten_to_tbl(db1_dm, .start = "location", main_tables[main_tables != "location"])
+# Join main tables by SSN
+combined_df <- db1_dm %>%
+  dm_filter(main_tables, !is.na(SSN)) %>%
+  dm_flatten_to_tbl(main_tables[[1]], main_tables[-1])
+```
+
+
+
+
+
+
+```{r}
+# Perform joins or other transformations to assemble the data into a single dataframe
+# Example: Join all tables based on common keys (adjust as per your schema)
+combined_df <- df_list[[1]]  # Start with the first table
+for (i in 2:length(df_list)) {
+  combined_df <- combined_df %>%
+    full_join(df_list[[i]], by = "common_key")  # Replace "common_key" with actual key
+}
+```
+
+
+```{r}
+# Close the database connection
+dbDisconnect(con)
+
+# Inspect the final combined dataframe
+print(head(combined_df))
+
+# Save the combined dataframe to a file (optional)
+write_csv(combined_df, "combined_dataframe.csv")
+
+```
+
+
+
+
+## TMP DF10
+
+
+
+## TMP REANs DF2
+
+
+
+## Comparrison & Cross-Validation
+
+
+
+
+
+## Integration
+
+#### Cross-Validation
+
+
+
+# Modifications & Additions
+
+
+with the goal of designing DF11 in-mind
+
+
+## Goals, Plan + Requirements
+
+## Metadata
+
+## Renaming Variables
+
+## Millon's + Subsequent Interpretations Variables
+
+```{r}
+
+Sherfield_z_archInterp1 = Sherfield_z_archInterp1 %>% 
+      pivot_wider(id_cols = "ID", names_from = "observation", values_from = "code")
+colnames(Sherfield_z_archInterp1) = c("SSN", str_sub(paste0("ZArch1_",colnames(Sherfield_z_archInterp1)[2:5]), end = -5))
+
+
+Sherfield_z_archInterp2 = Sherfield_z_archInterp2 %>% 
+      pivot_wider(id_cols = "ID", names_from = "observation", values_from = "code")
+colnames(Sherfield_z_archInterp2) = c("SSN", str_sub(paste0("ZArch2_",colnames(Sherfield_z_archInterp2)[2:5]), end = -5))
+
+
+Sherfield_z_funcInterp1 = Sherfield_z_funcInterp1 %>% 
+      pivot_wider(id_cols = "ID", names_from = "observation", values_from = "code")
+colnames(Sherfield_z_funcInterp1) = c("SSN", str_sub(paste0("ZFunc1_",colnames(Sherfield_z_funcInterp1)[2:5]), end = -5))
+
+
+Sherfield_z_funcInterp2 = Sherfield_z_funcInterp2 %>% 
+      pivot_wider(id_cols = "ID", names_from = "observation", values_from = "code")
+colnames(Sherfield_z_funcInterp2) = c("SSN", str_sub(paste0("ZFunc2_",colnames(Sherfield_z_funcInterp2)[2:5]), end = -5))
+
+DF9_Sherf_ArchFuncInterps <- Sherfield_a_FuncInterp1_for_digitization %>% 
+  rename(SSN = ID, XLMEFNC1 = code) %>% 
+  select(-observation) %>%
+  left_join(Sherfield_z_archInterp1, by = "SSN") %>% 
+  left_join(Sherfield_z_archInterp2, by = "SSN") %>% 
+  left_join(Sherfield_z_funcInterp1, by = "SSN") %>% 
+  left_join(Sherfield_z_funcInterp2, by = "SSN") 
+
+WorkingHierarchy_2020 = df_list[["WorkingHierarchy_2020"]] %>% 
+  rename(H2020_1_XLME = Hierarchy_1_2020, H2020_2_XLME = Hierarchy_2_2020, H2020_3_XLME = Hierarchy_3_2020) %>% 
+  select(-observation_2020, -site, -subsite, -unit)
+
+DF9_Sherf_ArchFuncInterps <- DF9_Sherf_ArchFuncInterps %>% 
+  left_join(WorkingHierarchy_2020, by = "SSN")
+
+write.csv(DF9_Sherf_ArchFuncInterps, "DF9_Sherf_ArchFuncInterps.csv")
+
+METADATA_DF_VERSIONS <- df_list[["METADATA_DF_VERSIONS"]]
+write.csv(METADATA_DF_VERSIONS, "METADATA_DF_VERSIONS.csv")
+```
+
+
+
+
+
+# Designing DF11
+
+
+
+
+
+
+
+
+
+
+

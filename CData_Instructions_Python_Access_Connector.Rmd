@@ -8,7 +8,38 @@ output: html_document
 
 # CData Python Connector for Microsoft Access
 
+**Overview**
+The CData Python Connector for Microsoft Access allows developers to write Python scripts with connectivity to Microsoft Access. The connector wraps the complexity of accessing Microsoft Access data in an interface commonly used by python connectors to common database systems.
 
+**Key Features**
+-   A variety of WHL files or a single TAR.GZ file that accommodate several execution environments after installation with "pip install".
+-   Supported for Python versions 3.8, 3.9, 3.10, and 3.11, within both Windows and Linux environments. Python 3.8, 3.9, and 3.10 distributions on Mac are also supported.
+-   Write and execute SQL queries to fetch and update data in Microsoft Access.
+-   Custom dialect class that enables SQLAlchemy 1.3 and 1.4 to use this connector.
+
+**Using the Python Connector/Using from Tools**
+See Using the Connector for examples of executing basic SELECT, INSERT, UPDATE, DELETE, and EXECUTE queries with the module's provided classes.
+
+See Using from Tools to connect Microsoft Access data to tools such as Pandas or Petl.
+
+**SQLAlchemy ORM**
+SQLAlchemy can be leveraged to model the tables in Microsoft Access with mapped classes. See From SQLAlchemy for instructions for configuring the Python connector with SQLAlchemy.
+
+**Pandas**
+Pandas' DataFrames can be used alongside the connector to generate analytical graphics. See From Pandas for a guide.
+
+**Schema Discovery**
+See Schema Discovery to query the provided system tables, which allows users to discover the available tables, views, and stored procedure, alongside additional information about their columns or parameters.
+
+**Advanced Features**
+Advanced Features details additional features supported by the connector, such as , ssl configuration, remoting, firewall/proxy settings, and advanced logging.
+
+
+**Data Model**
+See Data Model for the available database objects. This section also provides more detailed information on querying specific Microsoft Access entities.
+
+**Connection String Options**
+The Connection properties describe the various options that can be used to establish a connection.
 
 ## 1. Getting Started
 
@@ -131,7 +162,7 @@ For example:
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 #### 2.2.2. Parameterized Queries
 
@@ -149,7 +180,7 @@ For example:
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 
 ### 2.3. Modifying Data
@@ -315,13 +346,13 @@ Use "sqlalchemy.ext.declarative.declarative\_base" to declare a mapping class fo
 
 `class` `Orders(Base):`
 
-    `__tablename__ =` `"Orders"`
+`__tablename__ =` `"Orders"`
 
-    `Id = Column(String, primary_key=True)`
+`Id = Column(String, primary_key=True)`
 
-    `ShipName = Column(String)`
+`ShipName = Column(String)`
 
-    `ShipCity = Column(String)`
+`ShipCity = Column(String)`
 
 ##### 3.1.2.2. Automatically Reflecting Metadata
 
@@ -375,13 +406,13 @@ For example:
 
 `for` `instance` `in` `session.query(Orders).filter_by(ShipCountry=``"USA"``):`
 
-    `print(``"Id: "``, instance.Id)`
+`print(``"Id: "``, instance.Id)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"ShipCity: "``, instance.ShipCity)`
+`print(``"ShipCity: "``, instance.ShipCity)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 ###### Querying Data Using the Execute Method
 
@@ -391,13 +422,13 @@ The session object can also run the query with the **execute()** method alongsid
 
 `for` `instance` `in` `session.execute(Orders_table.select().where(Orders_table.c.ShipCountry ==` `"USA"``)):`
 
-    `print(``"Id: "``, instance.Id)`
+`print(``"Id: "``, instance.Id)`
 
-    `print(``"FullName: "``, instance.Name)`
+`print(``"FullName: "``, instance.Name)`
 
-    `print(``"City: "``, instance.BillingCity)`
+`print(``"City: "``, instance.BillingCity)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 ##### 3.1.3.2. Executing JOINs
 
@@ -415,33 +446,33 @@ If mapped classes of related Microsoft Access objects have a singular foreign ke
 
 `class` `Contact(Base):`
 
-    `__tablename__ =` `"Contact"`
+`__tablename__ =` `"Contact"`
 
-    `Id = Column(Integer, primary_key=True)`
+`Id = Column(Integer, primary_key=True)`
 
-    `Name = Column(String)`
+`Name = Column(String)`
 
-    `Email = Column(String)`
+`Email = Column(String)`
 
-    `BirthDate = Column(DateTime)`
+`BirthDate = Column(DateTime)`
 
-    `AccountId = Column(String, ForeignKey(``"Account.Id"``))`
+`AccountId = Column(String, ForeignKey(``"Account.Id"``))`
 
-    `Account_Link = relationship(``"Account"``, back_populates=``"Contact_Link"``)`
+`Account_Link = relationship(``"Account"``, back_populates=``"Contact_Link"``)`
 
 `class` `Account(Base):`
 
-    `__tablename__ =` `"Account"`
+`__tablename__ =` `"Account"`
 
-    `Id = Column(String, primary_key=True)`
+`Id = Column(String, primary_key=True)`
 
-    `Name = Column(String)`
+`Name = Column(String)`
 
-    `BillingCity = Column(String)`
+`BillingCity = Column(String)`
 
-    `NumberOfEmployees = Column(Integer)`
+`NumberOfEmployees = Column(Integer)`
 
-    `Contact_Link = relationship(``"Contact"``, order_by=Contact.Id, back_populates=``"Account_Link"``)`
+`Contact_Link = relationship(``"Contact"``, order_by=Contact.Id, back_populates=``"Account_Link"``)`
 
 Once the relationship is established, the tables are queried simultaneously using the session's **query()** method. For example:  
 
@@ -498,13 +529,13 @@ The following example sorts by a specified column using the session object's que
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Id: "``, instance.Id)`
+`print(``"Id: "``, instance.Id)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"ShipCity: "``, instance.ShipCity)`
+`print(``"ShipCity: "``, instance.ShipCity)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also use the session object's **execute()** method perform an ORDER BY. For example:  
 
@@ -520,11 +551,11 @@ The following example uses the session object's **query()** method to group reco
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Count: "``, instance.CustomCount)`
+`print(``"Count: "``, instance.CustomCount)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also use the session object's **execute()** method to perform a GROUP BY:  
 
@@ -540,13 +571,13 @@ The following example uses the session object's **query()** method to skip the f
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Id: "``, instance.Id)`
+`print(``"Id: "``, instance.Id)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"ShipCity: "``, instance.ShipCity)`
+`print(``"ShipCity: "``, instance.ShipCity)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also use the session object's **execute()** method to set a LIMIT or OFFSET:  
 
@@ -573,11 +604,11 @@ The following example counts the number of records in a set of groups using the 
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Count: "``, instance.CustomCount)`
+`print(``"Count: "``, instance.CustomCount)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also execute COUNT using the session object's **execute()** method:  
 
@@ -593,11 +624,11 @@ This example calculates the cumulative amount of a numeric column in a set of gr
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Sum: "``, instance.CustomSum)`
+`print(``"Sum: "``, instance.CustomSum)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also invoke SUM using the session object's **execute()** method.  
 
@@ -613,11 +644,11 @@ This example uses the session object's **query()** method to calculate the avera
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Avg: "``, instance.CustomAvg)`
+`print(``"Avg: "``, instance.CustomAvg)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also use the session object's **execute()** method to invoke AVG:  
 
@@ -633,13 +664,13 @@ This example finds the maximum value and minimum value of a numeric column in a 
 
 `for` `instance` `in` `rs:`
 
-    `print(``"Max: "``, instance.CustomMax)`
+`print(``"Max: "``, instance.CustomMax)`
 
-    `print(``"Min: "``, instance.CustomMin)`
+`print(``"Min: "``, instance.CustomMin)`
 
-    `print(``"ShipName: "``, instance.ShipName)`
+`print(``"ShipName: "``, instance.ShipName)`
 
-    `print(``"---------"``)`
+`print(``"---------"``)`
 
 You can also use the session object's **execute()** method to invoke MAX and MIN:  
 
@@ -705,15 +736,15 @@ In Pandas, SELECT queries are provided in a call to the **read\_sql()** method, 
 
 `df = pd.read_sql(``""``"`
 
-    `SELECT`
+`SELECT`
 
-       `ShipName,`
+   `ShipName,`
 
-       `ShipCity,`
+   `ShipCity,`
 
-     `$exNumericCol;`
+ `$exNumericCol;`
 
-    `FROM Orders;``""``", engine)`
+`FROM Orders;``""``", engine)`
 
 `print(df)`
 
@@ -809,7 +840,7 @@ The connector possesses system tables that are used to discover the tables and v
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 
 #### 4.1.2. Views
@@ -829,7 +860,7 @@ The connector possesses system tables that are used to discover the tables and v
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 ### 4.2. Columns
 
@@ -849,7 +880,7 @@ The available columns for any given table are fetched from a system table called
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 
 
@@ -874,7 +905,7 @@ A system table called "sys\_procedures" is queried to obtain the available store
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 
 #### 4.3.2. Parameters
@@ -895,7 +926,7 @@ The input parameters of any stored procedure are similarly obtained from the "sy
 
 `for` `row` `in` `rs:`
 
-    `print(row)`
+`print(row)`
 
 
 ## 5. Advanced Features
@@ -1155,56 +1186,26 @@ If left unspecified, the default location is "%APPDATA%\\\\CData\\\\Access Data 
 <table><tbody><tr><td><b>Platform</b></td><td><b>%APPDATA%</b></td></tr><tr><td>Windows</td><td>The value of the APPDATA environment variable</td></tr><tr><td>Linux</td><td>~/.config</td></tr></tbody></table>
 
 
-#### ****7.3.2. BrowsableSchemas
+#### 7.3.2. BrowsableSchemas
 
-This property restricts the schemas reported to a subset of the available schemas. For example, BrowsableSchemas=SchemaA,SchemaB,SchemaC.
+This property restricts the schemas reported to a subset of the available schemas. For example, BrowsableSchemas=SchemaA,SchemaB,SchemaC. Listing the schemas from databases can be expensive. Providing a list of schemas in the connection string improves the performance.
+  * **Data Type:** string
+  * **Default Value:** ""
 
-Data Type
-string
+#### 7.3.3. Tables
 
-Default Value
-""
-
-Remarks
-Listing the schemas from databases can be expensive. Providing a list of schemas in the connection string improves the performance.
-
-#### ****7.3.3. Tables
-
-This property restricts the tables reported to a subset of the available tables. For example, Tables=TableA,TableB,TableC.
-
-Data Type
-string
-
-Default Value
-""
-
-Remarks
-Listing the tables from some databases can be expensive. Providing a list of tables in the connection string improves the performance of the connector.
-
-This property can also be used as an alternative to automatically listing views if you already know which ones you want to work with and there would otherwise be too many to work with.
-
-Specify the tables you want in a comma-separated list. Each table should be a valid SQL identifier with any special characters escaped using square brackets, double-quotes or backticks. For example, Tables=TableA,[TableB/WithSlash],WithCatalog.WithSchema.`TableC With Space`.
+This property restricts the tables reported to a subset of the available tables. For example, Tables=TableA,TableB,TableC. Listing the tables from some databases can be expensive. Providing a list of tables in the connection string improves the performance of the connector. This property can also be used as an alternative to automatically listing views if you already know which ones you want to work with and there would otherwise be too many to work with. Specify the tables you want in a comma-separated list. Each table should be a valid SQL identifier with any special characters escaped using square brackets, double-quotes or backticks. For example, Tables=TableA,[TableB/WithSlash],WithCatalog.WithSchema.`TableC With Space`.
+  * **Data Type:** string
+  * **Default Value:** ""
 
 Note that when connecting to a data source with multiple schemas or catalogs, you will need to provide the fully qualified name of the table in this property, as in the last example here, to avoid ambiguity between tables that exist in multiple catalogs or schemas.
 
-#### ****7.3.4. Views
+#### 7.3.4. Views
 
-Restricts the views reported to a subset of the available tables. For example, Views=ViewA,ViewB,ViewC.
 
-Data Type
-string
-
-Default Value
-""
-
-Remarks
-Listing the views from some databases can be expensive. Providing a list of views in the connection string improves the performance of the connector.
-
-This property can also be used as an alternative to automatically listing views if you already know which ones you want to work with and there would otherwise be too many to work with.
-
-Specify the views you want in a comma-separated list. Each view should be a valid SQL identifier with any special characters escaped using square brackets, double-quotes or backticks. For example, Views=ViewA,[ViewB/WithSlash],WithCatalog.WithSchema.`ViewC With Space`.
-
-Note that when connecting to a data source with multiple schemas or catalogs, you will need to provide the fully qualified name of the table in this property, as in the last example here, to avoid ambiguity between tables that exist in multiple catalogs or schemas.
+Restricts the views reported to a subset of the available tables. For example, Views=ViewA,ViewB,ViewC. Listing the views from some databases can be expensive. Providing a list of views in the connection string improves the performance of the connector. This property can also be used as an alternative to automatically listing views if you already know which ones you want to work with and there would otherwise be too many to work with. Specify the views you want in a comma-separated list. Each view should be a valid SQL identifier with any special characters escaped using square brackets, double-quotes or backticks. For example, Views=ViewA,[ViewB/WithSlash],WithCatalog.WithSchema.`ViewC With Space`. Note that when connecting to a data source with multiple schemas or catalogs, you will need to provide the fully qualified name of the table in this property, as in the last example here, to avoid ambiguity between tables that exist in multiple catalogs or schemas.
+  * **Data Type:** string
+  * **Default Value:** ""
 
 ### 7.4. Caching
 
@@ -1216,77 +1217,171 @@ ___
 
 #### ****7.4.1. AutoCache
 
-Automatically caches the results of SELECT queries into a cache database specified by either CacheLocation or both of CacheConnection and CacheProvider .
+Automatically caches the results of SELECT queries into a cache database specified by either CacheLocation or both of CacheConnection and CacheProvider. When AutoCache = true, the connector automatically maintains a cache of your table's data in the database of your choice.
+  * **Data Type:** bool
+  * **Default Value:** false
 
-Data Type
-bool
+##### Setting the Caching Database
 
-Default Value
-false
+When <u>AutoCache</u> = true, the connector caches to a simple, file-based cache. You can configure its location or cache to a different database with the following properties:
 
-Remarks
-When AutoCache = true, the connector automatically maintains a cache of your table's data in the database of your choice.
+-   [CacheLocation](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheLocation.htm): Specifies the path to the file store.
+-   [CacheProvider](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheProvider.htm) and [CacheConnection](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheConnection.htm): Specifies a driver to a database and the connection string.
+
+##### See Also
+
+-   [CacheMetadata](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheMetadata.htm): This property reduces the amount of metadata that crosses the network by persisting table schemas retrieved from the Microsoft Access metadata. Metadata then needs to be retrieved only once instead of every connection.
+-   [Explicitly Caching Data](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_AutoCache.htm#pg_cacheExplicitly): This section provides more examples of using <u>AutoCache</u> in [Offline](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_Offline.htm) mode.
+-   [CACHE Statements](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_AutoCache.htm#pg_cache): You can use the CACHE statement to persist any SELECT query, as well as manage the cache; for example, refreshing schemas.
 
 
 #### 7.4.2. CacheProvider
 
+The name of the provider to be used to cache data. You can cache to any database for which you have an ADO.NET provider. The caching database is determined based on the CacheProvider and [CacheConnection](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheConnection.htm) properties.
+  * **Data Type:** string
+  * **Default Value:** ""
+
+The following sections show connection examples and address other requirements for several popular database drivers. Refer to [CacheConnection](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheConnection.htm) for more information on typical connection properties.
+
+##### Loading the Caching Database's Driver
+
+The CacheProvider property specifies the name of the DbProviderFactory used to cache data. You can find the provider factories available to you in your machine.config.
+
+##### PostgreSQL
+
+To cache to PostgreSQL, you can use the included CData ADO.NET Provider for PostgreSQL:
+
+`Cache Provider=System.Data.CData.PostgreSQL;Cache Connection='Server=localhost;Port=5432;Database=cache;User=postgres;Password=123456';User=myUser;Password=myPassword;Security Token=myToken;`
 
 
 #### 7.4.3. CacheDriver
 
+The database driver used to cache data. You can cache to any database for which you have a JDBC driver, including CData JDBC drivers. The cache database is determined by the <u>CacheDriver</u> and [CacheConnection](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheConnection.htm) properties. The <u>CacheDriver</u> is the name of the JDBC driver class that you want to use to cache data.
+  * **Data Type:** string
+  * **Default Value:** ""
 
+**Note:** you must add the <u>CacheDriver</u> JAR file to the classpath. For Linux systems and macOS, you need to create a config.ini file on the installation path of the driver (site-packages/cdata). The config.ini file has the following format (the driver and the path of the JDBC driver):  
+
+`[salesforce.cpython-38-x86_64-linux-gnu.so]`
+
+`CLASSPATH = /home/usrname/Downloads/lib/cdata.jdbc.postgresql.jar`
+
+##### Examples
+
+The following examples show how to cache to several major databases. Refer to [CacheConnection](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheConnection.htm) for more information on the JDBC URL syntax and typical connection properties.
+
+##### PostgreSQL
+
+The following JDBC URL uses the official PostgreSQL JDBC driver:  
+
+`jdbc:access:CacheDriver=cdata.jdbc.postgresql.PostgreSQLDriver;CacheConnection='jdbc:postgresql:User=postgres;Password=admin;Database=postgres;Server=localhost;Port=5432;';DataSource=C:\\My.accdb`
 
 #### 7.4.4. CacheConnection
 
+The connection string for the cache database. This property is always used in conjunction with CacheProvider . Setting both properties will override the value set for CacheLocation for caching data.
+The cache database is determined based on the CacheProvider and CacheConnection properties. Both properties are required to use the cache database. Examples of common cache database settings can be found below. For more information on setting the caching database's driver, refer to CacheProvider. The connection string specified in the CacheConnection property is passed directly to the underlying CacheProvider. Consult the documentation for the specific for more information on the available properties. 
+  * **Data Type:** string
+  * **Default Value:** ""
 
+##### PostgreSQL
+
+The following are typical connection properties:
+
+-   **Host**: The address of the server hosting the PostgreSQL database.
+-   **Port**: The port used to connect to the server hosting the PostgreSQL database.
+-   **Database**: The name of the database.
+-   **User name**: The user Id provided for authentication with the PostgreSQL database.
+-   **Password**: The password provided for authentication with the PostgreSQL database.
 
 #### 7.4.5. CacheLocation
 
+Specifies the path to the cache when caching to a file. The CacheLocation is a simple, file-based cache.
+  * **Data Type:** string
+  * **Default Value:** "%APPDATA%\\CData\\Access Data Provider"
 
+If left unspecified, the default location is "%APPDATA%\\CData\\Access Data Provider" with %APPDATA% being set to the user's configuration directory:
+
+<table><tbody><tr><td><b>Platform</b></td><td><b>%APPDATA%</b></td></tr><tr><td>Windows</td><td>The value of the APPDATA environment variable</td></tr><tr><td>Linux</td><td>~/.config</td></tr></tbody></table>
+
+##### See Also
+
+-   [AutoCache](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_AutoCache.htm): Set to implicitly create and maintain a cache for later offline use.
+-   [CacheMetadata](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheMetadata.htm): Set to persist the Microsoft Access catalog in <u>CacheLocation</u>.
 
 #### 7.4.6. CacheTolerance
 
-
+The tolerance for stale data in the cache specified in seconds when using AutoCache. The tolerance for stale data in the cache specified in seconds. This only applies when AutoCache is used. The connector checks with the data source for newer records after the tolerance interval has expired. Otherwise, it returns the data directly from the cache.
+  * **Data Type:** int
+  * **Default Value:** 600
 
 #### 7.4.7. Offline
 
-
+Use offline mode to get the data from the cache instead of the live source. When Offline = true, all queries execute against the cache as opposed to the live data source. In this mode, certain queries like INSERT, UPDATE, DELETE, and CACHE are not allowed.
+  * **Data Type:** bool
+  * **Default Value:** false
 
 #### 7.4.8. CacheMetadata
 
+This property determines whether or not to cache the table metadata to a file store. As you execute queries with this property set, table metadata in the Microsoft Access catalog is cached to the file store specified by CacheLocation if set or the user's home directory otherwise. A table's metadata is retrieved only once, when the table is queried for the first time.
+  * **Data Type:** bool
+  * **Default Value:** false
 
+##### When to Use CacheMetadata
+
+The connector automatically persists metadata in memory for up to an hour when you first discover the metadata for a table or view and therefore, <u>CacheMetadata</u> is generally not required. <u>CacheMetadata</u> becomes useful when metadata operations are expensive, such as when you are working with large amounts of metadata or when you have many short-lived connections.
+
+##### When Not to Use CacheMetadata
+
+-   **When you are working with volatile metadata**: The first time you query a table, the connector caches its metadata. This cache is not dynamically updated to reflect updates to the table schema, so you must delete and rebuild the metadata cache to pick up new, changed, or deleted columns. Therefore, it is best to rely on the in-memory caching for cases where metadata changes often.
+-   **When you are caching to a database**: <u>CacheMetadata</u> can only be used with [CacheLocation](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheLocation.htm). If you are caching to another database with the [CacheProvider](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheProvider.htm) and [CacheConnection](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CacheConnection.htm) properties, use [AutoCache](https://cdn.cdata.com/help/DCK/py/RSBAccess_p_AutoCache.htm) to cache implicitly.
 
 ### 7.5. Miscellaneous
 
+This section provides a complete list of the Miscellaneous properties you can configure in the connection string for this provider.
 
+___
+
+<table><tbody><tr><td><b>Property</b></td><td><b>Description</b></td></tr><tr><td><a href="https://cdn.cdata.com/help/DCK/py/RSBAccess_p_CreateNewDatabase.htm">CreateNewDatabase</a></td><td>Specifies what format shoud be used by a new database file created when the file specified by connection property DataSource does not exist.</td></tr><tr><td><a href="https://cdn.cdata.com/help/DCK/py/RSBAccess_p_IncludeMSysTables.htm">IncludeMSysTables</a></td><td>Set this property to the true value to allow querying from the system tables.</td></tr><tr><td><a href="https://cdn.cdata.com/help/DCK/py/RSBAccess_p_MaxRows.htm">MaxRows</a></td><td>Limits the number of rows returned when no aggregation or GROUP BY is used in the query. LIMIT clauses take precedence over the limit specified in MaxRows.</td></tr><tr><td><a href="https://cdn.cdata.com/help/DCK/py/RSBAccess_p_Other.htm">Other</a></td><td>These hidden properties are used only in specific use cases.</td></tr><tr><td><a href="https://cdn.cdata.com/help/DCK/py/RSBAccess_p_Readonly.htm">Readonly</a></td><td>You can use this property to enforce read-only access to Microsoft Access from the provider.</td></tr><tr><td><a href="https://cdn.cdata.com/help/DCK/py/RSBAccess_p_RTK.htm">RTK</a></td><td>The runtime key used for licensing.</td></tr></tbody></table>
 
 #### 7.5.1. CreateNewDatabase
 
-
+Specifies what format shouLd be used by a new database file created when the file specified by connection property DataSource does not exist. By default this is set to No, and an exception will be thrown instead of creating new database file. When a new database file is created it's file name extension is forcibly specified to correspond to default file name extension used by respective database's format pointed by this property.
+  * **Data Type:** string
+  * **Default Value:** "No"
+  * **Possible Values:** No, 2003, 2007, 2010, 2016, 2019
 
 #### 7.5.2. IncludeMSysTables
 
-
+Set this property to the true value to allow querying from the system tables. Tells provider to expose system tables in the read-only mode. Default value is False.
+  * **Data Type:** bool
+  * **Default Value:** false
 
 #### 7.5.3. MaxRows
 
-
+Limits the number of rows returned when no aggregation or GROUP BY is used in the query. LIMIT clauses take precedence over the limit specified in MaxRows. 
+  * **Data Type:** int
+  * **Default Value:** -1
 
 #### 7.5.4. Other
 
+These hidden properties are used only in specific use cases. The properties listed below are available for specific use cases. Normal driver use cases and functionality should not require these properties. Specify multiple properties in a semicolon-separated list.
+  * **Data Type:** string
+  * **Default Value:** ""
 
+##### Integration and Formatting
+
+<table><tbody><tr><td>DefaultColumnSize</td><td>Sets the default length of string fields when the data source does not provide column length in the metadata. The default value is 2000.</td></tr><tr><td>ConvertDateTimeToGMT</td><td>Determines whether to convert date-time values to GMT, instead of the local time of the machine.</td></tr><tr><td>RecordToFile=filename</td><td>Records the underlying socket data transfer to the specified file.</td></tr></tbody></table>
 
 #### 7.5.5. Readonly
 
-
+You can use this property to enforce read-only access to Microsoft Access from the provider. If this property is set to true, the connector will allow only SELECT queries. INSERT, UPDATE, DELETE, and stored procedure queries will cause an error to be thrown.
+  * **Data Type:** bool
+  * **Default Value:** false
 
 #### 7.5.6. RTK
 
-
-
-
-
-
-
+The runtime key used for licensing. The RTK property may be used to license a build.
+  * **Data Type:** string
+  * **Default Value:** ""
 
 
