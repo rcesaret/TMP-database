@@ -50,3 +50,12 @@ rsconnect/
 
 # Unused Microsoft Access Databases (.accdb & .mdb)
 data/unused-databases
+
+# Notes folder
+notes/
+
+# Other materials folder
+materials/
+
+# Knowledge Base folder
+knowledge_base/
