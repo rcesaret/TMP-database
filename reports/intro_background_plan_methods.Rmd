@@ -1,0 +1,197 @@
+---
+title: "Database Migration and Validation"
+author: "Rudolf Cesaretti"
+date: "2025-01-21"
+output: html_document
+---
+
+
+
+
+
+## Background
+
+At present, the TMP data is stored in three Microsoft Access databases (.accdb and.mdb):
+    - DF9
+    - DF10
+    - REANs DF2
+
+The TMP databases contain data on the following: (...)
+
+
+
+### DF8
+
+The DF8 database was developed by Cowgill and Robertson in the early 2000s. The database was developed in Microsoft Access and contains data on the following: (...)
+
+
+
+
+
+
+
+### DF9
+
+To do: explanation of the development of DF9 c.2000-2022 (by Cowgill, Robertson, MES, Huster and Dennehey) + the current state of the DF9 database
+
+Development from DF8
+
+Overall structure of the database in MS Access
+- Tables
+- Queries
+- Forms
+- relationships
+
+Underwent substantial quality checks under Huster and Dennehey c.2019-2022
+
+Tests were conducted (under Huster??) to validate and find errors in 
+    -- Spatial location of SSNs on the TMP map and their correspondence to architectural features
+        -- "UncertainStatusInGIS"
+    -- the coherence of Architectural complexes
+        -- "unique complexes" DF9 table
+        -- "unique macrocomplexes" DF9 table
+    -- testing for import errors in the tabular data
+        -- "InitialCleaning$_ImportErrors"
+        -- "InitialCleaning$_ImportErrors1"
+        -- "TestForDF9$_ImportErrors"
+    -- testing for and correcting errors in the lab analyst and field worker personnel data
+        -- "test labAnalysts no key"
+        -- "personnel error check"
+
+
+
+
+
+
+### DF10
+
+To do: explanation of the development of DF10 by Sherfield 2022-2023
+To do:
+
+Overall structure of the database in MS Access
+
+Major changes to the database
+
+
+
+
+### REANs DF2
+
+
+
+To do: explanation of the development of REANs DF2 by Robertson 2000-2023
+
+
+
+## Problems with the Current Databases
+
+
+### DF9
+
+Tons of Floating tables lacking relationships
+
+- No referential integrity constraints
+- No validation rules
+- No normalization
+- Redundant data
+- Inconsistent data
+- Incomplete data
+- Inaccurate data
+- Inefficient data retrieval
+- No data dictionary
+- No data documentation
+
+
+### REANs DF2
+
+
+
+### DF10
+
+
+
+### Discussion: Overarching Problems with the TMP Databases
+
+- the data is divided between numerous files and databases, which makes it difficult to access, understand and manage
+- there is no version control or automated logging documentation of changes
+
+
+These are the most updated versions of the database
+
+
+The database is not normalized and contains a lot of redundant data. The database is also not validated, and there are no referential integrity constraints. The database is not suitable for the new system, and it needs to be migrated to a normalized database. The new database will be designed using the Entity-Relationship (ER) model and will be implemented using a relational database management system (RDBMS). The new database will be validated, and referential integrity constraints will be enforced. The database will be migrated using a series of SQL scripts that will extract the data from the old database, transform it into the new format, and load it into the new database. The migration process will be tested to ensure that the data is migrated correctly and that the new database is working as expected.
+
+The current database 
+
+The database is not normalized and contains a lot of redundant data. The database is also not validated, and there are no referential integrity constraints. The database is not suitable for the new system, and it needs to be migrated to a normalized database. The new database will be designed using the Entity-Relationship (ER) model and will be implemented using a relational database management system (RDBMS). The new database will be validated, and referential integrity constraints will be enforced. The database will be migrated using a series of SQL scripts that will extract the data from the old database, transform it into the new format, and load it into the new database. The migration process will be tested to ensure that the data is migrated correctly and that the new database is working as expected.
+
+
+## Goals and Best Practices
+
+Goals --> The goal of this project is to migrate the current database to a new system that is more efficient, reliable, and secure.
+It should follow best practices for database design and implementation, including normalization, validation, and referential integrity constraints.
+Implementation in a wide variety of database management systems, including MySQL, Apache, PostgreSQL, and SQLite -- in addition to Microsoft Access.
+Because the database will be distributed in an open-access format on tDAR, it should be designed to be user-friendly and accessible to a wide audience.
+
+The necessary work for bringing the database up-to-snuff will involve migration from Access to PostgreSQL, using PostgreSQL as the primary database system for constructing and validating the new TMP database.
+
+PostgreSQL was chosen for the migration because it is open-source, widely used, has numerous free and open source software options  to facilitate access, and has a strong reputation for reliability and performance.
+
+Access --> modification of Access DBs to facilitate migration to new system --> Access to PostgreSQL migration --> ETL --> data cleaning, integration + validation --> migration to new database system in PostgreSQL --> testing and validation of new database system --> translation from PostgreSQL to other database systems (MySQL, Apache, SQLite) --> final testing and validation of new database systems --> distribution of new database systems on tDAR
+
+The above are prerequisites for Geospatial integration -- i.e. the construction of a geospatial database that will be integrated with the TMP database. This will involve the development of a geospatial database that will be integrated with the TMP database. The geospatial database will be designed using the Entity-Relationship (ER) model and will be implemented using a geospatial database management system (GDBMS). The geospatial database will be validated, and referential integrity constraints will be enforced. The geospatial database will be migrated using a series of SQL scripts that will extract the data from the TMP database, transform it into the new format, and load it into the geospatial database. The migration process will be tested to ensure that the data is migrated correctly and that the geospatial database is working as expected.
+
+
+and the implementation of a new database design that is more efficient, reliable, and secure.
+
+The database should be designed using the Entity-Relationship (ER) model and implemented using a relational database management system (RDBMS).
+
+This necessitates: reorganize the current database content, bring them  to a normalized state, validate the data, enforce referential integrity constraints, and migrate the data to the new system.
+'Wish-list'== best practices followed + additional substantive revisions, additions and refinements to the database structure and content
+
+
+
+
+
+## Database Migration Plan + Methods
+
+Although it may seem redundant, both DF9 and DF10 will be migrated to the new system. The two databases *may* contain different data. Robertson, Huster and Dennehy are known to have made substantial changes to the DF9 database, while Sherfield has made substantial changes to the DF10 database. Yet these changes were not made in a reproducible format, logging or a version control system. As such, this 
+
+the new system will need to incorporate both sets of data. The migration process will involve the following steps:
+
+The new system will need to incorporate both sets of data. The migration process will involve the following steps:
+and only a repr and the new system will need to incorporate both sets of data. The migration process will involve the following steps:
+
+
+### Step 1: Database Analysis
+
+
+
+### Step 2: Database Design
+
+
+
+
+## Method for Bringing the Databases to the New System
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

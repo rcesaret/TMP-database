@@ -6,6 +6,29 @@ output: html_document
 ---
 
 
+
+
+Also, a more general research project aimed at reviewing, editing and refining the architectural and functional interpretations of the TMP data was conducted. This work began under 
+      Huster & Dennehey, 
+      The work of Norwood on Plazas
+      Sherfield's aborted dissertation research 
+      Cesaretti and Blumenfeld (Blumenfeld et al 2024) 
+This endeavour involved the creation of the following tables:
+    -- "a_FuncInterp1 for digitization"
+    -- "a_FuncInterp1"
+    -- "z_archInterp1"
+    -- "z_archInterp2"
+    -- "z_funcInterp1"
+    -- "z_funcInterp2"
+    -- "1WorkingHierarchy"
+    -- "HierarchyCode"
+
+
+
+    
+
+
+
 ```{r}
 
 ```

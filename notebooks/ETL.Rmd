@@ -12,22 +12,64 @@ rm(list = ls()) # clear workspace
 ```
 
 
-```{r}
-# Load required libraries
-library(DBI)
-library(RPostgres)
-library(tidyverse)
-library(dm)
+```{r rmd_setup, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Ensure that the working directory is set to the root of the project
+library(rprojroot)
+knitr::opts_knit$set(root.dir = find_rstudio_root_file())
+```
+
+
+### Load Custom R Functions
+
+```{r custom_funcs, echo = TRUE, warning = FALSE, message = FALSE}
+#Read in custom R functions located in the WD$R directory folder
+
+# Custom function R file names
+#functions <- c("ks_test_tidy.R", "histogram_density.R", "plot_ks_ci.R", "gg_histogram_density.R", "ggplot_ks_ci.R") 
+
+invisible(lapply(functions, function(filename) {
+  source(file.path("R", filename))
+}))
+
+rm(functions) # Remove the vector of function filenames from the environment
+```
+
+### Load Required Packages
+
+```{r load_packages, echo = TRUE, warning = FALSE, message = FALSE}
+# List of required packages
+required_pkgs <- c("DBI", "tidyverse", "dm")#, "RPostgres", "",
+
+#, "ggplot2", "devtools", "broom", "plyr", "MASS", "NSM3"
+
+#required_pkgs <- c("DBI", "tidyverse", "dm", "dbplyr", "summarytools", "arsenal", "naniar", "janitor", "datawizard", "hacksaw", "pointblank", "inspectdf", "dtrackr", "Amelia", "dataCompareR", "data.validator", "etl", "octopus", "maestro", "dettl", "fctutils", "dlookr", "forcats", "flow", "systemPipeR", "codebook", "ViewPipeSteps", "skimr", "ExPanDaR", "DataExplorer", "explore", "SmartEDA", "tableone")
+
+# Check which packages are not yet installed
+to_install <- required_pkgs[!required_pkgs %in% installed.packages()]
+
+# Install the missing packages
+if (length(to_install) > 0) {
+  install.packages(to_install)
+}
+
+# Load all required packages
+invisible(sapply(required_pkgs, require, character.only = TRUE))
+
+# Clean up the environment
+#rm(required_pkgs, to_install)
+
 ```
 
 
 
 # ETL
 
-
 ### TMP DF9
 
-#### Connect to Database 1
+#### Connect to PostgreSQL Database
+
+!!!! To Do: Need to manage passwords per https://db.rstudio.com/best-practices/managing-credentials/
 
 ```{r}
 # Database connection details
@@ -48,17 +90,140 @@ db1_con <- dbConnect(
 )
 ```
 
+a <- dbReadTable(db1_con, "Codes_stoneQuant") %>% as_tibble()
+
+#### Inspect Tables and Schema
+
+
+List all tables in the database
+
+```{r}
+# List all tables in the database
+db1_tables <- dbListTables(db1_con)
+db1_tables[34:51]
+```
+
+Inspect database schema
+
+```{r}
+# Use the `dm` package to manage relational data
+db1_dm <- dm_from_con(con=db1_con, table_names = db1_tables)
+
+# Inspect the relationships between tables (optional)
+db1_dm %>% dm_draw(rankdir = "TB")
+
+#
+```
+
+
+Zoom-in on a portion of the database schema
+
+```{r}
+# Use the `dm` package to manage relational data
+X <- dm_from_con(con=db1_con, table_names = c("archMaterial", "Codes_FloorMat", "Codes_stoneDist", "Codes_archFeatures", "Codes_wallCoreStone", "Codes_wallCoreOther", "Codes_wallFacing", "Codes_materials"))
+
+# Inspect the relationships between tables (optional)
+X %>% dm_draw(rankdir = "TB")
+```
+"admin", "location", "archMaterial", "archInterp"
+db1_tables[35:52]
+```{r}
+
+main_tables <- db1_tables[!grepl("^Codes_", db1_tables)]
+code_tables <- db1_tables[grepl("^Codes_", db1_tables)]
+
+# Use the `dm` package to manage relational data
+X <- dm_from_con(con=db1_con, table_names = main_tables)
+
+# Inspect the relationships between tables (optional)
+X %>% dm_draw(rankdir = "TB")
+
+joined_tbl <- X %>%
+  dm_flatten_to_tbl(
+    .start = location
+  ) %>% 
+  as_tibble()
+
+dm_validate(X)
+
+```
+
+```{r}
+# Use the `dm` package to manage relational data
+Y <- dm_from_con(con=db1_con, table_names = c("archMaterial", "Codes_stoneQuant"))
+
+# Inspect the relationships between tables (optional)
+Y %>% dm_draw(rankdir = "TB")
+
+joined_tbl <- Y %>%
+  dm_flatten_to_tbl(
+    .start = archMaterial
+  ) %>% 
+  as_tibble()
+
+all_tables <- dm_get_tables(Y)
+
+```
+
+
+
+
+X %>% dm_get_all_pks()
+
+X %>%
+  dm_enum_pk_candidates(location)
+
+X %>%
+  dm_enum_fk_candidates(location, admin)
+
+X %>%
+  dm_get_all_fks()
+dm_get_tables
+
+yyy <- X %>%
+  dm_flatten_to_tbl(
+.start = location
+) %>%as_tibble()
+
+dm_joined %>%
+  class()
+
+dm_flatten_to_tbl(X, .start = admin, .recursive = T, .join = full_join)
+
+fieldWorkers = fieldWorkers %>% rename(SSN=ID) %>% mutate(SSN = as.integer(SSN), personnelCode = as.integer(personnelCode))
+fieldWorkers = fieldWorkers %>% mutate(SSN = as.integer(SSN), personnelCode = as.integer(personnelCode))
+dm_gui(dm = X)
+fieldWorkers
+
+wide_fieldWorkers_boolean <- fieldWorkers %>%
+  pivot_wider(
+    names_from = personnelCode, 
+    values_from = personnelCode, 
+    values_fn = list(personnelCode = ~ TRUE), # Convert values to TRUE
+    values_fill = list(personnelCode = FALSE) # Fill missing values with FALSE
+  ) %>%
+  select(SSN, order(as.numeric(names(.)[-1])) + 1)
+
+wide_personnel_boolean <- wide_personnel_boolean
+wide_fieldWorkers_boolean
+
+
+
 
 
 
 
 ```{r}
-# List all tables in the database
-db1_tables <- dbListTables(db1_con)
-db1_tables
+dm_joined <-
+  db1_dm %>%
+  dm_flatten_to_tbl(admin, location, .join = left_join)
+dm_joined
 ```
 
 
+#### Extract
+
+Extract all tables from DF9
 
 ```{r}
 # Initialize an empty list to store dataframes
@@ -72,23 +237,11 @@ for (table in db1_tables) {
 }
 ```
 
-```{r}
-# Use the `dm` package to manage relational data
-db1_dm <- dm_from_con(con=db1_con, table_names = db1_tables)
 
-# Inspect the relationships between tables (optional)
-db1_dm %>% dm_draw(rankdir = "TB")
 
-#
-```
 
-```{r}
-# Use the `dm` package to manage relational data
-X <- dm_from_con(con=db1_con, table_names = c("archMaterial", "Codes_FloorMat", "Codes_stoneDist", "Codes_archFeatures", "Codes_wallCoreStone", "Codes_wallCoreOther", "Codes_wallFacing", "Codes_materials"))
 
-# Inspect the relationships between tables (optional)
-X %>% dm_draw(rankdir = "TB")
-```
+#### Function to identify disconnected tables
 
 ```{r}
 # Load necessary libraries
@@ -116,7 +269,7 @@ disconnected_tables <- function(dm) {
 
 
 
-
+#### Transform
 
 ```{r}
 dm_flatten_to_tbl
@@ -135,8 +288,8 @@ combined_df <- db1_dm %>%
 ```
 
 
-
-
+Perform joins or other transformations to assemble the data into a single dataframe
+Example: Join all tables based on common keys (adjust as per your schema)
 
 
 ```{r}
@@ -149,6 +302,10 @@ for (i in 2:length(df_list)) {
 }
 ```
 
+
+
+
+# Disconnect and Save Transformed Output
 
 ```{r}
 # Close the database connection
@@ -165,7 +322,280 @@ write_csv(combined_df, "combined_dataframe.csv")
 
 
 
+
+
+### Replacing and factorizing
+
+wish list
+-- include number prefix
+-- indicate whether ordered factor or not
+-- indicate level
+-- change -1. missing values to NA if present
+
+```{r}
+
+library(tidyverse)
+
+read.csv("data/raw/METADATA_DF_VERSIONS.csv")
+
+metadata = METADATA_DF_VERSIONS %>% 
+	select(DF9_Variable, DF9_Codes_Table) %>% 
+	filter(DF9_Codes_Table != "-1") %>% 
+	rename(variable = DF9_Variable, code_table = DF9_Codes_Table)
+
+code_tabs <- db1_tables[grepl("^Codes_", db1_tables)]
+
+# Initialize an empty list to store dataframes
+code_tables <- list()
+
+# Extract data from each table and store it in the list
+for (tab in code_tabs) {
+  df <- dbReadTable(db1_con, tab) %>% as_tibble()
+  code_tables[[tab]] <- df
+}
+
+joinedTable_recoded <- metadata %>%
+  # Iterate over variable-code_table pairs
+  pmap(function(variable, code_table) {
+    
+    # Extract code-to-description mapping
+    code_key <- code_tables[[code_table]] %>%
+      select(code, description) %>%
+      deframe()  # Convert to named vector
+    
+    # Recode the target variable
+    joined_tbl %>%
+      mutate(across(
+        all_of(variable),
+        ~ recode_factor(.x, !!!code_key)  # Inject named vector with !!!
+      ))
+    
+  }) #%>%
+  # Reduce list of modified tibbles to a single tibble
+  #reduce(left_join, by = "SSN")  # Assuming "SSN" is the unique ID
+```
+
+
+
+
+
+
+
+
+
+
+
+
 ## TMP DF10
+
+
+#### Connect to PostgreSQL Database
+
+!!!! To Do: Need to manage passwords per https://db.rstudio.com/best-practices/managing-credentials/
+
+```{r}
+# Database connection details
+dbname <- "TMP_DF10"
+user <- "rudy"
+password <- "password"
+host <- "localhost"  # Replace with your host if not local
+port <- 5432         # Replace with your port if not default
+
+# Establish a connection to the PostgreSQL database
+df10_con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = dbname,
+  user = user,
+  password = password,
+  host = host,
+  port = port
+)
+```
+
+
+#### Inspect Tables and Schema
+
+
+List all tables in the database
+
+```{r}
+# List all tables in the database
+df10_tables <- dbListTables(df10_con)
+df10_tables#[34:51]
+```
+
+Inspect database schema
+
+```{r}
+# Use the `dm` package to manage relational data
+df10_dm <- dm_from_con(con=df10_con, table_names = df10_tables)
+
+# Inspect the relationships between tables (optional)
+df10_dm %>% dm_draw(rankdir = "TB")
+
+dm_gui(dm = df10_dm)
+
+
+
+```
+
+```{r}
+zzz = df10_dm %>%
+  dm_rm_fk(table = artifactTable, columns = SSN, ref_table = provTable, ref_columns = SSN) %>%
+  dm_rm_fk(table = archToSSN, columns = SSN, ref_table = provTable, ref_columns = SSN) %>%
+  dm_rm_fk(table = codeTable, columns = SSN, ref_table = provTable, ref_columns = SSN) %>%
+  dm_rm_fk(table = totalsTable, columns = SSN, ref_table = provTable, ref_columns = SSN) %>%
+  dm_rm_fk(table = interpTable, columns = SSN, ref_table = provTable, ref_columns = SSN) %>%
+  dm_rm_fk(table = codeTable, columns = Code, ref_table = codeCodes, ref_columns = Code) %>%
+  dm_rm_fk(table = interpTable, columns = Code, ref_table = interpCodes, ref_columns = Code) %>%
+  dm_add_fk(provTable, SSN, artifactTable, SSN) %>%
+  dm_add_fk(provTable, SSN, interpTable, SSN) %>%
+  dm_add_fk(provTable, SSN, codeTable, SSN) %>%
+  dm_add_fk(provTable, SSN, totalsTable, SSN) %>%
+  dm_add_fk(archToSSN, SSN, provTable, SSN) %>%
+  dm_add_fk(codeTable, Code, codeCodes, Code) %>%
+  dm_add_fk(interpTable, Code, interpCodes, Code)
+
+
+
+zzz %>% dm_draw(rankdir = "TB")
+
+#Validate schema
+dm_validate(zzz)
+
+
+dm_examine_cardinalities(zzz)
+```
+
+
+
+Generate script for new schema
+
+```{r}
+s <- dm_sql(dm=zzz, dest = df10_con)
+# s
+
+```
+
+
+
+
+```{r}
+
+artifactTable <- dbReadTable(df10_con, "artifactTable") %>% as_tibble()
+codeTable <- dbReadTable(df10_con, "codeTable") %>% as_tibble()
+interpTable <- dbReadTable(df10_con, "interpTable") %>% as_tibble()
+totalsTable <- dbReadTable(df10_con, "totalsTable") %>% as_tibble()
+
+### Step 1: Format totalsTable
+
+totals_table <- totalsTable %>% 
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "Missing", -1, Count)) %>%   # Replace "Missing" with -1,
+  ungroup() %>% 
+  select(-Where, -Count) %>%                              # Remove "Where" column
+  pivot_wider(id_cols = SSN, names_from = Variable, values_from = New, values_fill = 0) %>% 
+  mutate(SSN = as.integer(SSN)) %>% 
+  arrange(SSN)
+  
+### Step 1: Format totalsTable
+
+totals_table <- totalsTable %>% 
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -9999, Where),
+         New = ifelse(is.na(New), Count, New)) %>%  # Replace 0 with NA where "Where" == "M"
+  ungroup() %>% 
+  select(-Where, -Count) %>%                              # Remove "Where" column
+  pivot_wider(id_cols = ID, names_from = Variable, values_from = New, values_fill = 0) %>% 
+  mutate(ID = as.numeric(ID)) %>% 
+  arrange(ID) %>% 
+  mutate(across(everything(), ~ na_if(., -9999)))
+  
+### Step 2: Format interpTable
+
+interp_table <- interpTable %>%
+  rowwise() %>% 
+  mutate(New = ifelse(Where == "M", -1, Where),
+         New = ifelse(is.na(New), Code, New)) %>%  # Replace 0 with -1 where "Where" == "M"
+  ungroup() %>% 
+  left_join(interpCodes, by = join_by("New" == "code")) %>%      # Join with interpCodes
+  select(-Code, -Where) %>%# Remove unneeded columnws
+  pivot_wider(id_cols = ID, names_from = Variable, values_from = description)  %>% # Pivot wider by ID
+  mutate(ID = as.numeric(ID)) %>% arrange(ID)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Zoom-in on a portion of the database schema
+
+```{r}
+# Use the `dm` package to manage relational data
+X <- dm_from_con(con=db1_con, table_names = c("archMaterial", "Codes_FloorMat", "Codes_stoneDist", "Codes_archFeatures", "Codes_wallCoreStone", "Codes_wallCoreOther", "Codes_wallFacing", "Codes_materials"))
+
+# Inspect the relationships between tables (optional)
+X %>% dm_draw(rankdir = "TB")
+```
+"admin", "location", "archMaterial", "archInterp"
+db1_tables[35:52]
+```{r}
+
+main_tables <- db1_tables[!grepl("^Codes_", db1_tables)]
+code_tables <- db1_tables[grepl("^Codes_", db1_tables)]
+
+# Use the `dm` package to manage relational data
+X <- dm_from_con(con=db1_con, table_names = main_tables)
+
+# Inspect the relationships between tables (optional)
+X %>% dm_draw(rankdir = "TB")
+
+joined_tbl <- X %>%
+  dm_flatten_to_tbl(
+    .start = location
+  ) %>% 
+  as_tibble()
+
+dm_validate(X)
+
+```
+
+
 
 
 
@@ -253,7 +683,221 @@ write.csv(METADATA_DF_VERSIONS, "METADATA_DF_VERSIONS.csv")
 
 
 
+# x
 
+# x
+
+# x
+
+
+
+
+
+# x
+
+# x
+
+# x
+
+# x
+
+# x
+
+# x
+
+
+# ETL
+
+
+#### DBI: R Database Interface
+https://r-dbi.r-universe.dev/DBI
+A database interface definition for communication between R and relational database management systems. All classes in this package are virtual and need to be extended by the various R/DBMS implementations.
+
+#### dm: Relational Data Models
+https://cynkra.r-universe.dev/dm
+https://cynkra.r-universe.dev/dm/doc/manual.html#dm_get_all_fks
+https://cynkra.r-universe.dev/dm/doc/manual.html#dm_sql
+https://cynkra.r-universe.dev/dm/doc/manual.html#dm_flatten_to_tbl
+https://cynkra.r-universe.dev/dm/doc/manual.html#dm_filter
+https://cynkra.r-universe.dev/dm/doc/manual.html#dm_examine_constraints
+
+#### dbplyr: A 'dplyr' Back End for Databases
+https://tidyverse.r-universe.dev/dbplyr
+A 'dplyr' back end for databases that allows you to work with remote database tables as if they are in-memory data frames. Basic features works with any database that has a 'DBI' back end; more advanced features require 'SQL' translation to be provided by the package author.
+
+
+#### summarytools: Tools to Quickly and Neatly Summarize Data
+Data frame summaries, cross-tabulations, weight-enabled frequency tables and common descriptive (univariate) statistics in concise tables available in a variety of formats (plain ASCII, Markdown and HTML). A good point-of-entry for exploring data, both for experienced and new R users.
+https://dcomtois.r-universe.dev/summarytools
+
+#### arsenal: An Arsenal of 'R' Functions for Large-Scale Statistical Summaries
+An Arsenal of 'R' functions for large-scale statistical summaries, which are streamlined to work within the latest reporting tools in 'R' and 'RStudio' and which use formulas and versatile summary statistics for summary tables and models. The primary functions include tableby(), a Table-1-like summary of multiple variable types 'by' the levels of one or more categorical variables; paired(), a Table-1-like summary of multiple variable types paired across two time points; modelsum(), which performs simple model fits on one or more endpoints for many variables (univariate or adjusted for covariates); freqlist(), a powerful frequency table across many categorical variables; comparedf(), a function for comparing data.frames; and write2(), a function to output tables to a document.
+https://mayoverse.r-universe.dev/arsenal
+
+#### naniar: Data Structures, Summaries, and Visualisations for Missing Data
+https://njtierney.r-universe.dev/naniar
+Missing values are ubiquitous in data and need to be explored and handled in the initial stages of analysis. 'naniar' provides data structures and functions that facilitate the plotting of missing values and examination of imputations. This allows missing data dependencies to be explored with minimal deviation from the common work patterns of 'ggplot2' and tidy data. The work is fully discussed at Tierney & Cook (2023) <doi:10.18637/jss.v105.i07>.
+
+#### janitor: Simple Tools for Examining and Cleaning Dirty Data
+https://sfirke.r-universe.dev/janitor
+The main janitor functions can: perfectly format data.frame column names; provide quick counts of variable combinations (i.e., frequency tables and crosstabs); and explore duplicate records. Other janitor functions nicely format the tabulation results. These tabulate-and-report functions approximate popular features of SPSS and Microsoft Excel. This package follows the principles of the "tidyverse" and works well with the pipe function %>%. janitor was built with beginning-to-intermediate R users in mind and is optimized for user-friendliness.
+
+#### datawizard: Easy Data Wrangling and Statistical Transformations
+https://easystats.r-universe.dev/datawizard
+A lightweight package to assist in key steps involved in any data analysis workflow: (1) wrangling the raw data to get it in the needed form, (2) applying preprocessing steps and statistical transformations, and (3) compute statistical summaries of data properties and distributions. It is also the data wrangling backend for packages in 'easystats' ecosystem. References: Patil et al. (2022) <doi:10.21105/joss.04684>.
+
+#### hacksaw: Additional Tools for Splitting and Cleaning Data
+https://daranzolin.r-universe.dev/hacksaw
+Move between data frames and lists more efficiently with precision splitting via 'dplyr' verbs. Easily cast variables to different data types. Keep rows with NAs. Shift row values.
+
+#### pointblank: Data Validation and Organization of Metadata for Local and Remote Tables
+https://rstudio.r-universe.dev/pointblank
+https://rstudio.github.io/pointblank/index.html
+https://github.com/rstudio/pointblank
+Validate data in data frames, 'tibble' objects, 'Spark' 'DataFrames', and database tables. Validation pipelines can be made using easily-readable, consecutive validation steps. Upon execution of the validation plan, several reporting options are available. User-defined thresholds for failure rates allow for the determination of appropriate reporting actions. Many other workflows are available including an information management workflow, where the aim is to record, collect, and generate useful information on data tables.
+
+#### inspectdf: Inspection, Comparison and Visualisation of Data Frames
+https://alastairrushworth.r-universe.dev/inspectdf
+A collection of utilities for columnwise summary, comparison and visualisation of data frames. Functions report missingness, categorical levels, numeric distribution, correlation, column types and memory usage.
+
+#### dtrackr: Track your Data Pipelines
+https://terminological.r-universe.dev/dtrackr
+Track and document 'dplyr' data pipelines. As you filter, mutate, and join your way through a data set, 'dtrackr' seamlessly keeps track of your data flow and makes publication ready documentation of a data pipeline simple.
+
+#### Amelia: A Program for Missing Data
+https://matthewblackwell.r-universe.dev/Amelia
+A tool that "multiply imputes" missing data in a single cross-section (such as a survey), from a time series (like variables collected for each year in a country), or from a time-series-cross-sectional data set (such as collected by years for each of several countries). Amelia II implements our bootstrapping-based algorithm that gives essentially the same answers as the standard IP or EMis approaches, is usually considerably faster than existing approaches and can handle many more variables. Unlike Amelia I and other statistically rigorous imputation software, it virtually never crashes (but please let us know if you find to the contrary!). The program also generalizes existing approaches by allowing for trends in time series across observations within a cross-sectional unit, as well as priors that allow experts to incorporate beliefs they have about the values of missing cells in their data. Amelia II also includes useful diagnostics of the fit of multiple imputation models. The program works from the R command line or via a graphical user interface that does not require users to know R.
+
+#### dataCompareR: Compare Two Data Frames and Summarise the Difference
+https://capitalone.r-universe.dev/dataCompareR
+Easy comparison of two tabular data objects in R. Specifically designed to show differences between two sets of data in a useful way that should make it easier to understand the differences, and if necessary, help you work out how to remedy them. Aims to offer a more useful output than all.equal() when your two data sets do not match, but isn't intended to replace all.equal() as a way to test for equality.
+
+
+#### data.validator: Automatic Data Validation and Reporting
+https://appsilon.r-universe.dev/data.validator
+Validate dataset by columns and rows using convenient predicates inspired by 'assertr' package. Generate good looking HTML report or print console output to display in logs of your data processing pipeline.
+
+
+#### etl: Extract-Transform-Load Framework for Medium Data
+https://beanumber.r-universe.dev/etl
+A predictable and pipeable framework for performing ETL (extract-transform-load) operations on publicly-accessible medium-sized data set. This package sets up the method structure and implements generic functions. Packages that depend on this package download specific data sets from the Internet, clean them up, and import them into a local or remote relational database management system.
+
+#### octopus: A Database Management Tool
+https://mcodrescu.r-universe.dev/octopus
+A database management tool built as a 'shiny' application. Connect to various databases to send queries, upload files, preview tables, and more.
+
+#### maestro: Orchestration of Data Pipelines
+https://whipson.r-universe.dev/maestro
+Framework for creating and orchestrating data pipelines. Organize, orchestrate, and monitor multiple pipelines in a single project. Use tags to decorate functions with scheduling parameters and configuration.
+
+#### dettl: Data Extract, Transform, Test and Load
+https://vimc.r-universe.dev/dettl
+https://vimc.r-universe.dev/dettl/doc/manual.html#SqlImport
+Data extract, transform, test and load tool for sanitising your workflow.
+
+#### fctutils: Advanced Factor Manipulation Utilities
+https://guokai8.r-universe.dev/fctutils
+Provides a collection of utility functions for manipulating and analyzing factor vectors in R. It offers tools for filtering, splitting, combining, and reordering factor levels based on various criteria. The package is designed to simplify common tasks in categorical data analysis, making it easier to work with factors in a flexible and efficient manner.
+
+#### dlookr: Tools for Data Diagnosis, Exploration, Transformation
+https://choonghyunryu.r-universe.dev/dlookr
+A collection of tools that support data diagnosis, exploration, and transformation. Data diagnostics provides information and visualization of missing values, outliers, and unique and negative values to help you understand the distribution and quality of your data. Data exploration provides information and visualization of the descriptive statistics of univariate variables, normality tests and outliers, correlation of two variables, and the relationship between the target variable and predictor. Data transformation supports binning for categorizing continuous variables, imputes missing values and outliers, and resolves skewness. And it creates automated reports that support these three tasks.
+#### forcats: Tools for Working with Categorical Variables (Factors)
+https://tidyverse.r-universe.dev/forcats
+Helpers for reordering factor levels (including moving specified levels to front, ordering by first appearance, reversing, and randomly shuffling), and tools for modifying factor levels (including collapsing rare levels into other, 'anonymising', and manually 'recoding').
+
+#### flow: View and Browse Code Using Flow Diagrams
+https://moodymudskipper.r-universe.dev/flow
+Visualize as flow diagrams the logic of functions, expressions or scripts in a static way or when running a call, visualize the dependencies between functions or between modules in a shiny app, and more.
+
+#### systemPipeR: systemPipeR: Workflow Environment for Data Analysis and Report Generation
+https://bioc.r-universe.dev/systemPipeR
+systemPipeR is a multipurpose data analysis workflow environment that unifies R with command-line tools. It enables scientists to analyze many types of large- or small-scale data on local or distributed computer systems with a high level of reproducibility, scalability and portability. At its core is a command-line interface (CLI) that adopts the Common Workflow Language (CWL). This design allows users to choose for each analysis step the optimal R or command-line software. It supports both end-to-end and partial execution of workflows with built-in restart functionalities. Efficient management of complex analysis tasks is accomplished by a flexible workflow control container class. Handling of large numbers of input samples and experimental designs is facilitated by consistent sample annotation mechanisms. As a multi-purpose workflow toolkit, systemPipeR enables users to run existing workflows, customize them or design entirely new ones while taking advantage of widely adopted data structures within the Bioconductor ecosystem. Another important core functionality is the generation of reproducible scientific analysis and technical reports. For result interpretation, systemPipeR offers a wide range of plotting functionality, while an associated Shiny App offers many useful functionalities for interactive result exploration. The vignettes linked from this page include (1) a general introduction, (2) a description of technical details, and (3) a collection of workflow templates.
+
+#### codebook: Automatic Codebooks from Metadata Encoded in Dataset Attributes
+https://rubenarslan.r-universe.dev/codebook
+Easily automate the following tasks to describe data frames: Summarise the distributions, and labelled missings of variables graphically and using descriptive statistics. For surveys, compute and summarise reliabilities (internal consistencies, retest, multilevel) for psychological scales. Combine this information with metadata (such as item labels and labelled values) that is derived from R attributes. To do so, the package relies on 'rmarkdown' partials, so you can generate HTML, PDF, and Word documents. Codebooks are also available as tables (CSV, Excel, etc.) and in JSON-LD, so that search engines can find your data and index the metadata. The metadata are also available at your fingertips via RStudio Addins.
+
+#### ViewPipeSteps: Create View Tabs of Pipe Chains
+https://daranzolin.r-universe.dev/ViewPipeSteps
+Debugging pipe chains often consists of viewing the output after each step. This package adds RStudio addins and two functions that allow outputing each or select steps in a convenient way.
+
+
+#### skimr: Compact and Flexible Summaries of Data
+https://ropensci.r-universe.dev/skimr
+A simple to use summary function that can be used with pipes and displays nicely in the console. The default summary statistics may be modified by the user as can the default formatting. Support for data frames and vectors is included, and users can implement their own skim methods for specific object types as described in a vignette. Default summaries include support for inline spark graphs. Instructions for managing these on specific operating systems are given in the "Using skimr" vignette and the README.
+
+#### libr: Libraries, Data Dictionaries, and a Data Step for R
+https://dbosak01.r-universe.dev/libr
+Contains a set of functions to create data libraries, generate data dictionaries, and simulate a data step. The libname() function will load a directory of data into a library in one line of code. The dictionary() function will generate data dictionaries for individual data frames or an entire library. And the datestep() function will perform row-by-row data processing.
+
+#### dataMeta: Create and Append a Data Dictionary for an R Dataset
+https://dmrodz.r-universe.dev/dataMeta
+Designed to create a basic data dictionary and append to the original dataset's attributes list. The package makes use of a tidy dataset and creates a data frame that will serve as a linker that will aid in building the dictionary. The dictionary is then appended to the list of the original dataset's attributes. The user will have the option of entering variable and item descriptions by writing code or use alternate functions that will prompt the user to add these.
+
+#### labelmachine: Make Labeling of R Data Sets Easy
+https://a-maldet.r-universe.dev/labelmachine
+Assign meaningful labels to data frame columns. 'labelmachine' manages your label assignment rules in 'yaml' files and makes it easy to use the same labels in multiple projects.
+
+#### collections: High Performance Container Data Types
+https://randy3k.r-universe.dev/collections
+Provides high performance container data types such as queues, stacks, deques, dicts and ordered dicts. Benchmarks <https://randy3k.github.io/collections/articles/benchmark.html> have shown that these containers are asymptotically more efficient than those offered by other packages.
+
+#### dbc: Dictionary-Based Cleaning
+https://epicentre-msf.r-universe.dev/dbc
+Tools for dictionary-based data cleaning.
+
+#### dataspice: Create Lightweight Schema.org Descriptions of Data
+https://ropensci.r-universe.dev/dataspice
+The goal of 'dataspice' is to make it easier for researchers to create basic, lightweight, and concise metadata files for their datasets. These basic files can then be used to make useful information available during analysis, create a helpful dataset "README" webpage, and produce more complex metadata formats to aid dataset discovery. Metadata fields are based on the 'Schema.org' and 'Ecological Metadata Language' standards.
+
+#### git2rdata: Store and Retrieve Data.frames in a Git Repository
+https://ropensci.r-universe.dev/git2rdata
+The git2rdata package is an R package for writing and reading dataframes as plain text files. A metadata file stores important information. 1) Storing metadata allows to maintain the classes of variables. By default, git2rdata optimizes the data for file storage. The optimization is most effective on data containing factors. The optimization makes the data less human readable. The user can turn this off when they prefer a human readable format over smaller files. Details on the implementation are available in vignette("plain_text", package = "git2rdata"). 2) Storing metadata also allows smaller row based diffs between two consecutive commits. This is a useful feature when storing data as plain text files under version control. Details on this part of the implementation are available in vignette("version_control", package = "git2rdata"). Although we envisioned git2rdata with a git workflow in mind, you can use it in combination with other version control systems like subversion or mercurial. 3) git2rdata is a useful tool in a reproducible and traceable workflow. vignette("workflow", package = "git2rdata") gives a toy example. 4) vignette("efficiency", package = "git2rdata") provides some insight into the efficiency of file storage, git repository size and speed for writing and reading.
+
+
+
+
+
+
+
+
+
+
+
+
+
+# x
+
+
+# x
+
+
+# x
+
+
+
+# EDA
+
+#### ExPanDaR: Explore Your Data Interactively
+https://joachim-gassen.r-universe.dev/ExPanDaR
+Provides a shiny-based front end (the 'ExPanD' app) and a set of functions for exploratory data analysis. Run as a web-based app, 'ExPanD' enables users to assess the robustness of empirical evidence without providing them access to the underlying data. You can export a notebook containing the analysis of 'ExPanD' and/or use the functions of the package to support your exploratory data analysis workflow. Refer to the vignettes of the package for more information on how to use 'ExPanD' and/or the functions of this package.
+
+#### DataExplorer: Automate Data Exploration and Treatment
+https://boxuancui.r-universe.dev/DataExplorer
+Automated data exploration process for analytic tasks and predictive modeling, so that users could focus on understanding data and extracting insights. The package scans and analyzes each variable, and visualizes them with typical graphical techniques. Common data processing methods are also available to treat and format data.
+
+#### explore: Simplifies Exploratory Data Analysis
+https://rolkra.r-universe.dev/explore
+Interactive data exploration with one line of code, automated reporting or use an easy to remember set of tidy functions for low code exploratory data analysis.
+
+#### SmartEDA: Summarize and Explore the Data
+https://daya6489.r-universe.dev/SmartEDA
+Exploratory analysis on any input data describing the structure and the relationships present in the data. The package automatically select the variable and does related descriptive statistics. Analyzing information value, weight of evidence, custom tables, summary statistics, graphical techniques will be performed for both numeric and categorical predictors.
+
+#### correlationfunnel: Speed Up Exploratory Data Analysis (EDA) with the Correlation Funnel
+https://business-science.r-universe.dev/correlationfunnel
+Speeds up exploratory data analysis (EDA) by providing a succinct workflow and interactive visualization tools for understanding which features have relationships to target (response). Uses binary correlation analysis to determine relationship. Default correlation method is the Pearson method. Lian Duan, W Nick Street, Yanchi Liu, Songhua Xu, and Brook Wu (2014) <doi:10.1145/2637484>.
 
 
 

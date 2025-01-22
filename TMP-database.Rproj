@@ -14,5 +14,5 @@ RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
 PythonType: conda
-PythonVersion: 3.12.8
-PythonPath: C:/Users/TJ McMote/.conda/envs/TMP-database/python.exe
+PythonVersion: 3.11.11
+PythonPath: C:/Users/TJ McMote/.conda/envs/TMP-geo-database/python.exe

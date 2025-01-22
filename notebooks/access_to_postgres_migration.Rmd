@@ -1,0 +1,125 @@
+---
+title: "Untitled"
+author: "Rudolf Cesaretti"
+date: "2025-01-21"
+output: html_document
+---
+
+
+## Preliminary Mods to Access Databases
+
+SEE DATES FOR THESE
+
+Tests were conducted (under Huster??) to validate and find errors in 
+    -- Spatial location of SSNs on the TMP map and their correspondence to architectural features
+        -- "UncertainStatusInGIS"
+    -- the coherence of Architectural complexes
+        -- "unique complexes" DF9 table
+        -- "unique macrocomplexes" DF9 table
+    -- testing for import errors in the tabular data
+        -- "InitialCleaning$_ImportErrors"
+        -- "InitialCleaning$_ImportErrors1"
+        -- "TestForDF9$_ImportErrors"
+    -- testing for and correcting errors in the lab analyst and field worker personnel data
+        -- "test labAnalysts no key"
+        -- "personnel error check"
+        
+Also, a more generalresearch project aimed at reviewing, editing and refining the architectural and functional interpretations of the data was conducted. This endeavour involved the creation of the following tables:
+    -- "a_FuncInterp1 for digitization"
+    -- "a_FuncInterp1"
+    -- "z_archInterp1"
+    -- "z_archInterp2"
+    -- "z_funcInterp1"
+    -- "z_funcInterp2"
+    -- "1WorkingHierarchy"
+    -- "HierarchyCode"
+
+
+The goal is to preserve the core TMP dataset, while removing the superfluous tables and renaming the code value tables. The non-unique field names will be changed to unique names. The "variable check list" will be expanded and converted to a separate file called METADATA_DF_VERSIONS.csv.
+
+    
+Spatial location of SSNs on the TMP map
+
+
+### Preliminary Changes to DF9
+
+We want to preserve what I call the "core TMP dataset", which has remained more-or-less the same since Cowgill's (1993) metadata on DF8. While a few additions in DF9 and aggregations/removals in DF10 have caused the exact number of variables to fluctuate over time, the size of the core variables has fluctuated around ~290 variables
+
+Later versions of DF9 contain numerous other tables that were created for the purposes of error-checking, testing and validation, targeted detailed studies of specific artefact categories, or for the purpose of editing/refining Millon's original architectural and functional interpretations of the data. These tables are not part of the core TMP dataset and will be removed. 
+
+
+of the core
+
+
+-- i.e. the variables of which remained more or less the same as that specified by Cowgill in 
+
+##### Remove superfluous tables: 
+
+These tables were created for the testing phase and are no longer needed.
+
+"Almenas-2015"
+"InitialCleaning$_ImportErrors"
+"InitialCleaning$_ImportErrors1"
+"personnel error check"
+"test labAnalysts no key"
+"TestForDF9$_ImportErrors"
+"UncertainStatusInGIS"
+"unique complexes"
+"unique macrocomplexes"
+"z_vegetation"
+
+"variable check list" --> expanded and converted to separate file METADATA_DF_VERSIONS.csv
+
+--- 
+
+"a_FuncInterp1 for digitization"
+"a_FuncInterp1"
+
+"z_archInterp1"
+"z_archInterp2"
+"z_funcInterp1"
+"z_funcInterp2"
+
+"1WorkingHierarchy"
+"HierarchyCode"
+
+
+##### Renamed Code Value tables
+"DS <name>" --> "Codes_<name>"
+
+
+##### change non-unique field names:
+
+
+##### 
+
+
+##### 
+
+
+##### 
+
+
+##### 
+
+
+### Preliminary Changes to DF10
+
+
+
+
+
+
+
+
+
+
+
+## Migration from MS Access to PostgreSQL
+
+
+
+
+
+
+
