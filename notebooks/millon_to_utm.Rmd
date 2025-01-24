@@ -25,14 +25,20 @@ library(dplyr)
 
 #rm(list = ls())
 ```
-
+"C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TEO Drive - GIS Files/Millon to UTM and Back/Data"
 ```{r Import the Shapefiles}
+
+dir="C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/TEO Drive - GIS Files/Millon to UTM and Back/Data"
 #Millon Space TMP Grid
-basegrid_M <- readOGR('/Users/annesherfield/Documents/SCHOOL/4. Current TMP Projects/Finished.Shapefiles/Millon to UTM and Back/Data/basegrid.shp')
+
+basegrid_M <- readOGR(paste0(dir,"/basegrid.shp"))
 basegrid_M.df = df_spatial(basegrid_M)
 
+
+xxx=read.csv(paste0(dir,"/coord pairs mdc73 corners.csv"))
+
 #UTM TMP Grid
-Base_Map_UTM <- readOGR('/Users/annesherfield/Documents/SCHOOL/4. Current TMP Projects/Finished.Shapefiles/Millon to UTM and Back/Data/Base_Map.shp')
+Base_Map_UTM <- readOGR(paste0(dir,"/Base_Map.shp"))
 Base_Map_UTM.df = df_spatial(Base_Map_UTM)
 ```
 
@@ -50,12 +56,77 @@ text(Base_Map_UTM.df_duplicatesRM$x, Base_Map_UTM.df_duplicatesRM$y, labels = Ba
 
 #Remove duplicate values from the Millon space shapefile so all that's left are the SE corners of each grid square
 basegrid_M.df_duplicatesRM = basegrid_M.df %>% 
-  filter(coordinate_id == 4)
+  mutate(x2=10000+x, y2=10000+y) %>%
+  distinct(x2, y2, .keep_all = T) %>%
+  slice(which.min(y2)) %>%
+  ungroup()
+
+basegrid_M.df_duplicatesRM <- basegrid_M.df %>%
+  mutate(x2=10000+x, y2=10000+y) %>% 
+  group_by(square) %>%
+  filter(x2 == max(x2) & y2 == min(y2)) %>%
+  ungroup()
+
+Base_Map_UTM.df_duplicatesRM = Base_Map_UTM.df %>% 
+  group_by(map_grid) %>% 
+  filter(x == max(x) & y == min(y)) %>%
+  ungroup()
+
+basegrid_M.df_duplicatesRM <- basegrid_M.df %>%
+  distinct(x, y, .keep_all = TRUE)
+Base_Map_UTM.df_duplicatesRM <- Base_Map_UTM.df %>%
+  distinct(x, y, .keep_all = TRUE)
+
+Base_Map_UTM.df_duplicatesRM <- Base_Map_UTM.df %>%
+  distinct(x, y, feature_id, .keep_all = TRUE) %>% 
+  group_by(feature_id) %>%
+  mutate(
+    x_center = mean(x),  # Find polygon center
+    y_center = mean(y),
+    corner = case_when(
+      x > x_center & y < y_center ~ "SE",  # Southeast quadrant
+      x > x_center & y > y_center ~ "NE",  # Northeast quadrant
+      x < x_center & y > y_center ~ "NW",  # Northwest quadrant
+      x < x_center & y < y_center ~ "SW",  # Southwest quadrant
+      TRUE ~ "Edge/Center"  # Catch non-corner points
+    )
+  ) %>%
+  ungroup() %>%
+  select(-x_center, -y_center) %>%  # Remove temporary center columns
+  filter(corner == "SE")
+
+basegrid_M.df_duplicatesRM <- basegrid_M.df %>%
+  mutate(x2=10000+x, y2=10000+y) %>% 
+  distinct(x2, y2, feature_id, .keep_all = TRUE) %>% 
+  group_by(feature_id) %>%
+  mutate(
+    x_center = mean(x2),  # Find polygon center
+    y_center = mean(y2),
+    corner = case_when(
+      x2 > x_center & y2 < y_center ~ "SE",  # Southeast quadrant
+      x2 > x_center & y2 > y_center ~ "NE",  # Northeast quadrant
+      x2 < x_center & y2 > y_center ~ "NW",  # Northwest quadrant
+      x2 < x_center & y2 < y_center ~ "SW",  # Southwest quadrant
+      TRUE ~ "Edge/Center"  # Catch non-corner points
+    )
+  ) %>%
+  ungroup() %>%
+  select(-x_center, -y_center) %>%  # Remove temporary center columns
+  filter(corner == "SE")
 ```
 
 ```{r Merge The Shapefiles to get the Coordinate Pairs}
 #Change the column names so they match
-colnames(Base_Map_UTM.df_duplicatesRM)[3] <- "square"
+combined_df <- Base_Map_UTM.df_duplicatesRM %>% 
+  rename(square = map_grid,
+         X_UTM = x, Y_UTM = y) %>% 
+  left_join(basegrid_M.df_duplicatesRM, by = "square") %>%
+  select(square, x, y, X_UTM, Y_UTM) %>%
+  rename(E_Millon = x, N_Millon = y) %>% 
+  filter(!is.na(E_Millon))
+
+Base_Map_UTM.df_duplicatesRM %>% rename(square == map_grid) %>% 
+  left_join(basegrid_M.df_duplicatesRM, by = "square") %>%
 
 #Merge the dataframes
 combined_df = merge(basegrid_M.df_duplicatesRM, Base_Map_UTM.df_duplicatesRM, by='square')
@@ -72,7 +143,7 @@ combined_df = combined_df[,-c(4:11)]
 # Oct. 2019, Ian Robertson
 #################################################################$$
   # extract columns containing coordinate pairs
-  UTM <- as.matrix(combined_df[, 6:7])
+  UTM <- as.matrix(combined_df[, 4:5])
   tmpGrid <- as.matrix(combined_df[, 2:3])
 ```
 
@@ -94,6 +165,7 @@ combined_df = combined_df[,-c(4:11)]
   
   # the easy way to calculate new coordinates (using origin of Millon grid (0,0) as example)
   c(1, 0, 0) %*% affTrans1$coefficients
+
   print(c(1, 0, 0) %*% affTrans1$coefficients, digits = 15) # to access more digits
   
   # doing it manually

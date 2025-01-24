@@ -6,8 +6,144 @@ output: html_document
 ---
 
 
+# Notes Cowgill 2015
+
+### **Expanded Analysis: Developments and Current State of the TMP Electronic Database**  
+
+The evolution of the Teotihuacan Mapping Project (TMP) electronic database reflects both technological advancements and persistent challenges in archaeological data management. Below is an exhaustive breakdown of its developments and current state:  
+
+---
+
+#### **1. Digitization and Relational Database Development**  
+**a. *DF9 Database (1990s–2000s)*:**  
+- **Structure**: Designed by Ian Robertson, DF9 is a **relational database** that organizes TMP data into interconnected tables (e.g., collection units, artifacts, ceramics, spatial coordinates). Unlike flat files, it allows queries across datasets (e.g., linking ceramic types to specific map sectors).  
+- **Integration with Spatial Data**: Robertson digitized the TMP’s original **500x500m sector grid** (Figure 1) into a GIS-compatible format. Each sector (e.g., N3W4) was georeferenced, enabling overlay with artifact distribution maps.  
+- **Data Corrections**: Robertson identified **corrupted data** in legacy files, such as mismatched sector codes or mislabeled ceramic types. Corrections involved cross-referencing original SSRs and field journals.  
+
+**b. *REANS2 File (Ceramic Reanalysis)*:**  
+- Derived from **Evelyn Rattray’s 1970s–1980s ceramic reanalysis**, this file tabulates sherd counts by type and phase. It includes metadata on collection intensity (e.g., differences between original TMP surveys and later 10x10m intensive collections).  
+- **Limitations**: REANS2 lacks direct links to spatial data in DF9, requiring manual merging for cross-analysis.  
+
+**c. *Specialized Standalone Files*:**  
+- **Groundstone Artifacts (Biskowski)**: Coded attributes (material, dimensions, use-wear) for ~3,000 metates and manos. Data entered via paper forms in 1984, later digitized into Excel. No images or stratigraphic context.  
+- **Candeleros (Nawa Sugiyama)**: Records 1,200+ candelero (ceramic incense burners) attributes, including iconography (e.g., deity motifs) and spatial distribution. Integrates Deborah Cembellin’s typology but lacks chronological data.  
+- **Censer Ornaments (Kristin Sullivan)**: Focuses on ritual objects, with fields for material (e.g., ceramic vs. stone), style, and association with specific structures (e.g., Feathered Serpent Pyramid).  
+- **Lapidary Materials (Margaret Turner)**: Documents jade, obsidian, and shell artifacts, including workshop debris from Tecopac (N3E5).  
+
+**d. *Digitized Maps*:**  
+- **Process**: High-resolution scans of TMP’s hand-drawn field maps (Millon et al. 1973) were georectified using ground control points. Robertson embedded these into a **hyperlinked PDF** (ongoing as of 2010), allowing users to click sectors for artifact data.  
+- **GIS Integration**: Modern tools (ArcGIS, QGIS) enable dynamic mapping of sherd densities, craft activity zones, and structural layouts. For example, Robertson’s (2005) study of **San Martín Orange ware** used kernel density plots to identify workshop clusters.  
+
+---
+
+#### **2. Visualization Advancements**  
+**a. *Early Logarithmic Contour Maps (1970s)*:**  
+- **Methodology**: Cowgill’s logarithmic scales (3, 6, 12, 25, 50, 100, 200, 400 sherds/ha) addressed extreme density ranges. For example, rare Mazapan-phase ceramics used 3–25 contours, while ubiquitous Coyotlatelco wares required 100–400.  
+- **Criticism**: Underused due to archaeologists’ discomfort with logarithmic interpretation and preference for raw counts.  
+
+**b. *Modern GIS Applications*:**  
+- **Case Studies**:  
+  - Robertson (1999): Mapped **Aztec-period occupation** using DF9 data, revealing post-collapse reoccupation patterns.  
+  - Sullivan (2007): Overlaid **5x5m collection grids** at Cosotlan 23 onto satellite imagery to correlate surface finds with subsurface features.  
+- **Limitations**: Early GIS maps lacked temporal resolution (phases aggregated), but newer studies incorporate Bayesian chronologies.  
+
+---
+
+#### **3. Preservation and Accessibility**  
+**a. *Electronic File Repositories*:**  
+- **tDAR (Digital Archaeological Record)**: Select TMP files (e.g., REANS2, DF9 subsets) are archived here, though access is restricted pending metadata standardization.  
+- **Institutional Storage**: Originals reside at Arizona State University (ASU), SUNY-Buffalo, and the Teotihuacan research center. Files are stored in legacy formats (e.g., dBase, Excel 97), risking obsolescence.  
+
+**b. *Paper Record Backups*:**  
+- **SSR Scanning**: ~80% of Site Survey Records (SSRs) and field journals have been scanned as PDFs, hosted on ASU’s server. Unscanned materials include excavation notes from Plaza One (1958–1959) and Darlena Blucher’s Tlachinolpan work.  
+- **Redundancy**: Physical copies exist at ASU (4 filing cabinets), Teotihuacan, and SUNY-Buffalo.  
+
+---
+
+#### **4. Unfinished Projects and Integration Gaps**  
+**a. *1999 NSF Proposal*:**  
+- **Goals**:  
+  1. Standardize metadata across all TMP files.  
+  2. Develop a web portal for public data access.  
+  3. Publish a co-authored volume (*The Teotihuacan Dataset: Structure and Applications*).  
+- **Status**: A 2003 draft by Cowgill covers ceramic typologies and sector analyses but lacks integration with Robertson’s spatial data. Funding lapses halted progress.  
+
+**b. *Hyperlinked Map PDF*:**  
+- **Current State**: Partially completed; sectors N1W1–N3E5 are clickable, but links to artifact data are inconsistent. Robertson’s team seeks crowdsourcing to finalize it.  
+
+**c. *Relational Database Limitations*:**  
+- **Fragmentation**: Standalone files (e.g., candeleros, censers) cannot be queried alongside ceramics or groundstone. For example, correlating lapidary workshops with ritual structures requires manual data merging.  
+- **Metadata Inconsistencies**: Variable definitions differ between files (e.g., “workshop” in Sullivan’s censer file vs. Widmer’s lapidary dataset).  
+
+---
+
+#### **5. Emerging Technologies and Research Potential**  
+**a. *Machine Learning Applications*:**  
+- **Pattern Recognition**: Unsupervised clustering algorithms could identify undocumented ceramic type associations (e.g., linking Thin Orange ware to specific elite compounds).  
+- **Predictive Modeling**: Using spatial data to forecast undiscovered structures (e.g., Epiclassic temples) based on sherd distribution and topography.  
+
+**b. *3D Modeling*:**  
+- **Stratigraphic Reconstructions**: LiDAR scans of excavated sites (e.g., Techinantitla) could be layered with TMP surface data to visualize occupation phases.  
+
+**c. *Collaborative Platforms*:**  
+- **Open Context**: Publishing TMP data on this platform would enable annotation and integration with external datasets (e.g., Cholula or Monte Albán surveys).  
+
+---
+
+#### **6. Impact on Teotihuacan Research**  
+- **Urban Layout**: DF9-enabled studies revealed **northwest quadrant triadic groups** (e.g., Plaza One) as early ceremonial hubs, predating the Avenue of the Dead.  
+- **Economic Networks**: Groundstone and lapidary files identified **Tecopac (N3E5)** as a key workshop district, exporting goods to the Maya region.  
+- **Decline Analysis**: GIS maps of Coyotlatelco-phase sherds disproved the “abandonment” narrative, showing continuous Epiclassic reoccupation.  
+
+---
+
+### **Critical Challenges and Future Directions**  
+- **Data Silos**: Integration of standalone files into DF9 remains a technical and funding hurdle.  
+- **Temporal Resolution**: Ceramic phases (e.g., Miccaotli vs. Tlamimilolpa) are too coarse for detailed collapse studies.  
+- **Community Engagement**: Local resistance (e.g., Aztec Palace site) limits salvage archaeology.  
+
+In summary, the TMP database is a **monumental yet fragmented resource**. Its full exploitation demands interdisciplinary collaboration, sustained funding, and adoption of 21st-century digital tools.
+
+**Comprehensive and Analytical Summary of the TMP Electronic Database Files**  
+
+The Teotihuacan Mapping Project (TMP), initiated in the 1960s under René Millon, revolutionized the study of Teotihuacan through systematic surface surveys and excavations. A critical legacy of the TMP is its electronic database, derived from field records, which has faced both technical and methodological challenges while offering significant research potential.  
+
+### **Creation and Challenges of Electronic Files**  
+1. **Data Conversion from Analog to Digital**:  
+   - Field data were originally recorded on **Site Survey Records (SSRs)**, paper forms not designed for digital use. George Cowgill developed coding forms and codebooks to standardize data entry, but discrepancies arose due to coders’ lack of field experience and ambiguities in SSR interpretations.  
+   - **Ceramic data** were particularly problematic due to evolving typologies and communication gaps between researchers. Metadata documentation became essential to clarify limitations.  
+
+2. **Technological Limitations**:  
+   - Early electronic files (1960s–1980s) used **flat-file structures** with rigid column-row formats, restricting flexibility. Data fields were limited to 2–4 characters, complicating multivariate analyses.  
+   - **Computational constraints** forced researchers to analyze subsets of the 5,000+ collection units. FORTRAN programs were employed for statistical analyses, offering efficiency over contemporary tools like Excel.  
+
+3. **Data Integration and Error Management**:  
+   - Merging SSR units into coherent electronic cases proved challenging, exacerbated by mismatches between ceramic reanalysis units and original SSR-derived files.  
+   - **Error detection** relied on manual checks and basic software, highlighting risks of transcription mistakes.  
+
+### **Developments and Current State**  
+- **Digitization Efforts**: Ian Robertson spearheaded the creation of relational databases (e.g., **DF9**) and digitized the TMP map, integrating spatial and artifact data. Other specialized files (e.g., groundstone artifacts, candeleros, censer ornaments) were developed but remain standalone.  
+- **Visualization**: Early contour maps used logarithmic scales to address density variations, but modern GIS tools now enable granular mapping by collection unit. Robertson’s hyperlinked PDF of scanned maps enhances accessibility.  
+
+### **Preservation and Future Priorities**  
+1. **Institutional Support**:  
+   - The volatility of digital formats necessitates **long-term maintenance** and migration to new technologies. Institutional backing is critical for preserving both electronic files and original paper records (SSRs, journals), with recommendations for scanning and multi-site backups.  
+
+2. **Unfinished Tasks**:  
+   - A **relational database** integrating all TMP datasets remains unrealized. A 1999 NSF proposal aimed to standardize documentation and disseminate data online (via tDAR), but progress stalled.  
+   - Publication of a co-authored volume detailing TMP data and analyses is pending.  
+
+3. **Research Opportunities**:  
+   - The TMP collections and electronic files hold untapped potential for studies on urbanization, craft production, and sociopolitical complexity. Priorities include refining ceramic chronologies (via seriation) and leveraging spatial data for new insights into Teotihuacan’s layout and decline.  
+
+### **Analytical Insights**  
+- The TMP database exemplifies the transition from analog to digital archaeology, underscoring challenges in data standardization, integration, and preservation. While initial technological limitations constrained utility, subsequent efforts have modernized access, though fragmentation persists.  
+- The project highlights the necessity of **metadata rigor** and interdisciplinary collaboration to mitigate data obsolescence. Its evolution mirrors broader trends in archaeological informatics, emphasizing the balance between field data richness and digital adaptability.  
+
+In conclusion, the TMP electronic files are a foundational yet underutilized resource. Their full potential hinges on sustained institutional support, integration of disparate datasets, and innovative analyses to address enduring questions about Teotihuacan’s urban dynamics and legacy.
 
 
+# Notes Robertson (2015)
 
 ## Background
 
@@ -18,17 +154,13 @@ At present, the TMP data is stored in three Microsoft Access databases (.accdb a
 
 The TMP databases contain data on the following: (...)
 
-
-
 ### DF8
 
-The DF8 database was developed by Cowgill and Robertson in the early 2000s. The database was developed in Microsoft Access and contains data on the following: (...)
+The TMP database was developed by Cowgill in the 1990s. 
 
+Inthe 2000s, the DF8 database was developed in Microsoft Access and contains data on the following: (...)
 
-
-
-
-
+Explain DF8 database structure and content
 
 ### DF9
 

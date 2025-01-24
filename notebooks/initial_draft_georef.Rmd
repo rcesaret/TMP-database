@@ -22,8 +22,9 @@ library(readr)          # For reading CSV files
 
 # Set working directory
 #setwd("C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614")
-dir <- "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614"
+#dir <- "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614"
 
+dir <- "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/TeotihuacanDean/0_NEW_TEO_MODS_2024/Georef_R_MillonSpaceTo32614"
 # Define file paths
 gcp_file <- "GCPs_MillonTo32614_FifthPassGeoref.csv"
 raster_file <- "TMP_Map_Topo_MillonSpace_Full.tif"
