@@ -13,7 +13,7 @@ library(rprojroot)
 knitr::opts_knit$set(root.dir = find_rstudio_root_file())
 ```
 
-## Introduction/Background
+## Introduction
 
 The geospatial database is primarily composed of the Digitization of the TMP Survey Maps from Millon (1973)
 
@@ -302,7 +302,7 @@ Numerous (n = 74) collection units on TMP topo map that lack polygons altogether
     - Collection units with clearly identifiable provenances on the TMP topographic map, but which lack entries in the DF9 database.
     - Collection units indicated on the. TMP topographic map labeled only as ‘plazas’, and thus otherwise unassociated with any particular collection unit
 
-### 1. Clearly Labeled Collection Units Not Associated with a SSN
+#### 1. Clearly Labeled Collection Units Not Associated with a SSN
 
 - The first set of these collection units (n = 41) are standard collection units with clearly identifiable proveniences (i.e. Unit and site, as well as subsite if applicable).
     - It seems likely that many of these should actually be merged with one of the n = 5050 collection units in DF9
@@ -335,7 +335,7 @@ Numerous (n = 74) collection units on TMP topo map that lack polygons altogether
 | 21 | N4W1 | 56 | - |  |  |  |  |  |
 - Subsite also includes plaza
 
-### 2. Unassociated Plazas Lacking SSNs
+#### 2. Unassociated Plazas Lacking SSNs
 
 - The second set of these collection units (n = 33) are specifically designated as plazas on the TMP topo map – indicated by sites/subsites labeled only by either “PLAZA” or “P.” (example pictured below).
     - These plazas are clustered in the areas nearer to the densely occupied areas and civic-ceremonial core of the Classic Period site.
@@ -394,7 +394,7 @@ knitr::include_graphics("figs/CollectionUnitSSNPolygons_5.png")
 
 ### Duplicate/Overlapping SSN Polygons
 
-### 1. Spatially Separable Duplicates
+#### 1. Spatially Separable Duplicates
 
 in many cases the subside
 
@@ -406,9 +406,9 @@ In many cases subsite name designations make it possible to divide certain dupli
 knitr::include_graphics("figs/CollectionUnitSSNPolygons_6.png")
 ```
 
-### 2. Problematic Duplicates
+#### 2. Problematic Duplicates
 
-### 2. Problematic Duplicates
+
 
 ### SSN Merges/Aggregations
 
