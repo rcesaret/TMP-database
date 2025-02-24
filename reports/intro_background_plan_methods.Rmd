@@ -231,8 +231,7 @@ To do: explanation of the development of REANs DF2 by Robertson 2000-2023
 
 ### DF9
 
-Tons of Floating tables lacking relationships
-
+- Tons of Floating tables lacking relationships
 - No referential integrity constraints
 - No validation rules
 - No normalization
