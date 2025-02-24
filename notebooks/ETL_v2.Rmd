@@ -1,9 +1,10 @@
 ---
-title: "ETL v.1"
+title: "ETL v.2"
 author: "Rudolf Cesaretti"
-date: "2025-01-19"
+date: "2025-02-24"
 output: html_document
 ---
+
 
 # Setup
 
