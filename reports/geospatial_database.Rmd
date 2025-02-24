@@ -15,6 +15,12 @@ knitr::opts_knit$set(root.dir = find_rstudio_root_file())
 
 ## Introduction
 
+The Teotihuacan Mapping Project (TMP) was a large-scale archaeological survey of the ancient city of Teotihuacan, Mexico, conducted by René Millon and his team in the 1960s and 1970s. The project aimed to document and map the architectural and artifact remains of the city, providing a detailed record of the spatial organization and material culture of Teotihuacan. The TMP survey map, drawn by hand on a 1:1000 scale, covers an area of approximately 75 km2 and includes detailed information on the location of archaeological features such as buildings, plazas, roads, and other structures, as well as the distribution of artifacts and other material remains.
+
+The TMP survey map is a valuable resource for researchers studying the ancient city of Teotihuacan, providing a detailed record of the archaeological remains and the spatial organization of the site. However, the digitization of the TMP map into a geospatial database has presented numerous challenges, including issues with georeferencing, vector digitization, and the integration of the spatial data with the TMP database. This document outlines the problems with the existing geospatial database of the TMP map and proposes a plan for improving the quality and usability of the data.
+
+
+
 The geospatial database is primarily composed of the Digitization of the TMP Survey Maps from Millon (1973)
 
 There are two maps:
@@ -36,12 +42,23 @@ When the database was created, an additional ID tag, the SSN number, was created
 
 The TMP organizational system is complex with each grid having a designation (i.e. N1W1) and each collection unit within that grid numbered 1+ leaving the designation for each collection unit: N1W1:12 for example. When the database was created, an additional ID tag, the SSN number, was created numbered 1 to 5050. It is this number that Sherfield used to identify the architecture since it can easily be linked to the database.
 
+
 ```{r plot_FigA1, echo = FALSE, warning = FALSE, message = FALSE}
 # Display Plot
 knitr::include_graphics("figs/TMP_grid.png")
 ```
 
-There are 150 grid squares (each 500 x 500 meters; 0.25 km2)
+There are 150 grid squares (each 500 x 500 meters; 0.25 km2).
+
+
+
+
+
+The TMP map was drawn by hand in the 1960s and 1970s by the Teotihuacan Mapping Project (TMP) team led by René Millon. The map was created by tracing low-altitude airphotos taken in the 1960s. The map was drawn on a 1:1000 scale, with each grid square representing 500 x 500 meters (0.25 km2). The map covers an area of approximately 75 km2, including the ancient city of Teotihuacan and its surrounding landscape. The map includes detailed information on the location of archaeological features such as buildings, plazas, roads, and other structures, as well as the distribution of artifacts and other material remains. The TMP map is a valuable resource for researchers studying the ancient city of Teotihuacan and its inhabitants, providing a detailed record of the archaeological remains and the spatial organization of the site.
+
+The digitization of the TMP map into a geospatial database has presented numerous challenges, including issues with georeferencing, vector digitization, and the integration of the spatial data with the TMP database. This document outlines the problems with the existing geospatial database of the TMP map and proposes a plan for improving the quality and usability of the data.
+
+
 
 
 **Georeferencing Transformation Types:**
@@ -120,6 +137,8 @@ Second, there is the TMP geospatial database. Perhaps the most important outcome
 
 
 
+The TMP geospatial database is a critical resource for researchers studying the ancient city of Teotihuacan. It provides a spatial framework for analyzing the distribution of archaeological features, the organization of the city, and the relationship between different elements of the urban landscape. However, the geospatial database has several limitations and challenges that need to be addressed in order to maximize its utility for archaeological research.
+
 
 
 
@@ -185,7 +204,9 @@ Yet, for some reason, there has so-far been no attempt to digitize any of these 
 
 #### Integration with the TMP Database
 
-Only the 5050 survey tracts (SSNs) where collections were made has there been any attempt to connect the spatial database to the TMP database. Yet attaching the TMP polygons with their TMP records was for some reason never formalized. The few senior researchers who conducted spatial analysis of the TMP database apparently attached these files ad hoc, or only used collection unit centroid coordinates (rather than areal polygon topologies). Regardless, present day best practices necessitate integration of these data either as a geospatial dataset or a geospatial database (e.g. PostGIS). Regardless of the choice of format, doing this is the only way that spatial queries can be conducted to further integrate the other (undigitized) TMP spatial data -- as well as other modern geostatistical data such as high-resolution DEMs, soil data, satellite imagery, remote sensing, etc. to help bolster the data available for archaeological analysis.
+Only the 5050 survey tracts (SSNs) where collections were made has there been any attempt to connect the spatial database to the TMP database. Yet attaching the TMP polygons with their TMP records was for some reason never formalized. The few senior researchers who conducted spatial analysis of the TMP database apparently attached these files ad hoc, or only used collection unit centroid coordinates (rather than areal polygon topologies). Regardless, present day best practices necessitate integration of these data either as a geospatial dataset or a geospatial database (e.g. PostGIS). Regardless of the choice of format, doing this is the only way that spatial queries can be conducted to further integrate the other (undigitized) TMP spatial data -- as well as other modern geostatistical data such as high-resolution DEMs, soil data, satellite imagery, remote sensing, etc. to help bolster the data available for archaeological analysis. 
+
+
 
 
 #### Classification of Architectural Features
@@ -408,7 +429,7 @@ knitr::include_graphics("figs/CollectionUnitSSNPolygons_6.png")
 
 #### 2. Problematic Duplicates
 
-
+AI GEN:: "In other cases, the duplicate polygons are spatially inseparable, and thus cannot be divided into separate subsites. This is especially the case when the duplicate polygons represent individual subsites ‘N’ and ‘S’."
 
 ### SSN Merges/Aggregations
 
@@ -457,6 +478,25 @@ file:///C:/Users/TJ%20McMote/ASU%20Dropbox/Rudolf%20Cesaretti/TEO%20Drive/ELECTR
 -
 
 
+## Proposed Solutions
+
+
+
+### Georeferencing Transformation
+
+### Vector Digitization
+
+### Integration with the TMP Database
+
+### Classification of Architectural Features
+
+### Missing Features from the TMP Map
+
+### On-Site Data
+
+### Off-Site Data
+
+### Other (On- and Off-Site) Geographical Data on the TMP Topo Map
 
 
 

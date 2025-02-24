@@ -161,15 +161,23 @@ The TMP databases contain data on the following: (...)
 
 The TMP database was developed by Cowgill in the 1990s. 
 
-Inthe 2000s, the DF8 database was developed in Microsoft Access and contains data on the following: (...)
+In the 2000s, the DF8 database was developed in Microsoft Access and contains data on the following: (...)
 
 Explain DF8 database structure and content
 
+
+
 ### DF9
 
-To do: explanation of the development of DF9 c.2000-2022 (by Cowgill, Robertson, MES, Huster and Dennehey) + the current state of the DF9 database
 
-Development from DF8
+
+To do: explanation of the development of DF9 c.2000-2022 (by Cowgill, Robertson, MES, Huster and Dennehey) + the current state of the DF9 database. 
+
+DF9 is a relational database that organizes TMP data into interconnected tables (e.g., collection units, artifacts, ceramics, spatial coordinates). Unlike flat files, it allows queries across datasets (e.g., linking ceramic types to specific map sectors). 
+
+#### Development from DF8
+
+DF9 was developed by Robertson in the 2000s as a relational database that organizes TMP data into interconnected tables (e.g., collection units, artifacts, ceramics, spatial coordinates). Unlike flat files, it allows queries across datasets (e.g., linking ceramic types to specific map sectors).
 
 Overall structure of the database in MS Access
 - Tables
@@ -193,7 +201,7 @@ Tests were conducted (under Huster??) to validate and find errors in
         -- "test labAnalysts no key"
         -- "personnel error check"
 
-
+Also, a more generalresearch project aimed at reviewing, editing and refining the architectural and functional interpretations of the data was conducted. This endeavour involved the creation of the following tables:
 
 
 
@@ -284,7 +292,7 @@ The database should be designed using the Entity-Relationship (ER) model and imp
 This necessitates: reorganize the current database content, bring them  to a normalized state, validate the data, enforce referential integrity constraints, and migrate the data to the new system.
 'Wish-list'== best practices followed + additional substantive revisions, additions and refinements to the database structure and content
 
-
+The new database system will be designed using the Entity-Relationship (ER) model and will be implemented using a relational database management system (RDBMS). The data from the current databases will be migrated to the new system using a series of SQL scripts that will extract the data from the old databases, transform it into the new format, and load it into the new database system. The migration process will be tested to ensure that the data is migrated correctly and that the new database system is working as expected.
 
 
 
@@ -300,33 +308,33 @@ and only a repr and the new system will need to incorporate both sets of data. T
 
 ### Step 1: Database Analysis
 
-
+The first step in the migration process is to analyze the current databases to identify the structure, content, and relationships between the tables. This will involve examining the tables, queries, forms, and relationships in the databases to understand how the data is organized and stored. The analysis will also identify any data quality issues, such as redundant data, inconsistent data, incomplete data, and inaccurate data. The goal of this step is to gain a comprehensive understanding of the current databases and to identify any issues that need to be addressed in the migration process.
 
 ### Step 2: Database Design
 
-
+The next step in the migration process is to design the new database system. This will involve creating an Entity-Relationship (ER) model that defines the structure of the database, including the tables, fields, and relationships between the tables. The ER model will be used to guide the implementation of the new database system and to ensure that the data is organized in a logical and efficient manner. The design of the new database system will also include the validation rules and referential integrity constraints that will be enforced to ensure the quality and consistency of the data.
 
 
 ## Method for Bringing the Databases to the New System
 
+The method for bringing the databases to the new system will involve the following steps:
 
+1. **Database Analysis**: Analyze the current databases to identify the structure, content, and relationships between the tables. This will involve examining the tables, queries, forms, and relationships in the databases to understand how the data is organized and stored. The analysis will also identify any data quality issues, such as redundant data, inconsistent data, incomplete data, and inaccurate data.
 
+2. **Database Design**: Design the new database system using an Entity-Relationship (ER) model that defines the structure of the database, including the tables, fields, and relationships between the tables. The ER model will be used to guide the implementation of the new database system and to ensure that the data is organized in a logical and efficient manner. The design of the new database system will also include the validation rules and referential integrity constraints that will be enforced to ensure the quality and consistency of the data.
 
+3. **Database Implementation**: Implement the new database system using a relational database management system (RDBMS) such as PostgreSQL. The data from the current databases will be migrated to the new system using a series of SQL scripts that will extract the data from the old databases, transform it into the new format, and load it into the new database system. The migration process will be tested to ensure that the data is migrated correctly and that the new database system is working as expected.
 
+4. **Testing and Validation**: Test and validate the new database system to ensure that it is functioning correctly and that the data is accurate and consistent. This will involve running queries and reports to verify that the data is being stored and retrieved correctly, and that the validation rules and referential integrity constraints are being enforced.
 
+5. **Translation to Other Database Systems**: Translate the new database system to other database systems such as MySQL, Apache, and SQLite. This will involve exporting the data from the new database system and importing it into the other database systems. The translation process will be tested to ensure that the data is translated correctly and that the other database systems are working as expected.
 
+6. **Final Testing and Validation**: Perform final testing and validation of the new database systems to ensure that they are functioning correctly and that the data is accurate and consistent. This will involve running queries and reports to verify that the data is being stored and retrieved correctly, and that the validation rules and referential integrity constraints are being enforced.
 
+7. **Distribution on tDAR**: Distribute the new database systems on tDAR for open-access use. This will involve uploading the databases to tDAR and providing documentation and instructions for users on how to access and use the data.
 
+The above steps will ensure that the current databases are migrated to a new system that is more efficient, reliable, and secure, and that the data is accurate and consistent. The new database systems will be designed using best practices for database design and implementation, and will be accessible to a wide audience on tDAR.
 
-
-
-
-
-
-
-
-
-
-
+## Database Migration Plan
 
 
