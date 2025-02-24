@@ -1,0 +1,98 @@
+---
+title: "DF8 Wide"
+author: "Rudolf Cesaretti"
+date: "2025-01-21"
+output: html_document
+---
+
+
+# Load Packages
+
+```{r}
+# Load the required package
+library(tidyverse)
+library(readxl)
+library(stringi)
+
+```
+
+
+# Set Working Directory
+
+```{r}
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
+```
+
+
+# Create DF8 Wide 
+
+## Merge DF8 Tables for Raw (original numeric) Values Dataset
+
+
+### Step 1: Import all excel files from the specified directory into a list of dataframes
+
+```{r}
+
+file_list <- list.files(
+  path = paste0(DIR, "data/raw/DF8"),
+  pattern = "\\.xlsx$", full.names = TRUE
+)
+file_names <- tools::file_path_sans_ext(basename(file_list))
+data_list <- map(file_list, read_excel)
+names(data_list) <- file_names
+
+```
+
+### Step 2: Rearrange the list so the last dataframe is first, then join all
+```{r}
+
+# Rearrange the list so the last dataframe is first, then join all
+DF8_wide <- data_list %>%
+  {c(tail(., 1), head(., -1))} %>%  # Reorder the list
+  reduce(full_join, by = "SSN") %>% # Join all dataframes by SSN
+  rename(`SITE_` = `Site.`,
+         `UNIT_` = `Unit`,
+         `DRAINS_ARCH` = `DRAINS.x`,
+         `DRAINS_MODERN` = `DRAINS.y`) # Rename columns
+
+```
+
+### Step 3: Check for any discrepancies between the SITE and UNIT columns
+
+```{r}
+
+checksum <- DF8_wide %>% 
+  dplyr::select(SSN, SITE, SITE_, UNIT, UNIT_) %>% 
+  mutate(check_SITE = ifelse(SITE == SITE_, 1, 0),
+         check_UNIT = ifelse(UNIT == UNIT_, 1, 0)) %>% 
+  summarize(checksum_SITE = sum(check_SITE),
+            checksum_UNIT = sum(check_UNIT))
+
+if (checksum$checksum_SITE == nrow(DF8_wide) & checksum$checksum_UNIT == nrow(DF8_wide)) {
+  print("CHECKS PASSED: SITE + SITE_ and UNIT + UNIT_ columns are identical across all rows")
+  DF8_wide <- DF8_wide %>% 
+    dplyr::select(-SITE, -UNIT_) %>% 
+    rename(SITE = SITE_)
+} else {
+  print("WARNING: SITE + SITE_ and UNIT + UNIT_ columns are NOT identical across all rows")
+}
+
+```
+
+### Step 4: Save the DF8_wide dataframe to a CSV file
+
+```{r}
+write_csv(DF8_wide, paste0(DIR, "data/DF8_wide_raw_values.csv"))
+```
+
+
+
+## Process DF8 wide dataset values for Standardized Dataset
+
+
+
+
+
+
+
+

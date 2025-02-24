@@ -474,8 +474,8 @@ file:///C:/Users/TJ%20McMote/ASU%20Dropbox/Rudolf%20Cesaretti/TEO%20Drive/ELECTR
 - Eroded
 - Silted
 - Not Surveyed + No Permission
-- Nada (“N”) + Almost Nada (“AN”)
--
+- Survey tracts with 'Nada' (“N”) surface artifact densities
+- Survey tracts with 'Almost Nada' (“AN”) surface artifact densities
 
 
 ## Proposed Solutions
@@ -495,6 +495,9 @@ file:///C:/Users/TJ%20McMote/ASU%20Dropbox/Rudolf%20Cesaretti/TEO%20Drive/ELECTR
 ### On-Site Data
 
 ### Off-Site Data
+
+
+
 
 ### Other (On- and Off-Site) Geographical Data on the TMP Topo Map
 
