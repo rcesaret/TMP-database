@@ -1,0 +1,2339 @@
+VarID,DF9b_VarName,VarName,Table,DataType,CovertToFactorVar,NAValue,CodedVar,CodesTable,DF8_VarName,Var_Description_Short,Var_Description_Long,VarValuesDomain,Changes,Comments,
+0,SSN,SSN,,Integer,TRUE,,FALSE,,SSN,SSN Primary Key,,,,,
+1,site,site,Data_location,Character,TRUE,,FALSE,,SITE,Site number,"The site number is a sequence of characters that identifies a single site, a unit of analysis that corresponds to various kinds of structural and spatial entities. Most site numbers used in this database correspond to designations used to label sites in the Millon et al. (1973) mapsheets.",,"Small numbers of sites have been subjected to post-fieldwork merging, and/or redesignation. This is much more common with subsite, rather than site designations, however.","Most sites correspond to single tracts of land ('collection tracts') that were used as the minimal unit of description, collection and analysis by the TMP. Some sites subsume one or more 'subsites', and in such cases, the subsites usually constitute the collection tracts that were defined and used by fieldworkers.Most sites were defined on the basis of visible architectural remains; a minority are based on spatial units that relate to recent or modern land-use practices. Site numbers are mostly integers, but some sites have the prefix ""L"". This indicates that the site was judged to lack significant evidence for occupation during the Teotihuacan Period, although there was evidence of earlier and/or later occupation; these determinations were sometimes later revised. Published references to TMP sites and subsites may use colons and subscripts that are not part of this database. A site designation such as 1B':N1E1 is composed of three parts: site 1; subsite B1; and square N1E1.",
+2,subsite,subsite,Data_location,Character,TRUE,NONE,FALSE,,SUBSITE,Subsite,"Alphanumeric code for identifying parts of a single site that were recorded individually, as well as related collections and code sheets.",,"A fair number of subsites have been subjected to post-fieldwork merging, and/or redesignation. This may sometimes be a cause of discrepency between the current database and its various predecessors.","Subsite designations were used to identify survey tracts, collections and records thought to relate to a single 'site', but which (for one of several possible reasons [Millon 1973:22]) were treated as individual collection tracts. The subsite field is blank for most cases, since many collections from sites and subsites shown as single structures in Millon et al. (1973) were merged. The field is still relevant for subsites that were interpreted as distinct structures and left unmerged.  Published references to TMP sites and subsites may use colons and subscripts that are not part of this database. A site designation such as 1B':N1E1 is composed of three parts: site 1; subsite B1; and square N1E1.",
+3,unit,unit,Data_location,Character,TRUE,,FALSE,,UNIT,Map square designation,"A four character designation for a 500m square containing the site or subsite. These squares were based on a grid system established near the beginning of the TMP survey, with its origin near the southwest corner of the Ciudadela. The first two characters indicate the square's position north or south of the origin; the second two characters indicate its position east or west of the origin (eg. N5W4, S2E6).",,,Published references to TMP sites and subsites may use colons and subscripts that are not part of this database. A site designation such as 1B':N1E1 is composed of three parts: site 1; subsite B1; and square N1E1.,
+4,northing,northing,Data_location,Integer,FALSE,-999,FALSE,,NORTHING,North-south location of site,"This is the distance from the center of the site north or south of the center of the Teotihuacan map grid (the SW corner of N1E1), in multiples of 10 meters. Negative numbers are south, positive are north: 467 means ca. 4670m north, -211 means ca. 2100m south.","domain set:
+[-1,0..]
+-999=missing data",,,
+5,easting,easting,Data_location,Integer,FALSE,-999,FALSE,,EASTING,East-west location of site,"This is the distance from the center of the site east or west of the center of the Teotihuacan map grid (the SW corner of N1E1), in multiples of 10 meters. Negative numbers are west, positive are east: 250 means ca. 2500m east, -420 means ca. 4200m west.","domain set:
+[-1,0..]
+-999=missing data",,,
+6,fieldWorker1,fieldWorkers,Data_fieldWorkers,Integer,TRUE,-1,TRUE,Codes_personnel,FLDWRK1,Field workers,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+7,fieldWorker2,fieldWorkers,Data_fieldWorkers,Integer,TRUE,-1,TRUE,Codes_personnel,FLDWRK2,Field workers,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+8,fieldWorker3,fieldWorkers,Data_fieldWorkers,Integer,TRUE,-1,TRUE,Codes_personnel,FLDWRK3,Field workers,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+9,fieldWorker4,fieldWorkers,Data_fieldWorkers,Integer,TRUE,-1,TRUE,Codes_personnel,FLDWRK4,Field workers,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+10,fieldWorker5,fieldWorkers,Data_fieldWorkers,Integer,TRUE,-1,TRUE,Codes_personnel,FLDWRK5,Field workers,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+11,collectionYear,collectionYear,Data_admin,Integer,FALSE,-1,FALSE,,COLLYEAR,Collection year,The last two digits of the year within which the collection was made.,"domain set:
+[-1,62..70]
+-1=missing data",,Collections made in December are coded for the following year.,
+12,collectionQuarter,collectionQuarter,Data_admin,Integer,TRUE,-1,TRUE,Codes_quarter,COLLQURT,Collection quarter,Quarter within which the collection was made.,"domain set:
+[-1,1..4]
+1=December-February
+2=March-May
+3=June-August
+4=September-November",,,
+13,lastBuildPhase,lastBuildPhase,Data_description,Integer,TRUE,-1,TRUE,Codes_lastBuildPhase,LSTBUILD,Last major Teotihuacan building phase,This field records the last Teotihuacan occupation phase (Patlachique to Oxtoticpac) for which there was major evidence of building.,"domain set:
+[-1,0..6]
+-1=missing data
+0=insufficient basis for judgement, or Patlachique
+1=Tzacualli
+2=Miccaotli
+3=Tlamimilolpa
+4=Xolalpan
+5=Metepec
+6=Oxtoticpac","A programming error in creating DF8 changed all ""-1""s for this field to ""0""s, thus mixing sites judged to have no Teotihuacan building phase later than Patlachique with those designated ""insufficient basis for judgement"".",DO NOT RELY ON VAR.13!!,
+14,burials,burials,Data_description,Integer,TRUE,-1,TRUE,Codes_burials,BURIALS,Burials,"Combined observations bearing simultaneously on evidence for burials, looting, and the nature of collected artifacts.","domain set:
+[-1,0..9]
+-1=missing data
+0=none observed
+1=possibly present; evidence destroyed by looting
+2=present, looted; collection not mainly grave material
+3=present, not looted; collection not mainly grave material
+4=present, looted; collection mainly grave material
+5=present, not looted; collection mainly grave material
+6=present, looted; collection entirely grave material
+7=present, not looted; collection entirely grave material
+8=burials possibly present
+9=other",,Needs to be checked by referring to original site records.,
+15,midden,midden,Data_description,Integer,TRUE,-1,TRUE,Codes_midden,MIDDEN,Midden deposits on site,Evidence for the existence of midden deposits on the site.,"domain set:
+[-1,0..3]
+-1=missing data
+0=not observed
+1=possibly
+2=probably
+3=definitely",,"Very limited utility for analysis. This field is not very useful for judging where middens might be encountered upon excavation. Almost all cases were recorded as ""middens not observed"", indicating that surface evidence for middens is very rare at Teotihuacan.",
+16,stoneQuant,stoneQuant,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_stoneQuant,QNTSTONE,Quantity of stone on site,Quantity of stone observed on site.,"domain set:
+[-1,0..9]
+-1=missing data
+0=absent
+1=very sparse
+2=sparse to very sparse
+3=sparse
+4=sparse to moderate
+5=moderate
+6=moderate to abundant
+7=abundant
+8=abundant to very abundant
+9=very abundant",,Much of this stone is likely to be the remains of ancient buildings.,
+17,stoneDist,stoneDist,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_stoneDist,DSTSTONE,Distribution of stone,Distributional patterns observed in stone on site.,"domain set:
+[-1,1..4]
+-1=missing data
+1=relatively uniform
+2=localized
+3=variable
+4=heavily modified due to clearing",,,
+18,stoneCut,stoneCut,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,CUTSTONE,Cut stone,Quantity of cut stone observed.,"domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+19,lajas,lajas,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,LAJAS,Lajas,"Quantity of ""lajas"" observed. Lajas are tabular building stones used for a variety of purposes at Teotihuacan, including the construction of talud-tablero facades.","domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+20,tepetate,tepetate,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,TEPETATE,Tepetate,"Quantity of ""tepetate"" observed. Tepetate is the sterile volcanic bedrock that characteristically underlies surface sediments at Teotihuacan, but is also exposed on the surface in many areas. Tepetate was often used as a building material by the prehispanic peoples of this area.","domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+21,adobe,adobe,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,ADOBE,Adobe,"Quantity of ""adobe"" observed. Adobe is unfired mud and/or clay used as a building material.","domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+22,xalnene,xalnene,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,XALNENE,Xalnene,"Quantity of ""xalnene"" observed. [I don't know what xalnene is… (a type of sand??) George?]","domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+23,cascajo,cascajo,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,CASCAJO,Cascajo,"Quantity of ""cascajo"" observed. [I don't know what cascajo/crushed tezontli is; George?]","domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,Crushed Tezontli,
+24,concrete,concrete,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,CONCRETE,Concrete fragments,"Quantity of concrete fragments observed. ""Teotihuacan concrete"" (quicklime) was a common building material at Teotihuacan.","domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+25,plasterUnpaint,plasterUnpaint,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,PLSTRUNP,Unpainted plaster fragments,Quantity of unpainted plaster fragments observed.,"domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+26,plasterPaint,plasterPaint,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,PLSTRPNT,Painted plaster fragments,Quantity of painted plaster observed.,"domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+27,burntClay,burntClay,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_materials,BURNCLAY,Burnt clay,Quantity of burnt clay observed.,"domain set:
+[-1,0..6]
+-1=missing data
+0=none observed
+1=very sparse
+2=sparse
+3=present in unspecified quantity
+4=moderate
+5=abundant
+6=very abundant",,,
+28,almena,almena,Data_archMaterial,Integer,FALSE,-1,FALSE,,ALMENA,Number of almena fragments collected,"Counts of ""almena"" fragments collected. Almenas are a type of roof decoration, typically made of stone, but also made of pottery, particularly granular ware.","domain set:
+[-1,0..]
+-1=missing data",,,
+29,burnedStruct,burnedStruct,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_burnedStruct,BRNDSTRC,Evidence of burned ancient structure,Assessment of evidence for burning of ancient architectural features.,"domain set:
+[-1,0..3]
+-1=missing data
+0=absent
+1=present
+2=strong
+3=possible",,"The intent of this field was to gather information pertaining to the deliberate destruction by fire of much of Teotihuacan late in its Classic Period history; presumably, an attempt was made to record evidence for burning at a scale compatible with such an event, and not related to cooking, pottery firing, or similarly mundane activities.",
+30,floors,floors,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,FLOORS,Floors,Evidence for in situ floor remains.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of floor
+2=possible floor, evidence indirect or ambiguous
+3=one floor
+4=two or three floors
+5=four or more floors
+6=floor present, count unspecified
+9=other",,,
+31,walls,walls,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,WALLS,Walls,Evidence for in situ walls.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of wall
+2=possible wall, evidence indirect or ambiguous
+3=one wall
+4=two or three walls
+5=four or more walls
+6=wall present, count unspecified
+9=other",,,
+32,drainSitu,drains,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,DRAINS,Drains,Evidence for in situ drain features.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of drain
+2=possible drain, evidence indirect or ambiguous
+3=one drain
+4=two or three drains
+5=four or more drains
+6=drain present, count unspecified
+9=other",,,
+33,wallFixSitu,wallFixtures,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,WALLFIXT,Wall fixtures,Evidence for in situ wall fixtures.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of wall fixture
+2=possible wall fixture, evidence indirect or ambiguous
+3=one wall fixture
+4=two or three wall fixtures
+5=four or more wall fixtures
+6=wall fixture present, count unspecified
+9=other",,,
+34,murals,murals,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,MURALS,Murals,Evidence for in situ murals.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of mural
+2=possible mural, evidence indirect or ambiguous
+3=one mural
+4=two or three murals
+5=four or more murals
+6=mural present, count unspecified
+9=other",,,
+35,columns,columns,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,COLUMNS,Columns,Evidence for in situ columns.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of column
+2=possible column, evidence indirect or ambiguous
+3=one column
+4=two or three columns
+5=four or more columns
+6=column present, count unspecified
+9=other",,,
+36,taludes,taludes,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,TALUDES,Taludes,Evidence for in situ taludes.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of talud
+2=possible talud, evidence indirect or ambiguous
+3=one talud
+4=two or three taludes
+5=four or more taludes
+6=talud present, count unspecified
+9=other",,,
+37,tableros,tableros,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_archFeatures,TABLEROS,Tableros,Evidence for in situ tableros.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=problematic object that could be part of tablero
+2=possible tablero, evidence indirect or ambiguous
+3=one tablero
+4=two or three tableros
+5=four or more tableros
+6=tablero present, count unspecified
+9=other",,,
+38,floorMaterial,floorMaterial,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_FloorMat,SITUFLRS,In situ floor materials,Materials recorded for in situ floors.,"domain set:
+[-1,1..9]
+-1=missing data
+1=floors present, materials unspecified
+2=earth only
+3=concrete only
+4=concrete, plastered at least in part
+5=some floors of earth and some of unplastered concrete
+6=some of earth, some of concrete with plaster
+7=crushed tezontli
+8=cobble paving
+9=other, including floors with red plaster",,,
+39,wallCoreStone,wallCoreStone,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_wallCoreStone,TALUDSTN,Stone in wall cores,Stone (including tezontli) in cores of walls or taludes.,"domain set:
+[-1,0..5]
+-1=missing data
+0=walls present, but no stone observed in them
+1=small stones
+2=medium stones
+3=stones present, unspecified size
+4=stones of mixed sizes
+5=large stones",,,
+40,wallCoreOthMat,wallCoreOthMat,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_wallCoreOther,WALLMATR,Other wall core materials,"Materials in cores of walls, instead of or in addition to stone.","domain set:
+[-1,0..3]
+-1=no walls, or walls but no data on materials present in wall core
+0=walls present but nothing except stone and/or tezontli observed
+1=tepetate is the only recorded additional material
+2=adobes present, plus possibly other materials
+3=other, including xalnene or tepetate and xalnene, but not adobes",,,
+41,wallFacing,wallFacing,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_wallFacing,WALLFACE,Wall facing materials,Facing materials of walls or taludes.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=apparently had no facing
+1=concrete
+2=concrete plus plaster
+3=mud
+4=plaster on mud
+5=facing material lost or uncertain
+6=concrete plus painted plaster
+9=other",,,
+42,intrusiveSherd,intrusiveSherd,Data_description,Integer,TRUE,-1,TRUE,Codes_intrusiveSherd,INTRUSHD,Intrusive sherds,Judgment on intrusion of sherds from other sites/phases.This data field was intended to help identify cases where there was reason to think that the ceramic collection was unlikely to be representative of what would be found upon excavation. ,"domain set:
+[-1,0..3,9]
+0=isolated site
+1=average
+2=probably considerable
+3=probably primarily intrusive material
+9=other",,This data field was intended to help identify cases where there was reason to think that the ceramic collection was unlikely to be representative of what would be found upon excavation. ,
+43,height,height,Data_description,Integer,FALSE,-1,FALSE,,HEIGHT,Height of site,Height of site to nearest decametre.,"domain set:
+[-1,0..99]
+-1=missing data
+0-98=height to nearest multiple of 10cm
+99=over 9.85m high",,"Multiply by 10 to get an estimate of the height of the site, plus or minus 5cm. Ex. ""5"" indicates a height estimate between 45 and 55 cm.",
+44,arch1PMic,arch1PMic,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpPrim,PMICARC1,Pre-Miccaotli primary architectural interpretation,Primary architectural interpretation for Pre-Miccaotli occupation.,"domain set:
+[-1,1..21,99]
+-1=missing data
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+99=other",,Not reliable.,
+45,arch1McTl,arch1McTl,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpPrim,MCTLARC1,Miccaotli-Tlamimilolpa primary architectural interpretation,Primary architectural interpretation for Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,1..21,99]
+-1=missing data
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+99=other",,,
+46,arch1XlMe,arch1XlMe,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpPrim,XLMEARC1,Xolalpan-Metepec primary architectural interpretation,Primary architectural interpretation for Xolalpan-Metepec occupation.,"domain set:
+[-1,1..21,99]
+-1=missing data
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+99=other",,,
+47,arch1Oxto,arch1Oxto,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpPrim,OXTOARC1,Oxtoticpac primary architectural interpretation,Primary architectural interpretation for Oxtoticpac occupation.,"domain set:
+[-1,1..21,99]
+-1=missing data
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+99=other",,Should not be used at all.,
+48,arch2PMic,arch2PMic,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpAltern,PMICARC2,Pre-Miccaotli alternative architectural interpretation,Alternative architectural interpretation for Pre-Miccaotli occupation.,"domain set:
+[-1,1..21,77,88,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+77=no plausible alternative to the primary interpretation
+88=primary interpretation is the best assessment of a very ambiguous situation
+99=other
+
+Code 77 is used when the primary interpretation appears quite certain. Codes 1-21 and 99 are used when there is a plausible alternative to the primary interpretation. Code -1 is used when the primary interpretation is uncertain, and there is no specific alternative interpretation that appears more probable than others.",,,
+49,arch2McTl,arch2McTl,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpAltern,MCTLARC2,Miccaotli-Tlamimilolpa alternative architectural interpretation,Alternative architectural interpretation for Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,1..21,77,88,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+77=no plausible alternative to the primary interpretation
+88=primary interpretation is the best assessment of a very ambiguous situation
+99=other
+
+Code 77 is used when the primary interpretation appears quite certain. Codes 1-21 and 99 are used when there is a plausible alternative to the primary interpretation. Code -1 is used when the primary interpretation is uncertain, and there is no specific alternative interpretation that appears more probable than others.",,,
+50,arch2XlMe,arch2XlMe,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpAltern,XLMEARC2,Xolalpan-Metepec alternative architectural interpretation,Alternative architectural interpretation for Xolalpan-Metepec occupation.,"domain set:
+[-1,1..21,77,88,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+77=no plausible alternative to the primary interpretation
+88=primary interpretation is the best assessment of a very ambiguous situation
+99=other
+
+Code 77 is used when the primary interpretation appears quite certain. Codes 1-21 and 99 are used when there is a plausible alternative to the primary interpretation. Code -1 is used when the primary interpretation is uncertain, and there is no specific alternative interpretation that appears more probable than others.",,,
+51,arch2Oxto,arch2Oxto,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ArchInterpAltern,OXTOARC2,Oxtoticpac alternative architectural interpretation,Alternative architectural interpretation for Oxtoticpac occupation.,"domain set:
+[-1,1..21,77,88,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=room group
+2=room group
+3=casa humilde
+4=apartment compound
+5=temple base (incl. platforms & multi-tiered platforms)
+6=pyramid (more than ca. 10m high)
+7=simple platform
+8=platform with other structures on it
+9=platform with other structures on it
+10=platform with other structures on it
+11=platform in plaza (momoztli)
+12=plaza
+13=free-standing wall or segment of wall
+14=access-way (alley, street, avenue, etc.)
+15=avenue divider or possible avenue divider
+16=avenue divider or possible avenue divider
+17=cemetery
+18=dam
+19=occupation without durable structures
+20=probably not occupied or utilized in this period
+21=cave
+77=no plausible alternative to the primary interpretation
+88=primary interpretation is the best assessment of a very ambiguous situation
+99=other
+
+Code 77 is used when the primary interpretation appears quite certain. Codes 1-21 and 99 are used when there is a plausible alternative to the primary interpretation. Code -1 is used when the primary interpretation is uncertain, and there is no specific alternative interpretation that appears more probable than others.",,,
+52,constructQual,constructQual,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_ConstructQual,QUALCNST,Construction quality,Construction quality associated with the latest Teotihuacan Period occupation.,"domain set:
+[-1,0..4]
+-1=missing data
+0=probably only perishable materials
+1=very simple or below average
+2=ordinary, nothing special noted
+3=elaborate or very fine
+4=""both perishable and ""permanent"" architecture, perhaps pertaining to different periods""",,,
+53,func1PMic,func1PMic,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpPrim,PMICFNC1,Pre-Miccaotli primary functional interpretation,Primary functional interpretation for Pre-Miccaotli occupation.,"domain set:
+[-1,1..43,99]
+-1=missing data
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+99=other",,,
+54,func1McTl,func1McTl,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpPrim,MCTLFNC1,Miccaotli-Tlamimilolpa primary functional interpretation,Primary functional interpretation for Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,1..43,99]
+-1=missing data
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+99=other",,,
+55,func1XlMe,func1XlMe,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpPrim,XLMEFNC1,Xolalpan-Metepec primary functional interpretation,Primary functional interpretation for Xolalpan-Metepec occupation.,"domain set:
+[-1,1..43,99]
+-1=missing data
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+99=other",,,
+56,func1Oxto,func1Oxto,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpPrim,OXTOFNC1,Oxtoticpac primary functional interpretation,Primary functional interpretation for Oxtoticpac occupation.,"domain set:
+[-1,1..43,99]
+-1=missing data
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+99=other",,,
+57,func2PMic,func2PMic,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpAltern,PMICFNC2,Pre-Miccaotli secondary functional interpretation,Secondary functional interpretation for Pre-Miccaotli occupation.,"domain set:
+[-1,1..43,77,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+77=no plausible alternative to the pirmary interpretation
+99=other",,,
+58,func2McTl,func2McTl,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpAltern,MCTLFNC2,Miccaotli-Tlamimilolpa secondary functional interpretation,Secondary functional interpretation for Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,1..43,77,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+77=no plausible alternative to the pirmary interpretation
+99=other",,,
+59,func2XlMe,func2XlMe,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpAltern,XLMEFNC2,Xolalpan-Metepec secondary functional interpretation,Secondary functional interpretation for Xolalpan-Metepec occupation.,"domain set:
+[-1,1..43,77,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+77=no plausible alternative to the pirmary interpretation
+99=other",,,
+60,func2Oxto,func2Oxto,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_FuncInterpAltern,OXTOFNC2,Oxtoticpac secondary functional interpretation,Secondary functional interpretation for Oxtoticpac occupation.,"domain set:
+[-1,1..43,77,99]
+-1=primary interpretation is the best assessment of a very ambiguous situation
+1=low status residential, no obvious occupational specialization
+2=intermediate status residence
+3=residence of uncertain status
+4=high status residence
+5=high status residence
+6=altar
+7=temple platform
+8=temple in residential unit
+9=temple
+10=temple
+11=temple
+12=temple
+13=temple
+14=pyramid temple (over 10 m high)
+15=possible temple for foreign gods
+16=probably temple, hard to fit into any of the above categories
+17=""civic"" structure, but not a temple
+18=""civic"" structure, but not a temple
+19=""civic"" structure, but not a temple
+20=""civic"" structure, but not a temple
+21=""civic"" structure, but not a temple
+22=market or part of a market
+23=puesto
+24=obsidian workshop
+25=pottery workshop
+26=other type of workshop or craft production area
+27=momoztli (platform in plaza)
+28=plaza
+29=ball court
+30=possible ball court
+31=street or avenue
+32=street or avenue
+33=street or avenue
+34=street or avenue
+35=avenue divider
+36=dam
+37=wall or segment of a wall
+38=cemetery
+39=cultivated field
+40=uncultivated open area
+41=unoccupied, not clear if cultivated or not
+42=residential workshop
+43=platform of probable religious significance
+77=no plausible alternative to the pirmary interpretation
+99=other",,,
+61,Cmplx_archInt1PaTz,archInt1PaTz,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexGenPrim,PTTZCX1,Patlachique-Tzacualli primary architectural interpretation for complex,Primary architectural interpretation for complex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..9]
+-1=missing data
+0=site is not part of a complex
+1=row of two or more mounds on a long mound
+2=3-mound complex (sometimes with additional minor features)
+3=4-mound complex
+4=several mounds associated in a symmetrical or partially symmetrical pattern, but but not a 3- or 4-mound complex
+5=group of several mounds suggesting an interrelated pattern but lacking any obvious symmetry
+6=walled open area complex (large compound)
+7=single mound plus platform on terrace
+8=site is part of a macrocomplex but no meaningful complex
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+62,Cmplx_archInt1McTl,archInt1McTl,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexGenPrim,MCTLCX1,Miccaotli-Tlamimilolpa primary architectural interpretation for complex,Primary architectural interpretation for complex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..9]
+-1=missing data
+0=site is not part of a complex
+1=row of two or more mounds on a long mound
+2=3-mound complex (sometimes with additional minor features)
+3=4-mound complex
+4=several mounds associated in a symmetrical or partially symmetrical pattern, but but not a 3- or 4-mound complex
+5=group of several mounds suggesting an interrelated pattern but lacking any obvious symmetry
+6=walled open area complex (large compound)
+7=single mound plus platform on terrace
+8=site is part of a macrocomplex but no meaningful complex
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+63,Cmplx_archInt1XlMt,archInt1XlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexGenPrim,XLMECX1,Xolalpan-Metepec primary architectural interpretation for complex,Primary architectural interpretation for complex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..9]
+-1=missing data
+0=site is not part of a complex
+1=row of two or more mounds on a long mound
+2=3-mound complex (sometimes with additional minor features)
+3=4-mound complex
+4=several mounds associated in a symmetrical or partially symmetrical pattern, but but not a 3- or 4-mound complex
+5=group of several mounds suggesting an interrelated pattern but lacking any obvious symmetry
+6=walled open area complex (large compound)
+7=single mound plus platform on terrace
+8=site is part of a macrocomplex but no meaningful complex
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+64,Cmplx_archInt2PaTz,archInt2PaTz,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexGenAltern,PTTZCX2,Patlachique-Tzacualli alternative architectural interpretation for complex,Alternative architectural interpretation for complex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..9]
+-1=no reasonable alternative to primary interpretation
+0=site is not part of a complex
+1=row of two or more mounds on a long mound
+2=3-mound complex (sometimes with additional minor features)
+3=4-mound complex
+4=several mounds associated in a symmetrical or partially symmetrical pattern, but but not a 3- or 4-mound complex
+5=group of several mounds suggesting an interrelated pattern but lacking any obvious symmetry
+6=walled open area complex (large compound)
+7=single mound plus platform on terrace
+8=no reasonable alternative to primary interpretation
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+65,Cmplx_archInt2McTl,archInt2McTl,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexGenAltern,MCTLCX2,Miccaotli-Tlamimilolpa alternative architectural interpretation for complex,Alternative architectural interpretation for complex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..9]
+-1=no reasonable alternative to primary interpretation
+0=site is not part of a complex
+1=row of two or more mounds on a long mound
+2=3-mound complex (sometimes with additional minor features)
+3=4-mound complex
+4=several mounds associated in a symmetrical or partially symmetrical pattern, but but not a 3- or 4-mound complex
+5=group of several mounds suggesting an interrelated pattern but lacking any obvious symmetry
+6=walled open area complex (large compound)
+7=single mound plus platform on terrace
+8=no reasonable alternative to primary interpretation
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+66,Cmplx_archInt2XlMt,archInt2XlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexGenAltern,XLMECX2,Xolalpan-Metepec alternative architectural interpretation for complex,Alternative architectural interpretation for complex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..9]
+-1=no reasonable alternative to primary interpretation
+0=site is not part of a complex
+1=row of two or more mounds on a long mound
+2=3-mound complex (sometimes with additional minor features)
+3=4-mound complex
+4=several mounds associated in a symmetrical or partially symmetrical pattern, but but not a 3- or 4-mound complex
+5=group of several mounds suggesting an interrelated pattern but lacking any obvious symmetry
+6=walled open area complex (large compound)
+7=single mound plus platform on terrace
+8=no reasonable alternative to primary interpretation
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+67,Cmplx_funcIntPaTz,funcIntPaTz,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunWhole,PTTZCXFN,Patlachique-Tzacualli functional interpretation for whole complex,Functional  interpretation for whole complex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..9]
+-1=site not part of complex or (rarely) no information
+0=dominantly residential
+1=dominantly temples
+2=dominantly non-temple civic structures
+3=mixed
+4=mixed
+5=mixed
+6=mixed
+7=mixed
+8=mixed
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+68,Cmplx_funcIntMcTl,funcIntMcTl,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunWhole,MCTLCXFN,Miccaotli-Tlamimilolpa functional interpretation for whole complex,Functional  interpretation for whole complex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..9]
+-1=site not part of complex or (rarely) no information
+0=dominantly residential
+1=dominantly temples
+2=dominantly non-temple civic structures
+3=mixed
+4=mixed
+5=mixed
+6=mixed
+7=mixed
+8=mixed
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+69,Cmplx_funcIntXlMt,funcIntXlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunWhole,XLMECXFN,Xolalpan-Metepec functional interpretation for whole complex,Functional  interpretation for whole complex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..9]
+-1=site not part of complex or (rarely) no information
+0=dominantly residential
+1=dominantly temples
+2=dominantly non-temple civic structures
+3=mixed
+4=mixed
+5=mixed
+6=mixed
+7=mixed
+8=mixed
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+70,Cmplx_funcResPaTz,funcResPaTz,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunRes,PTTZRSFN,Patlachique-Tzacualli functional interpretation for residential elements of complex,Functional  interpretation for residential elements of complex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..6,9]
+-1=site not part of complex or (rarely) no information
+0=evidence suggests no part of complex was residential
+1=residential block of uncertain status
+2=low or intermediate status
+3=low or intermediate status
+4=residential block of uncertain status
+5=high status
+6=high status
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+71,Cmplx_funcResMcTl,funcResMcTl,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunRes,MCTLRSFN,Miccaotli-Tlamimilolpa functional interpretation for residential elements of complex,Functional  interpretation for residential elements of complex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..6,9]
+-1=site not part of complex or (rarely) no information
+0=evidence suggests no part of complex was residential
+1=residential block of uncertain status
+2=low or intermediate status
+3=low or intermediate status
+4=residential block of uncertain status
+5=high status
+6=high status
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+72,Cmplx_funcResXlMt,funcResXlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunRes,XLMERSFN,Xolalpan-Metepec functional interpretation for residential elements of complex,Functional  interpretation for residential elements of complex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..6,9]
+-1=site not part of complex or (rarely) no information
+0=evidence suggests no part of complex was residential
+1=residential block of uncertain status
+2=low or intermediate status
+3=low or intermediate status
+4=residential block of uncertain status
+5=high status
+6=high status
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+73,Cmplx_funcTmpPaTz,funcTmpPaTz,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunTemp,PTTZTMFN,Patlachique-Tzacualli functional interpretation for temple-like elements of complex,Functional  interpretation for temple-like elements of complex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..9]
+-1=missing data
+0=evidence suggests there were no temples in complex
+1=temples included
+2=temples included
+3=temples included
+4=temples included
+5=temples included
+6=temples included
+7=one or more pyramid temples included
+8=temple(s) possibly for foreign gods
+9=temples of uncertain or varied character",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+74,Cmplx_funcTmpMcTl,funcTmpMcTl,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunTemp,MCTLTMFN,Miccaotli-Tlamimilolpa functional interpretation for temple-like elements of complex,Functional  interpretation for temple-like elements of complex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..9]
+-1=missing data
+0=evidence suggests there were no temples in complex
+1=temples included
+2=temples included
+3=temples included
+4=temples included
+5=temples included
+6=temples included
+7=one or more pyramid temples included
+8=temple(s) possibly for foreign gods
+9=temples of uncertain or varied character",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+75,Cmplx_funcTmpXlMt,funcTmpXlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunTemp,XLMETMFN,Xolalpan-Metepec functional interpretation for temple-like elements of complex,Functional  interpretation for temple-like elements of complex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..9]
+-1=missing data
+0=evidence suggests there were no temples in complex
+1=temples included
+2=temples included
+3=temples included
+4=temples included
+5=temples included
+6=temples included
+7=one or more pyramid temples included
+8=temple(s) possibly for foreign gods
+9=temples of uncertain or varied character",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+76,Cmplx_funcCivPaTz,funcCivPaTz,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunCivic,PTTZCVFN,Patlachique-Tzacualli functional interpretation for non-temple civic elements of complex,Functional  interpretation for non-temple civic elements of complex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=evidence suggests none in complex
+1=present
+2=present
+3=present
+4=present
+5=present
+6=present
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+77,Cmplx_funcCivMcTl,funcCivMcTl,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunCivic,MCTLCVFN,Miccaotli-Tlamimilolpa functional interpretation for non-temple civic elements of complex,Functional  interpretation for non-temple civic elements of complex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=evidence suggests none in complex
+1=present
+2=present
+3=present
+4=present
+5=present
+6=present
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+78,Cmplx_funcCivXlMt,funcCivXlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunCivic,XLMECVFN,Xolalpan-Metepec functional interpretation for non-temple civic elements of complex,Functional  interpretation for non-temple civic elements of complex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..6,9]
+-1=missing data
+0=evidence suggests none in complex
+1=present
+2=present
+3=present
+4=present
+5=present
+6=present
+9=other",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+79,Cmplx_funcOthXlMt,funcOthXlMt,Data_complexData,Integer,TRUE,-1,TRUE,Codes_complexFunOther,XLMEOTFN,Xolalpan-Metepec functional interpretation for other elements of complex,"Functional interpretation of elements of complex other than residential, temples, or civic structures during Xolalpan-Metepec occupation only.","domain set:
+[-1,0..12]
+-1=missing data
+0=no other kinds of elements seem present in complex
+1=obsidian workshop
+2=stone workshop
+3=pottery workshop
+4=other kind of workshop
+5=market (or possible market)
+6=market (or possible market)
+7=market (or possible market)
+8=market (or possible market)
+9=cemetery
+10=ball court
+11=major walled compound
+12=open field",,"Complex definitions are not axiomatic. Even in the case of well defined complexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the complex to which a site is assigned, not necessarily about the site itself.",
+80,Cmplx_Num,complexNum,Data_complexData,Integer,TRUE,-1,FALSE,,CXUNITN,Sequential complex ID,Sequential complex identification number.,"domain set:
+[-1,1..99]
+-1=not assigned to a complex",,Assigned sequentially to CXs in each square,
+81,Cmplx_Unit,complexUnit,Data_complexData,Character,TRUE,XXXX,FALSE,,CXUNIT,Complex unit,Designation for map square containing complex.,,,,
+82,MCmplx_Num,macroComplexNum,Data_complexMacroData,Integer,TRUE,-1,FALSE,,MCXUNITN,Sequential macrocomplex ID,Sequential macrocomplex identification number.,"domain set:
+[-1,1..99]
+-1=not assigned to a complex",,Assigned sequentially to MCXs in each square,
+83,MCmplx_Unit,macroComplexUnit,Data_complexMacroData,Character,TRUE,XXXX,FALSE,,MCXUNIT,Macrocomplex unit,Designation for map square containing macrocomplex.,,,,
+84,MCmplx_presPaTz,presPaTz,Data_complexMacroData,Integer,TRUE,-1,TRUE,Codes_McomplexGen,PTTZMCX,Patlachique-Tzacualli macrocomplex status,Existence of macrocomplex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..2]
+-1=missing data
+0=site not part of a macrocomplex
+1=site part of a possible macrocomplex
+2=site part of a macrocomplex",,"Macrocomplex definitions are not axiomatic. Even in the case of well defined macrocomplexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the macrocomplex to which a site is assigned, not necessarily about the site itself.",
+85,MCmplx_presMcTl,presMcTl,Data_complexMacroData,Integer,TRUE,-1,TRUE,Codes_McomplexGen,MCTLMCX,Miccaotli-Tlamimilolpa macrocomplex status,Existence of macrocomplex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..2]
+-1=missing data
+0=site not part of a macrocomplex
+1=site part of a possible macrocomplex
+2=site part of a macrocomplex",,"Macrocomplex definitions are not axiomatic. Even in the case of well defined macrocomplexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the macrocomplex to which a site is assigned, not necessarily about the site itself.",
+86,MCmplx_presXlMt,presXlMt,Data_complexMacroData,Integer,TRUE,-1,TRUE,Codes_McomplexGen,XLMEMCX,Xolalpan-Metepec macrocomplex status,Existence of macrocomplex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..2]
+-1=missing data
+0=site not part of a macrocomplex
+1=site part of a possible macrocomplex
+2=site part of a macrocomplex",,"Macrocomplex definitions are not axiomatic. Even in the case of well defined macrocomplexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the macrocomplex to which a site is assigned, not necessarily about the site itself.",
+87,MCmplx_funcIntPaTz,funcIntPaTz,Data_complexMacroData,Integer,TRUE,-1,TRUE,Codes_McomplexFun,PTTZMXFN,Patlachique-Tzacualli functional interpretation for macrocomplex,Functional interpretation for macrocomplex during Patlachique-Tzacualli occupation.,"domain set:
+[-1,0..9]
+-1=??
+0=dominantly residential
+1=dominantly temples
+2=dominantly non-temple civic structures
+3=mixed
+4=mixed
+5=mixed
+6=mixed
+7=mixed
+8=mixed
+9=other",,"Macrocomplex definitions are not axiomatic. Even in the case of well defined macrocomplexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the macrocomplex to which a site is assigned, not necessarily about the site itself.",
+88,MCmplx_funcIntMcTl,funcIntMcTl,Data_complexMacroData,Integer,TRUE,-1,TRUE,Codes_McomplexFun,TLXLMXFN,Miccaotli-Tlamimilolpa functional interpretation for macrocomplex,Functional interpretation for macrocomplex during Miccaotli-Tlamimilolpa occupation.,"domain set:
+[-1,0..9]
+-1=??
+0=dominantly residential
+1=dominantly temples
+2=dominantly non-temple civic structures
+3=mixed
+4=mixed
+5=mixed
+6=mixed
+7=mixed
+8=mixed
+9=other",,"Macrocomplex definitions are not axiomatic. Even in the case of well defined macrocomplexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the macrocomplex to which a site is assigned, not necessarily about the site itself.",
+89,MCmplx_funcIntXlMt,funcIntXlMt,Data_complexMacroData,Integer,TRUE,-1,TRUE,Codes_McomplexFun,XLMEMXFN,Xolalpan-Metepec functional interpretation for macrocomplex,Functional interpretation for macrocomplex during Xolalpan-Metepec occupation.,"domain set:
+[-1,0..9]
+-1=??
+0=dominantly residential
+1=dominantly temples
+2=dominantly non-temple civic structures
+3=mixed
+4=mixed
+5=mixed
+6=mixed
+7=mixed
+8=mixed
+9=other",,"Macrocomplex definitions are not axiomatic. Even in the case of well defined macrocomplexes, there may be much uncertainty about the assignment of structures near their edges. 
+Codings for this variable provide information about the macrocomplex to which a site is assigned, not necessarily about the site itself.",
+90,neighborhoodChar,neighborhoodChar,Data_archinterp,Integer,TRUE,-1,TRUE,Codes_neighborhoodChar,NHOODCHR,Neighbourhood character,Character of neighbourhood of site.,"domain set:
+[-1,0..9]
+1=other sites arranged more or less compactly in neighbourhood
+2=other sites arranged more or less compactly in neighbourhood
+3=other sites arranged more or less compactly in neighbourhood
+4=other sites arranged more or less compactly in neighbourhood
+5=other sites arranged more or less compactly in neighbourhood
+6=other sites arranged more or less compactly in neighbourhood
+7=part of isolated site cluster
+8=isolated site
+9=other",,,
+91,freeStandWall,freeStandWall,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_otherArchFeatures,FRSTNDWL,Free standing walls,Free standing walls in site.,"domain set:
+[-1,0,8,9]
+-1=missing data
+0=none observed in site
+8=present in site
+9=other, including possibly present",,,
+92,wells,wells,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_otherArchFeatures,WELLS,Wells,Prehispanic features in site: wells,"domain set:
+[-1,0,8,9]
+-1=missing data
+0=none observed in site
+8=present in site
+9=other, including possibly present",,,
+93,jagueyArch,jagueys,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_otherArchFeatures,JAGUEYS,Jagueys,Prehispanic features in site: jagueys,"domain set:
+[-1,0,8,9]
+-1=missing data
+0=none observed in site
+8=present in site
+9=other, including possibly present",,,
+94,puestos,puestos,Data_archMaterial,Integer,TRUE,-1,TRUE,Codes_otherArchFeatures,PUESTOS,Puestos,Prehispanic features in site: puestos,"domain set:
+[-1,0,8,9]
+-1=missing data
+0=none observed in site
+8=present in site
+9=other, including possibly present",,,
+95,milpa,milpa,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,MILPA,Milpa,Vegetation cover at the time of collection: milpa,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+96,barley,barley,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,BARLEY,Barley,Vegetation cover at the time of collection: barley,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+97,beans,beans,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,BEANS,Beans,Vegetation cover at the time of collection: beans,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+98,alfalfaCut,alfalfaCut,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,CUTALFAL,Cut alfalfa,Vegetation cover at the time of collection: cut alfalfa,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+99,alfalfaUncut,alfalfaUncut,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,UNCALFAL,Uncut alfalfa,Vegetation cover at the time of collection: uncut alfalfa,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+100,nopales,nopales,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,NOPALES,Nopales,Vegetation cover at the time of collection: nopales,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+101,magueys,magueys,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,MAGUEYS,Magueys,Vegetation cover at the time of collection: magueys,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+102,fallow,fallow,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,FALLOWLD,Fallow land,Vegetation cover at the time of collection: fallow land,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+103,uncultivate,uncultivate,Data_condition,Integer,TRUE,-1,TRUE,Codes_vegetation,UNCULTIV,Uncultivated,Vegetation cover at the time of collection: uncultivated,"domain set:
+[-1,0..4]
+-1=missing data
+0=this kind of vegetation absent
+1=present in a small portion of site or very scattered
+2=present over a moderate part of site, or moderately thick
+3=present but extent or density not recorded
+4=abundant or dense on all or most of site",,"If this field is coded ""3"" and all of the related (vegetative cover) fields are coded ""2"", then it is probably pretty safe to assume that this category was dominant on the site.",
+104,cropWater,cropWater,Data_condition,Integer,TRUE,-1,TRUE,Codes_water,CROPWATR,Crop water,Type of water for crops at the time of the survey.,"domain set:
+[-1,0..3]
+-1=missing data
+0=humedad
+1=temporal
+2=reigo (used if any part of site in riego)
+3=flood water",,,
+105,plowing,plowing,Data_condition,Integer,TRUE,-1,TRUE,Codes_plowing,PLOWING,Plowing status,Status of plowing when the collection was made.,"domain set:
+[-1,0..5]
+-1=missing data
+0=there is reason to think the site was never plowed
+1=probably plowed in the past, but not in recent years
+2=part of site in plow cultivation, but much not
+3=most or all in plow cultivation, but not freshly plowed
+4=part of site freshly plowed
+5=most or all of site freshly plowed",,,
+106,pitCultivate,pitCultivate,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,CULTPITS,Cultivation pits,Presence and effects of cultivation pits.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+107,pitLoot,pitLoot,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,LOOTPITS,Looter pits,Presence and effects of looter pits.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+108,archaeoExcRest,archaeoExcRest,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,ARCHEXCV,Archaeological restoration or excavation,Presence and effects of archaeological restoration or excavation.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+109,pitMisc,pitMisc,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,MISCPITS,Miscellaneous pits,Presence and effects of miscellaneous pits.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+110,quarrying,quarrying,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,QRRYING,Quarrying,Presence and effects of quarrying.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+111,stoneClearing,stoneClearing,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,CLRSTONE,Stone clearing,Presence and effects of stone clearing.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+112,landLeveling,landLeveling,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,LDLVLING,Land levelling,Presence and effects of land levelling.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+113,terracing,terracing,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,TERRACNG,Terracing,Presence and effects of terracing.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+114,ditching,ditching,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,DITCHING,Ditching,Presence and effects of ditching.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+115,roadOrRail,roadOrRail,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,ROADORRR,Road or railroad,Presence and effects of road or railroad construction.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+116,recentWall,recentWall,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,RCNTWALL,Recent walls,Presence and effects of recent walls.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+117,stoneRows,stoneRows,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,STONERWS,"Stone rows, rock piles",Presence and effects of stone rows and rock piles.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+118,recentBuild,recentBuild,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,RCNTBLDG,Recent Buildings,Presence and effects of recent buildings.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+119,dam,dam,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,DAM,Dam,Presence and effects of dam construction.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+120,jagueyMod,jaguey,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,JAGUEY,Jaguey,Presence and effects of jaguey.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+121,erosion,erosion,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,EROSION,Erosion,Presence and effects of erosion.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+122,silting,silting,Data_condition,Integer,TRUE,-1,TRUE,Codes_altering_features,SILTING,Silting,Presence and effects of silting.,"domain set:
+[-1,0..5]
+-1=missing data
+0=absent or virtually absent
+1=present, but sparse or limited in effects
+2=present in sufficient degree to have considerable effect
+3=present, but degree unspecified
+4=present in sufficient degree to have a very strong effect
+5=present in a degree that amounts to total destruction",,,
+123,siteAlteration,siteAlteration,Data_condition,Integer,TRUE,-1,TRUE,Codes_overallcondition,OBSCSITE,Overall degree of site alteration,"Degree of site alteration, as the overall result of all features affecting its present condition.","domain set:
+[-1,0..4]
+-1=missing data
+0=none or negligible
+1=slight
+2=moderate
+3=considerable
+4=extreme",,"""Degree to which the nature of the site has been obscured or altered, as the overall result of all features affecting its present condition""",
+124,slope,slope,Data_description,Integer,TRUE,-1,TRUE,Codes_slope,SLOPE,slope,General slope of site surface.,"domain set:
+[-1,0..4]
+0=flat or nearly flat
+1=slight slope
+2=moderate slope
+3=considerable slope
+4=very steep slope",,,
+125,groundstoneField,groundstoneField,Data_workshop,Integer,TRUE,-1,TRUE,Codes_workshopField,GSWKSHOP,Ground stone workshop,"Field judgment about whether the site was a pecked, ground, or polished stone workshop.","domain set:
+[0,1..4]
+0=nothing special noted in the field
+1=considered an area of concentration, of unspecified character
+2=judged to be a workshop area
+3=some sort of specialized concentration but not a workshop
+4=possible workshop area",,,
+126,obsidianField,obsidianField,Data_workshop,Integer,TRUE,-1,TRUE,Codes_workshopField,OBWKSHOP,Obsidian workshop,Field judgment about whether the site was an obsidian workshop.,"domain set:
+[0,1..4]
+0=nothing special noted in the field
+1=considered an area of concentration, of unspecified character
+2=judged to be a workshop area
+3=some sort of specialized concentration but not a workshop
+4=possible workshop area",,,
+127,manos,manos,Data_lithicGround,Integer,FALSE,-1,FALSE,,MANOS,Manos,Counts of mano fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+128,metates,metates,Data_lithicGround,Integer,FALSE,-1,FALSE,,METATES,Metates,Counts of metate fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+129,mortars,mortars,Data_lithicGround,Integer,FALSE,-1,FALSE,,MORTARS,Mortars,Counts of mortar (molcajete) fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+130,pestles,pestles,Data_lithicGround,Integer,FALSE,-1,FALSE,,PESTLES,Pestles,Counts of pestle (tejolote) fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+131,plasterSmoothers,plasterSmoothers,Data_lithicGround,Integer,FALSE,-1,FALSE,,PSMOOTHR,"""Plaster smoothers""","Counts of ""plaster smoother"" fragments.","domain set:
+[-1,0..]
+-1=missing data",,,
+132,plumbBobs,plumbBobs,Data_lithicGround,Integer,FALSE,-1,FALSE,,PLUMBBOB,"""Plumb-bobs""","Counts of ""plumb-bob"" fragments.","domain set:
+[-1,0..]
+-1=missing data",,,
+133,wallFixSurf,wallFixtures,Data_lithicGround,Integer,FALSE,-1,FALSE,,FIXTWALL,Wall fixtures,Counts of wall fixture fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+134,fireGods,fireGods,Data_lithicGround,Integer,FALSE,-1,FALSE,,FIREGODS,Firegods,"Counts of ""firegod"" (Huehueteotl) censer fragments.","domain set:
+[-1,0..]
+-1=missing data",,,
+135,sculptureFrags,sculptureFrags,Data_lithicGround,Integer,FALSE,-1,FALSE,,MSCSTNSC,Miscellaneous stone sculpture fragments,Counts of miscellaneous stone sculpture fragments.,"domain set:
+[-1,0..]
+-1=missing data",,"Do not confuse [lithicGround].[sculptureFrags] with [lithicGround].[groundstoneOther]; the former contains fragments of stone sculpture, the latter stone objects, presumably mostly artifact fragments, which coders could not fit with the other [lithicGround] categories.",
+136,hammerStones,hammerStones,Data_lithicGround,Integer,FALSE,-1,FALSE,,HAMMERS,Hammer stones,Counts of hammer stone (martillo) fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+137,slingStones,slingStones,Data_lithicGround,Integer,FALSE,-1,FALSE,,SLINGSTN,Slingstones,Counts of slingstone fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+138,smoothStones,smoothStones,Data_lithicGround,Integer,FALSE,-1,FALSE,,SMTHSTN,Smoothing/rubbing stones,Counts of smoothing/rubbing stone fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+139,whetStones,whetStones,Data_lithicGround,Integer,FALSE,-1,FALSE,,WHETSTN,Whetstones,Counts of whetstone fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+140,palettes,palettes,Data_lithicGround,Integer,FALSE,-1,FALSE,,PALETTES,Palettes,Counts of palette fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+141,celts,celts,Data_lithicGround,Integer,FALSE,-1,FALSE,,CELTS,Celts,Counts of celt fragments.,"domain set:
+[-1,0..]
+-1=missing data",,Category no longer used,
+142,lajasReworked,lajasReworked,Data_lithicGround,Integer,FALSE,-1,FALSE,,RWKDLAJA,Reworked lajas,Counts of reworked laja fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+143,anvils,anvils,Data_lithicGround,Integer,FALSE,-1,FALSE,,ANVILS,Anvils,Counts of anvil fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+144,drainSurf,drains,Data_lithicGround,Integer,FALSE,-1,FALSE,,DRAINS,Drains,Counts of drain fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+145,drainCovers,drainCovers,Data_lithicGround,Integer,FALSE,-1,FALSE,,DRAINCVR,Drain covers and stoppers,Counts of drain cover and stopper fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+146,groundstoneOther,groundstoneOther,Data_lithicGround,Integer,FALSE,-1,FALSE,,OTHERGS,"Other pecked, ground, or polished stone","Counts of other pecked, ground, or polished stone fragments.","domain set:
+[-1,0..]
+-1=missing data",,"Do not confuse [lithicGround].[sculptureFrags] with [lithicGround].[groundstoneOther]; the former contains fragments of stone sculpture, the latter stone objects, presumably mostly artifact fragments, which coders could not fit with the other [lithicGround] categories.",
+147,obsidianTot,obsidianTot,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSITOTS,Total obsidian,Total obsidian counts.,"domain set:
+[-1,0..]
+-1=missing data",,,
+148,obsidianBlades,obsidianBlades,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIBLDS,Obsidian prismatic blades,Counts of obsidian prismatic blades.,"domain set:
+[-1,0..]
+-1=missing data",,,
+149,obsidianWaste,obsidianWaste,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIWSTE,Obsidian waste,Counts of obsidian waste flakes.,"domain set:
+[-1,0..]
+-1=missing data",,,
+150,obsidianScrapers,obsidianScrapers,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSISCRP,Obsidian scrapers,Counts of obsidian scrapers.,"domain set:
+[-1,0..]
+-1=missing data",,,
+151,obsidianPoints,obsidianPoints,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIPNTS,Obsidian points,Counts of obsidian points.,"domain set:
+[-1,0..]
+-1=missing data",,"With var.153, probably best thought of as a combined category of ""bifaces"".",
+152,obsidianCores,obsidianCores,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSICORS,Obsidian polyhedral cores,Counts of obsidian polyhedral cores.,"domain set:
+[-1,0..]
+-1=missing data",,,
+153,obsidianKnives,obsidianKnives,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIKNIV,Obsidian knives,Counts of obsidian knives.,"domain set:
+[-1,0..]
+-1=missing data",,"With var.151, probably best thought of as a combined category of ""bifaces"".",
+154,obsidianEccentrics,obsidianEccentrics,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIECCE,Obsidian eccentrics,"Counts of obsidian eccentrics, including figurines.","domain set:
+[-1,0..]
+-1=missing data",,,
+155,obsidianMagueyS,obsidianMagueyS,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIMGSC,Obsidian maguey scrapers,Counts of obsidian maguey scrapers.,"domain set:
+[-1,0..]
+-1=missing data",,Almost never coded. The few exceptions are supposed to have been added to var.150 (Scrapers).,
+156,obsidianUtFlake,obsidianUtFlake,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSIUFLK,Obsidian utilized flakes,Counts of obsidian utilized flakes.,"domain set:
+[-1,0..]
+-1=missing data",,,
+157,obsidianNodules,obsidianNodules,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,OBSINODS,Obsidian nodules,Counts of obsidian nodules.,"domain set:
+[-1,0..]
+-1=missing data",,,
+158,basaltTot,basaltTot,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,BSLTTOTS,Total basalt,Total basalt counts.,"domain set:
+[-1,0..]
+-1=missing data",,,
+159,basaltTools,basaltTools,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,BSLTTOOL,Basalt tools,Counts of basalt tools.,"domain set:
+[-1,0..]
+-1=missing data",,,
+160,chert,chert,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,CHRTFRAG,Chert  fragments,Counts of chert and chert-like stone fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+161,quartz,quartz,Data_lithicFlaked,Integer,FALSE,-1,FALSE,,QUARTZ,Quartz and quartzite,Counts of quartz and quartzite fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+162,slateTot,slateTot,Data_lithicGround,Integer,FALSE,-1,FALSE,,SLATETOT,Total slate,Total slate counts.,"domain set:
+[-1,0..]
+-1=missing data",,,
+163,slatePainted,slatePainted,Data_lithicGround,Integer,FALSE,-1,FALSE,,SLATEPNT,Painted slate,Counts of painted slate.,"domain set:
+[-1,0..]
+-1=missing data",,,
+164,alabaster,alabaster,Data_lithicGround,Integer,FALSE,-1,FALSE,,ALABASTR,Alabaster,"Counts of alabaster (onyx, tecali) fragments.","domain set:
+[-1,0..]
+-1=missing data",,,
+165,serpentine,serpentine,Data_lithicGround,Integer,FALSE,-1,FALSE,,SERPENTN,Serpentine,Counts of serpentine fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+166,jade,jade,Data_lithicGround,Integer,FALSE,-1,FALSE,,JADE,Jade,Counts of jade fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+167,workedBone,workedBone,Data_artifactOther,Integer,FALSE,-1,FALSE,,WRKDBONE,Worked bone,Counts of worked bone.,"domain set:
+[-1,0..]
+-1=missing data",,,
+168,shellTot,shellTot,Data_artifactOther,Integer,FALSE,-1,FALSE,,SHELLTOT,Total shell,Total shell counts.,"domain set:
+[-1,0..]
+-1=missing data",,,
+169,shellWorked,shellWorked,Data_artifactOther,Integer,FALSE,-1,FALSE,,SHELLWKD,Worked shell,Counts of worked shell fragments.,"domain set:
+[-1,0..]
+-1=missing data",,,
+170,figTot,figTot,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,FIGUTOTS,Total figurines,Total counts of figurine fragments.,"domain set:
+[-1,0..]
+-1=missing data",,"""OK""",
+171,figHead,figHead,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,FIGHEADS,Figurine heads,Total counts of figurine heads.,"domain set:
+[-1,0..]
+-1=missing data",,"Includes animal heads but excludes detached headdresses. Incomplete, and should not be used at all.",
+172,figPPat,figPPat,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,PPATFIGS,Pre-Patlachique figurines,Total counts of Pre-Patlachique figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+173,figPatl,figPatl,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,PATLFIGS,Patlachique,Total counts of Patlachique figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+174,figTzac,figTzac,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,TZACFIGS,Tzacualli,Total counts of Tzacualli figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+175,figMicc,figMicc,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,MICCFIGS,Miccaotli,Total counts of Miccaotli figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+176,figTlam,figTlam,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,TLAMFIGS,Tlamimilolpa,Total counts of Tlamimilolpa figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+177,figXola,figXola,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,XOLAFIGS,Xolalpan,Total counts of Xolalpan figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+178,figMete,figMete,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,METEFIGS,Metepec,Total counts of Metepec figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+179,figTolt,figTolt,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,TOLTFIGS,"""Toltec""","Total counts of ""Toltec"" figurines.","domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+180,figAzte,figAzte,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,AZTEFIGS,Aztec,Total counts of Aztec figurines.,"domain set:
+[-1,0..]
+-1=missing data",,"Incomplete, and should not be used at all.",
+181,figPupp,figPupp,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,PUPPFIGS,"""Puppet"" fragments","Total counts of ""puppet"" figurines.","domain set:
+[-1,0..]
+-1=missing data",,"""OK""",
+182,spindleWhorl,spindleWhorl,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,SPINWHRL,Spindle whorls,Counts of spindle whorls.,"domain set:
+[-1,0..]
+-1=missing data",,Probably nearly all Aztec. Inattentive coders probably missed a few occurences of the less common categories.,
+183,sealStamp,sealStamp,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,SEALSTMP,Seals and stamps,Counts of seals and stamps.,"domain set:
+[-1,0..]
+-1=missing data",,Inattentive coders probably missed a few occurences of the less common categories.,
+184,earSpool,earSpool,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,EARSPOOL,Earspools,Counts of earspools.,"domain set:
+[-1,0..]
+-1=missing data",,Inattentive coders probably missed a few occurences of the less common categories.,
+185,whistle,whistle,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,WHISTLES,Whistles,Counts of whistles.,"domain set:
+[-1,0..]
+-1=missing data",,Inattentive coders probably missed a few occurences of the less common categories.,
+186,flute,flute,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,FLUTES,Flutes,Counts of flutes.,"domain set:
+[-1,0..]
+-1=missing data",,Doesn't include simple clay tubes. Inattentive coders probably missed a few occurences of the less common categories.,
+187,labAnalyst1,labAnalysts,Data_labAnalysts,Integer,TRUE,-1,TRUE,Codes_personnel,CERANWK1,Ceramic analyst,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+188,labAnalyst2,labAnalysts,Data_labAnalysts,Integer,TRUE,-1,TRUE,Codes_personnel,CERANWK2,Ceramic analyst,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+189,labAnalyst3,labAnalysts,Data_labAnalysts,Integer,TRUE,-1,TRUE,Codes_personnel,CERANWK3,Ceramic analyst,,"domain set:
+[-1,1..32]
+1=René Millon
+2=Bruce Drewitt
+3=James A. Bennyhoff
+4=Pedro Baños
+5=George L. Cowgill
+6=Michael W. Spence
+7=Matthew Wallrath
+8=Joseph D. Marino
+9=Warren T. D. Barbour
+10=Arnulfo de Lucio
+11=José de Lucio
+12=Darlena K. Blucher
+13=Daniel W. Hungerford
+14=Donald R. Sutherland
+15=S. Jeffrey K. Wilkerson
+16=Steve M. Sharnoff
+17=Silvestre Sánchez
+18=Charles K. Fletcher
+19=Charles C. Kolb
+20=Clara Millon
+21=Wendy Drewitt
+22=James W. Dow
+23=Mario de Lucio
+24=Paul Shankman
+25=Chris D. Dodds
+26=G. Raymond Krotser
+27=A. Jane Quisenberry
+28=Michael S. West
+29=Dan B. Bruhns
+30=Karen O. Bruhns
+31=Silvia G. Duran
+32=Erica West",,,
+190,analysisYear,analysisYear,Data_admin,Integer,FALSE,-1,FALSE,,CERANYR,Year of ceramic analysis,The last two digits of the year in which the ceramic analysis occurred.,"domain set:
+[-1,62..71]
+-1=missing data",,Analyses carried out in December are coded for the following year.,
+191,analysisQuarter,analysisQuarter,Data_admin,Integer,TRUE,-1,TRUE,Codes_quarter,CERANQT,Quarter in which the ceramic analysis was done,Quarter in which the ceramic analysis occurred.,"domain set:
+[-1,1..4]
+1=December-February
+2=March-May
+3=June-August
+4=September-November",,,
+192,ceramicField,ceramicField,Data_workshop,Integer,TRUE,-1,TRUE,Codes_workshopField,FLDCWKSH,Field judgement about whether the site was a ceramic workshop,,"domain set:
+[0,1..4]
+0=nothing special noted in the field
+1=considered an area of concentration, of unspecified character
+2=judged to be a workshop area
+3=some sort of specialized concentration but not a workshop
+4=possible workshop area",,"Coding is the same as for vars.125-126, but it is SUPERSEDED by var.287.",
+193,ceramicAbundance,ceramicAbundance,Data_description,Integer,TRUE,-1,TRUE,Codes_ceramicAbundance,FLDCABUN,Field rating of ceramic abundance,,"domain set:
+[0..9]
+0=Absent
+1=Very Sparse
+2=Very Sparse to Sparse
+3=Sparse
+4=Sparse to Moderate
+5=Moderate
+6=Moderate to Abundant
+7=Abundant
+8=Abundant to Very Abundant
+9=Very Abundant",,,
+194,candTot,candTot,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,CANDTOTS,Total candeleros,,"domain set:
+[-1,0..]
+-1=missing data",,OK,
+195,candCoat,candCoat,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,COATCAND,"""Coatlan"" (Early Tlamamilolpa) candeleros",,"domain set:
+[-1,0..]
+-1=missing data",,Variable not useful.,
+196,candAtoy,candAtoy,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,ATOYCAND,"""Atoyac"" (Late Tlamimilolpa) candeleros",,"domain set:
+[-1,0..]
+-1=missing data",,Variable not useful.,
+197,candEXol,candEXol,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,EXOLCAND,Early Xolalpan candeleros,,"domain set:
+[-1,0..]
+-1=missing data",,Variable not useful.,
+198,candLXol,candLXol,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,LXOLCAND,Late Xolalpan candeleros,,"domain set:
+[-1,0..]
+-1=missing data",,Variable not useful.,
+199,candMete,candMete,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,METECAND,Metepec candeleros,,"domain set:
+[-1,0..]
+-1=missing data",,Variable not useful.,
+200,candComm,candComm,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,COMMCAND,"""Common"" candeleros",,"domain set:
+[-1,0..]
+-1=missing data",,OK,
+201,burner3P,burner3P,Data_cerVessel,Integer,FALSE,-1,FALSE,,BRN3PRNG,Three-prong burners,,"domain set:
+[-1,0..]
+-1=missing data",,,
+202,coverHandled,coverHandled,Data_cerVessel,Integer,FALSE,-1,FALSE,,HANDCOVR,Handled covers,,"domain set:
+[-1,0..]
+-1=missing data",,,
+203,areaSite,areaSite,Data_description,Integer,FALSE,-1,FALSE,,AREASITE,Area of collection tract,,"domain set:
+[-1,0..]
+-1=missing data",,Var.203 (not289) is appropriate for the denominator in computing local densities of things collected; in multiples of 10 sq.m.,
+204,totAll,totAll,Data_cerPhTot,Integer,FALSE,-1,FALSE,,SHRDSTOT,Total sherds collected,,"domain set:
+[-1,0..]
+-1=missing data",,Includes vars. 205-217; 201; 202; 230; 265; 274; 275; 276; 277; 284.  Does not include vars. 170-186; 194-200.,
+205,totPrec,totPrec,Data_cerPhTot,Integer,FALSE,-1,FALSE,,OTHPCLAS,"""Other"" Preclassic",,"domain set:
+[-1,0..]
+-1=missing data",,,
+206,totCuan,totCuan,Data_cerPhTot,Integer,FALSE,-1,FALSE,,CUANALAN,Cuanalan (Ticoman),,"domain set:
+[-1,0..]
+-1=missing data",,,
+207,totTezo,totTezo,Data_cerPhTot,Integer,FALSE,-1,FALSE,,TEZOYUCA,Tezoyuca,,"domain set:
+[-1,0..]
+-1=missing data",,,
+208,totPatl,totPatl,Data_cerPhTot,Integer,FALSE,-1,FALSE,,PATLACHI,Patlachique,,"domain set:
+[-1,0..]
+-1=missing data",,,
+209,totTzac,totTzac,Data_cerPhTot,Integer,FALSE,-1,FALSE,,TZACUALL,Tzacualli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+210,totMicc,totMicc,Data_cerPhTot,Integer,FALSE,-1,FALSE,,MICCAOTL,Miccaotli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+211,totTlam,totTlam,Data_cerPhTot,Integer,FALSE,-1,FALSE,,TLAMIMIL,Tlamimilolpa,,"domain set:
+[-1,0..]
+-1=missing data",,,
+212,totXola,totXola,Data_cerPhTot,Integer,FALSE,-1,FALSE,,XOLALPAN,Xolalpan,,"domain set:
+[-1,0..]
+-1=missing data",,,
+213,totMete,totMete,Data_cerPhTot,Integer,FALSE,-1,FALSE,,METEPEC,Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+214,totOxto,totOxto,Data_cerPhTot,Integer,FALSE,-1,FALSE,,OXTOTIPA,Oxtoticpac,,"domain set:
+[-1,0..]
+-1=missing data",,,
+215,totXome,totXome,Data_cerPhTot,Integer,FALSE,-1,FALSE,,XOMETLA,Xometla,,"domain set:
+[-1,0..]
+-1=missing data",,,
+216,totMaza,totMaza,Data_cerPhTot,Integer,FALSE,-1,FALSE,,MAZAPAN,Mazapan,,"domain set:
+[-1,0..]
+-1=missing data",,,
+217,totAzte,totAzte,Data_cerPhTot,Integer,FALSE,-1,FALSE,,AZTEC,Aztec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+218,censerTot,censerTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,CNSRTOTS,Total censers; Patlachique-Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+219,censerPPat,censerPPat,Data_cerVessel,Integer,FALSE,-1,FALSE,,PPATCNSR,Pre-Patlachique,,"domain set:
+[-1,0..]
+-1=missing data",,,
+220,censerPatl,censerPatl,Data_cerVessel,Integer,FALSE,-1,FALSE,,PATLCNSR,Patlachique,,"domain set:
+[-1,0..]
+-1=missing data",,,
+221,censerTzac,censerTzac,Data_cerVessel,Integer,FALSE,-1,FALSE,,TZACCNSR,Tzacualli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+222,censerMicc,censerMicc,Data_cerVessel,Integer,FALSE,-1,FALSE,,MICCCNSR,Miccaotli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+223,censerTlam,censerTlam,Data_cerVessel,Integer,FALSE,-1,FALSE,,TLAMCNSR,Tlamimilolpa,,"domain set:
+[-1,0..]
+-1=missing data",,,
+224,censerXola,censerXola,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOLACNSR,Xolalpan,,"domain set:
+[-1,0..]
+-1=missing data",,,
+225,censerMete,censerMete,Data_cerVessel,Integer,FALSE,-1,FALSE,,METECNSR,Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+226,censerOxto,censerOxto,Data_cerVessel,Integer,FALSE,-1,FALSE,,OXTOCNSR,Oxtoticpac,,"domain set:
+[-1,0..]
+-1=missing data",,Post-Metepec censer frags. were very rarely counted; numbers in DF8 for vars.226-229 have little meaning.,
+227,censerXome,censerXome,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOMECNSR,Xometla,,"domain set:
+[-1,0..]
+-1=missing data",,Post-Metepec censer frags. were very rarely counted; numbers in DF8 for vars.226-229 have little meaning.,
+228,censerMaza,censerMaza,Data_cerVessel,Integer,FALSE,-1,FALSE,,MAZACNSR,Mazapan,,"domain set:
+[-1,0..]
+-1=missing data",,Post-Metepec censer frags. were very rarely counted; numbers in DF8 for vars.226-229 have little meaning.,
+229,censerAzte,censerAzte,Data_cerVessel,Integer,FALSE,-1,FALSE,,AZTECNSR,Aztec,,"domain set:
+[-1,0..]
+-1=missing data",,Post-Metepec censer frags. were very rarely counted; numbers in DF8 for vars.226-229 have little meaning.,
+230,toTot,toTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,THNOTOTS,Total Thin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,,
+231,toRegular,toRegular,Data_cerVessel,Integer,FALSE,-1,FALSE,,REGTHNO,Regular Thin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,"Includes ""Thick"" Thin Orange",
+232,toCoarse,toCoarse,Data_cerVessel,Integer,FALSE,-1,FALSE,,CRSTHNO,Coarse Thin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,,
+233,smoTot,smoTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,SMOTOTS,Total San Martin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,,
+234,smoTlam,smoTlam,Data_cerVessel,Integer,FALSE,-1,FALSE,,TLAMSMO,Tlamimilolpa San Martin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,,
+235,smoXola,smoXola,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOLASMO,Xolalpan San Martin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,,
+236,smoMete,smoMete,Data_cerVessel,Integer,FALSE,-1,FALSE,,METESMO,Metepec San Martin Orange,,"domain set:
+[-1,0..]
+-1=missing data",,,
+237,ollaTot,ollaTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,OLLATOT,Total ollas; Patlachique-Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+238,ollaPatl,ollaPatl,Data_cerVessel,Integer,FALSE,-1,FALSE,,PATLOLLA,Patlachique,,"domain set:
+[-1,0..]
+-1=missing data",,,
+239,ollaWedge,ollaWedge,Data_cerVessel,Integer,FALSE,-1,FALSE,,WDGROLLA,Wedge Rim ollas (Patlachique and Tzacualli),,"domain set:
+[-1,0..]
+-1=missing data",,,
+240,ollaMicc,ollaMicc,Data_cerVessel,Integer,FALSE,-1,FALSE,,MICCOLLA,Miccaotli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+241,ollaTlam,ollaTlam,Data_cerVessel,Integer,FALSE,-1,FALSE,,TLAMOLLA,Tlamimilolpa,,"domain set:
+[-1,0..]
+-1=missing data",,,
+242,ollaXola,ollaXola,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOLAOLLA,Xolalpan,,"domain set:
+[-1,0..]
+-1=missing data",,,
+243,ollaMete,ollaMete,Data_cerVessel,Integer,FALSE,-1,FALSE,,METEOLLA,Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+244,comalTot,comalTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,COMLTOTS,Total comals; Patlachique-Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+245,comalPatl,comalPatl,Data_cerVessel,Integer,FALSE,-1,FALSE,,PATLCOML,Patlachique,,"domain set:
+[-1,0..]
+-1=missing data",,Category not used.,
+246,comalTzac,comalTzac,Data_cerVessel,Integer,FALSE,-1,FALSE,,TZACCOML,Tzacualli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+247,comalMicc,comalMicc,Data_cerVessel,Integer,FALSE,-1,FALSE,,MICCCOML,Miccaotli,,"domain set:
+[-1,0..]
+-1=missing data",,,
+248,comalTlam,comalTlam,Data_cerVessel,Integer,FALSE,-1,FALSE,,TLAMCOML,Tlamimilolpa,,"domain set:
+[-1,0..]
+-1=missing data",,,
+249,comalXola,comalXola,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOLACOML,Xolalpan,,"domain set:
+[-1,0..]
+-1=missing data",,,
+250,comalMete,comalMete,Data_cerVessel,Integer,FALSE,-1,FALSE,,METECOML,Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+251,comalOxto,comalOxto,Data_cerVessel,Integer,FALSE,-1,FALSE,,OXTOCOML,Oxtoticpac,,"domain set:
+[-1,0..]
+-1=missing data",,,
+252,comalPOxt,comalPOxt,Data_cerVessel,Integer,FALSE,-1,FALSE,,POXTCOML,Post-Oxtoticpac,,"domain set:
+[-1,0..]
+-1=missing data",,,
+253,nubbinTot,nubbinTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,NUBBTOTS,Total nubbins,,"domain set:
+[-1,0..]
+-1=missing data",,,
+254,nubbinPatl,nubbinPatl,Data_cerVessel,Integer,FALSE,-1,FALSE,,PATLNUBB,Patlachique,,"domain set:
+[-1,0..]
+-1=missing data",,,
+255,nubbinApet,nubbinApet,Data_cerVessel,Integer,FALSE,-1,FALSE,,APTENUBB,"""Apetlac"" nubbins",,"domain set:
+[-1,0..]
+-1=missing data",,Do not use.,
+256,nubbinInset,nubbinInset,Data_cerVessel,Integer,FALSE,-1,FALSE,,INSTNUBB,Inset,,"domain set:
+[-1,0..]
+-1=missing data",,"Formerly ""Miccaotli""",
+257,nubbinFlush,nubbinFlush,Data_cerVessel,Integer,FALSE,-1,FALSE,,FLSMNUBB,Flush,,"domain set:
+[-1,0..]
+-1=missing data",,"Formerly ""Early Tlamamilolpa""",
+258,nubbinAtoy,nubbinAtoy,Data_cerVessel,Integer,FALSE,-1,FALSE,,ATOYNUBB,"""Atoyac""",,"domain set:
+[-1,0..]
+-1=missing data",,"Formerly ""Late Tlamimilolpa""; do not use.",
+259,nubbinXola,nubbinXola,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOLANUBB,Xolalpan,,"domain set:
+[-1,0..]
+-1=missing data",,,
+260,nubbinMete,nubbinMete,Data_cerVessel,Integer,FALSE,-1,FALSE,,METENUBB,Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+261,shrdStamped,shrdStamped,Data_cerVessel,Integer,FALSE,-1,FALSE,,STMPSHRD,Stamped sherds,,"domain set:
+[-1,0..]
+-1=missing data",,,
+262,shrdPlanoR,shrdPlanoR,Data_cerVessel,Integer,FALSE,-1,FALSE,,PLRFSHRD,Plano-relief sherds,,"domain set:
+[-1,0..]
+-1=missing data",,,
+263,shrdStucco,shrdStucco,Data_cerVessel,Integer,FALSE,-1,FALSE,,STCCSHRD,Stuccoed sherds,,"domain set:
+[-1,0..]
+-1=missing data",,,
+264,shrdIncised,shrdIncised,Data_cerVessel,Integer,FALSE,-1,FALSE,,INCISHRD,Incised sherds,,"domain set:
+[-1,0..]
+-1=missing data",,,
+265,foreignTot,foreignTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,FRNSHTOT,Total sherds identified as foreign,,"domain set:
+[-1,0..]
+-1=missing data",,,
+266,mayaLow,mayaLow,Data_cerVessel,Integer,FALSE,-1,FALSE,,LOWMAYA,Lowland Maya,,"domain set:
+[-1,0..]
+-1=missing data",,,
+267,mayaHigh,mayaHigh,Data_cerVessel,Integer,FALSE,-1,FALSE,,HIGHMAYA,Highland Maya,,"domain set:
+[-1,0..]
+-1=missing data",,,
+268,huastec,huastec,Data_cerVessel,Integer,FALSE,-1,FALSE,,HUASTEC,Huastec,,"domain set:
+[-1,0..]
+-1=missing data",,,
+269,tajin,tajin,Data_cerVessel,Integer,FALSE,-1,FALSE,,TAJIN,El Tajin,,"domain set:
+[-1,0..]
+-1=missing data",,,
+270,gulfCoast,gulfCoast,Data_cerVessel,Integer,FALSE,-1,FALSE,,GULFCST,Central Veracruz or Gulf Coast,,"domain set:
+[-1,0..]
+-1=missing data",,,
+271,monteAlban,monteAlban,Data_cerVessel,Integer,FALSE,-1,FALSE,,MONTEALB,Monte Alban,,"domain set:
+[-1,0..]
+-1=missing data",,,
+272,oaxaca,oaxaca,Data_cerVessel,Integer,FALSE,-1,FALSE,,OAXACA,Oaxaca,,"domain set:
+[-1,0..]
+-1=missing data",,Not specifically Monte Alban.,
+273,foreignOther,foreignOther,Data_cerVessel,Integer,FALSE,-1,FALSE,,OTHFRN,Other foreign (mainly unidentified),,"domain set:
+[-1,0..]
+-1=missing data",,,
+274,adornos,adornos,Data_cerVessel,Integer,FALSE,-1,FALSE,,ADORNOS,Adornos,,"domain set:
+[-1,0..]
+-1=missing data",,May apply to both composite censer and cylinder vase fragments (tabulated seperately in the reanalysis data).,
+275,minatures,minatures,Data_cerVessel,Integer,FALSE,-1,FALSE,,MINIATUR,Miniatures,,"domain set:
+[-1,0..]
+-1=missing data",,,
+276,copas,copas,Data_cerVessel,Integer,FALSE,-1,FALSE,,COPAS,Copas,,"domain set:
+[-1,0..]
+-1=missing data",,Coding may be unreliable (confusion of shape and ware criteria?),
+277,matteWare,matteWare,Data_cerVessel,Integer,FALSE,-1,FALSE,,MATTWARE,"""Matte Ware""",,"domain set:
+[-1,0..]
+-1=missing data",,Probably recorded by only a few analysts; category very differently conceived in ceramic reanalysis.,
+278,granTot,granTot,Data_cerVessel,Integer,FALSE,-1,FALSE,,GRANTOTS,Total Granular Ware,,"domain set:
+[-1,0..]
+-1=missing data",,,
+279,granPMic,granPMic,Data_cerVessel,Integer,FALSE,-1,FALSE,,PMICGRAN,Pre-Miccaotli,,"domain set:
+[-1,0..]
+-1=missing data",,"Use with great caution, if at all.",
+280,granMicc,granMicc,Data_cerVessel,Integer,FALSE,-1,FALSE,,MICCGRAN,Miccaotli,,"domain set:
+[-1,0..]
+-1=missing data",,"Use with great caution, if at all.",
+281,granTlam,granTlam,Data_cerVessel,Integer,FALSE,-1,FALSE,,TLAMGRAN,Tlamimilolpa,,"domain set:
+[-1,0..]
+-1=missing data",,"Use with great caution, if at all.",
+282,granXola,granXola,Data_cerVessel,Integer,FALSE,-1,FALSE,,XOLAGRAN,Xolalpan,,"domain set:
+[-1,0..]
+-1=missing data",,"Use with great caution, if at all.",
+283,granMete,granMete,Data_cerVessel,Integer,FALSE,-1,FALSE,,METEGRAN,Metepec,,"domain set:
+[-1,0..]
+-1=missing data",,"Use with great caution, if at all.",
+284,ceramicDisk,ceramicDisk,Data_cerNonVessel,Integer,FALSE,-1,FALSE,,CERADISK,Ceramic disks,,"domain set:
+[-1,0..]
+-1=missing data",,,
+285,obsidianSpencePhase1,obsidianSpencePhase1,Data_workshop,Integer,TRUE,-1,TRUE,Codes_workshopSpence1,SOBSIWK1,Michael Spence identification of obsidian workshops by phase,Spence identification of obsidian workshop by interval. This is the primary phase/interval associated with obsidian workshops,"domain set:
+[-1,0,1,2,3,4]
+-1=missing data
+0=not believed a workshop
+1=present, Patlachique phase
+2=present, Tzacualli phase
+3=present, Miccaotli-Metepec phase
+4=present, Aztec phase",,These data fields are probably useful indicators of obsidian concentrations (especially those likely to be pre-Miccaotli or Aztec) but otherwise should by used with great caution.,
+286,obsidianSpencePhase2,obsidianSpencePhase2,Data_workshop,Integer,TRUE,-1,TRUE,Codes_workshopSpence2,SOBSIWK2,Additional phase for multiphase obsidian workshops (Spence),Spence obsidianworkshopidentification: Additional interval for multi-interval obsidian workshops (spillover variable for sites with obsidian workshops in more than one phase),"domain set:
+[-1,0,1,2,3,4]
+-1=missing data
+0=not a workshop in more than one phase
+1=Patlachique phase
+2=Tzacualli phase
+3=Miccaotli-Metepec phase
+4=Aztec phase",,These data fields are probably useful indicators of obsidian concentrations (especially those likely to be pre-Miccaotli or Aztec) but otherwise should by used with great caution.,
+287,ceramicKrotser,ceramicKrotser,Data_workshop,Integer,TRUE,-1,TRUE,Codes_workshopKrotser,KCERAWKS,Paula Krotser's classification of ceramic workshops,,"domain set:
+[-1,1]
+-1=missing data
+0=not identified as a workshop
+1=probably or surely a ceramic workshop",,,
+288,figurineConcBarbour,figurineConcBarbour,Data_workshop,Integer,TRUE,-1,TRUE,Codes_figurineConcBarbour,BFIGCONC,Figurine concentrations identified by Warren Barbour,,"domain set:
+[-1,1]
+-1=missing data
+0=not identified as a figurine concentration
+1=identified as a figurine concentration",,,
+289,areaStruct,areaStruct,Data_description,Integer,FALSE,-1,FALSE,,AREASTRC,Structure area,,"domain set:
+[-1,0..]
+-1=missing data",,,
+290,insubstantialCount,insubstantialCount,Data_archInterp,Integer,FALSE,-1,FALSE,,INSUBSTR,Number of insubstantial structures in the site,,"domain set:
+[-1,0..]
+-1=missing data",,Probably not useful.,
+291,boundInfoQual,boundInfoQual,Data_archInterp,Integer,TRUE,-1,TRUE,Codes_boundInfoQual,QUALBND,Quality of information on structural boundaries,,"domain set:
+[-1,2]
+-1=missing data
+0=boundaries clear
+1=not all boundaries clear
+2=conventional symbols for insubstantial structures",,,

@@ -1,0 +1,503 @@
+---
+title: "DF9 Wide"
+author: "Rudolf Cesaretti"
+date: "2025-01-21"
+output: html_document
+---
+read_csv(paste0(DIR, "data/raw/DF9b_rev_metadata_to_assemble.csv"))
+DF9b_rev_metadata_to_assemble.csv
+read_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
+# Create DF9 Wide for Cross-Checking the Data
+
+
+### Step 0: Import all excel files from the specified directory
+
+```{r}
+
+DF9_metadata <- read_csv(paste0(DIR, "data/raw/DF9b_rev_metadata_to_assemble.csv"), locale = locale(encoding = "Latin1"))
+
+file_list <- list.files(
+  path = paste0(DIR, "data/raw/DF9_rev"),
+  pattern = "\\.csv$", full.names = TRUE
+)
+file_names <- tools::file_path_sans_ext(basename(file_list))
+df_list <- map(file_list, read_csv, locale = locale(encoding = "Latin1"))
+names(df_list) <- file_names
+#list2env(data_list, envir = .GlobalEnv)
+
+# Assuming your list of dataframes is stored in `df_list`
+data_list  <- df_list[grepl("^Data_", names(df_list))]
+codes_list <- df_list[grepl("^Codes_", names(df_list))]
+
+data <- data_list %>%
+  discard(names(.) %in% c("Data_fieldWorkers", "Data_labAnalysts", "Data_fieldWorkers_bool_wide", "Data_labWorkers_bool_wide", "Data_Plazas")) %>%
+  reduce(full_join, by = "SSN") %>% 
+  mutate(labAnalyst1 = NA,
+         labAnalyst2 = NA,
+         labAnalyst3 = NA,
+         fieldWorker1 = NA,
+         fieldWorker2 = NA,
+         fieldWorker3 = NA,
+         fieldWorker4 = NA,
+         fieldWorker5 = NA
+         ) %>% 
+  select(-unworkedBone) %>% 
+  rename(drainSitu = drains.x,
+         wallFixSitu = wallFixtures.x,
+         drainSurf = drains.y,
+         wallFixSurf = wallFixtures.y,
+         jagueyArch = jagueys,
+         jagueyMod = jaguey) %>% 
+  select(DF9_metadata$DF9b_VarName)
+
+write.csv(data, paste0(DIR, "data/raw/DF9b_raw_data.csv"), fileEncoding = "Latin1")
+  
+
+```
+
+
+Step 2: Replace Values with NA
+
+```{r}
+na_replacements <- DF9_metadata %>%
+  filter(!is.na(NAValue)) %>%
+  select(DF9b_VarName, NAValue)
+
+# Convert specified values to NA
+for (i in seq_len(nrow(na_replacements))) {
+  col <- na_replacements$DF9b_VarName[i]
+  na_val <- na_replacements$NAValue[i]
+  
+  data[[col]][data[[col]] == na_val] <- NA
+}
+```
+
+Step 3: Replace Coded Values with Descriptions
+
+```{r}
+# Recode numeric coded variables to factors using corresponding Codes_ tables.
+# Assumes the metadata has a column "CodesTable" that gives the filename
+# (e.g., "Codes_A.csv") for variables that need recoding.
+
+coded_vars <- DF9_metadata %>% 
+  filter(!is.na(CodesTable) & CodesTable != "")
+
+for(i in seq_len(nrow(coded_vars))) {
+  var_name <- coded_vars$DF9b_VarName[i]
+  codes_table <- coded_vars$CodesTable[i]
+  
+  # Read in the appropriate codes mapping.
+  # Assumes each codes file has at least two columns: 
+  # one with the numeric code (named "Code") and one with the description (named "Description").
+  codes_mapping <- codes_list[[codes_table]]
+  
+  # Recode the variable:
+  # Convert the raw numeric codes to factors with levels defined by the "Code" column
+  # and labels from the "Description" column.
+  data <- data %>% 
+    mutate(!!sym(var_name) := factor(!!sym(var_name),
+                                      levels = codes_mapping$code,
+                                      labels = codes_mapping$description))
+}
+
+data_fct <- data
+
+data_char <- data %>% mutate(across(where(is.factor), as.character))
+```
+
+
+FIRST, CHANGE ORDINAL FACTOR VARIABLE DESCRIPTIONS SO THAT THEY INCLUDE THE NUMBER IN FRONT OF THE DESCRIPTION
+
+We can extend this workflow by incorporating a metadata column (say, `FactorType`) that indicates whether a coded variable should be treated as ordinal (ordered) or nominal (unordered). Then, when you convert the numeric codes to factors, you simply check that metadata value and set the `ordered` argument in the `factor()` function accordingly.
+
+Below is an example that builds on the previous recoding loop. In this snippet, the metadata is assumed to have:
+
+*   A column (e.g., `DF9b_VarName`) with the variable name,
+*   A column `CodesTable` indicating which "Codes\_" table to use,
+*   And a column `FactorType` which holds values like `"ordered"` or `"unordered"`.
+
+```{r}
+
+# Assume DF9_metadata contains columns:
+# DF9b_VarName, CodesTable, and FactorType.
+
+# Filter to only those variables that need recoding.
+coded_vars <- DF9_metadata %>% 
+  filter(!is.na(CodesTable) & CodesTable != "")
+
+for(i in seq_len(nrow(coded_vars))) {
+  var_name   <- coded_vars$DF9b_VarName[i]
+  codes_file <- coded_vars$CodesTable[i]
+  factor_type <- coded_vars$FactorType[i]  # Expected to be "ordered" or "unordered"
+  
+  # Read the corresponding codes mapping
+  codes_mapping <- read_csv(codes_file) %>% 
+    select(Code, Description)
+  
+  # Determine if the factor should be ordered
+  is_ordered <- tolower(factor_type) == "ordered"
+  
+  # Recode the variable using the codes mapping and set factor order accordingly.
+  data <- data %>% 
+    mutate(!!sym(var_name) := factor(!!sym(var_name),
+                                     levels = codes_mapping$Code,
+                                     labels = codes_mapping$Description,
+                                     ordered = is_ordered))
+}
+```
+
+
+
+```{r}
+str(data)
+```
+
+
+```{r}
+
+```
+
+Reasoned about dataset summarization tools for 19 seconds
+
+Below are eight separate R scripts—one per package—to load your CSV file and generate a data summary or metadata report. In each script, we assume your CSV file is named `"DF9b_raw_data.csv"`. Adjust file paths or function options as needed.
+
+* * *
+
+### Script 1: Using **summarytools**
+
+```{r}
+# Script 1: Dataset Summarization using summarytools
+library(tidyverse)    # For data import and piping
+library(summarytools)
+
+# Read the dataset
+#data <- read_csv("DF9b_raw_data.csv")
+
+# Generate a detailed summary report of the dataset
+summary_report <- dfSummary(
+  data,
+  plain.ascii = FALSE, 
+  style = "grid",
+  valid.col = FALSE,
+  headings = TRUE
+)
+
+# Print the summary to the console
+print(summary_report)
+
+# Optionally, view the report in a browser/HTML viewer
+view(summary_report)
+```
+
+* * *
+
+### Script 2: Using **dlookr**
+
+```{r}
+# Script 2: Dataset Diagnosis using dlookr
+library(dlookr)
+
+# Read the dataset
+# Generate a diagnostic report (includes missing values, distributions, outliers, etc.)
+# The report is exported as an HTML file.
+diagnose_report(
+  data, 
+  output_format = "html", 
+  output_file = "dlookr_report.html"
+)
+```
+
+* * *
+
+### Script 3: Using **codebook**
+
+```{r}
+# Script 3: Generating Codebook using the codebook package
+library(codebook)
+
+# Read the dataset
+# Generate and print a codebook for the dataset
+# This function automatically creates a codebook with variable descriptions and summary statistics.
+codebook(data)
+```
+
+* * *
+
+### Script 4: Using **skimr**
+
+```{r}
+# Script 4: Quick Data Summary using skimr
+library(tidyverse)
+library(skimr)
+
+# Read the dataset
+data <- read_csv("DF9b_raw_data.csv")
+
+# Obtain a comprehensive summary of the dataset (including missing values, distribution, etc.)
+skim(data)
+```
+
+* * *
+
+### Script 5: Using **dataMeta**
+
+> _Note:_ The exact function name can vary with version. Here we assume a function called `create_meta()` exists for extracting metadata.
+
+```{r}
+# Script 5: Extracting Metadata using dataMeta
+library(tidyverse)
+library(dataMeta)
+
+# Read the dataset
+data <- read_csv("DF9b_raw_data.csv")
+
+# Extract metadata information from the dataset
+# (Check your version’s documentation if the function name differs.)
+metadata_info <- create_meta(data)
+
+# Print the extracted metadata
+print(metadata_info)
+```
+
+* * *
+
+### Script 6: Using **DataExplorer**
+
+```{r}
+# Script 6: Exploratory Data Analysis Report using DataExplorer
+library(tidyverse)
+library(DataExplorer)
+
+# Read the dataset
+data <- read_csv("DF9b_raw_data.csv")
+
+# Create an automated EDA report in HTML format
+create_report(data, output_file = "DataExplorer_report.html")
+```
+
+* * *
+
+### Script 7: Using **explore**
+
+```{r}
+# Script 7: Interactive Data Exploration using explore package
+library(tidyverse)
+library(explore)
+
+# Read the dataset
+data <- read_csv("DF9b_raw_data.csv")
+
+# Launch an interactive exploration of the dataset
+# This typically opens an interactive report in your RStudio viewer or default browser.
+explore(data)
+```
+
+* * *
+
+### Script 8: Using **SmartEDA**
+
+```{r}
+# Script 8: Automated Exploratory Data Analysis with SmartEDA
+library(tidyverse)
+library(SmartEDA)
+
+# Read the dataset
+data <- read_csv("DF9b_raw_data.csv")
+
+# Generate an EDA report (HTML) using SmartEDA
+ExpReport(data, op_file = "SmartEDA_report.html", op_dir = getwd())
+```
+
+* * *
+
+Each of these scripts loads the data and then leverages a different package to summarize your dataset or extract metadata. You can run these individually or combine parts of them into your workflow as needed.
+
+
+
+"admin" is the base table
+
+-- 5050-row tables --
+
+WorkingHierarchy
+`a_FuncInterp1 for digitization`
+archInterp
+archMaterial
+
+
+
+
+```{r}
+
+ceramics = cerPhTot %>% 
+  left_join(cerVessel, by = "ID") %>% 
+  left_join(cerNonVessel, by = "ID")
+
+lithics = lithicFlaked %>% 
+  left_join(lithicGround, by = "ID")
+
+artifactOther
+
+```
+
+
+
+
+
+
+complexData
+complexMacroData
+
+condition
+description
+
+location
+
+Plazas
+workshop
+
+
+
+materials
+materialsLabel
+
+
+z_archInterp1
+z_archInterp2
+z_funcInterp1
+z_funcInterp2
+z_vegetation
+HierarchyCode
+
+
+
+personnelLabel
+"personnel error check"
+fieldWorkers
+labAnalysts
+
+
+```{r}
+
+
+
+
+colz <- c("fieldWorker1", "fieldWorker2", "fieldWorker3", "fieldWorker4", "fieldWorker5",
+                    "ceramicAnalyst1", "ceramicAnalyst2", "ceramicAnalyst3")
+
+
+personnel <- personnelLabel %>% 
+  mutate(FullName = paste(first_name, last_name, sep = " ")) %>% 
+  select(-last_name, -first_name) %>% 
+  mutate(FullName = stri_trans_general(FullName, "Latin-ASCII")) %>%
+  rename(code = code, FullName = FullName)
+
+code_to_name <- setNames(personnel$FullName, personnel$code)
+
+admin <- admin %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[6:9]
+
+code_to_name <- setNames(DS_ArchInterpPrim$description, DS_ArchInterpPrim$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[10:13]
+
+code_to_name <- setNames(DS_ArchInterpAltern$description, DS_ArchInterpAltern$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[14:17]
+
+code_to_name <- setNames(DS_FuncInterpPrim$description, DS_FuncInterpPrim$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[18:21]
+
+code_to_name <- setNames(DS_FuncInterpAltern$description, DS_FuncInterpAltern$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+########################
+
+
+
+
+
+
+
+
+
+
+6:21
+
+
+
+#%>%
+  select(-all_of(worker_columns))
+
+
+admin_names <- admin %>%
+  mutate(across(all_of(worker_columns), ~ personnel$FullName[match(., personnel$code)], .names = "name_{col}"))
+
+  
+materials_wide <- materials %>% 
+  left_join(materialsLabel, by = "code") %>% 
+  select(-code) %>% 
+  pivot_wider(id_cols = "ID", names_from = "observation", values_from = "label")
+
+
+
+
+write_csv(ceramics, paste0(DIR, "ceramics.csv"))
+
+write_csv(lithics, paste0(DIR, "lithics.csv"))
+
+write_csv(personnel, paste0(DIR, "personnel.csv"))
+
+
+```
+
+personnel
+
+
+
+
+
+
+
+
+
+
+### Step 6: Check and reorganize totals columns (if necessary)???
+This placeholder is where you'd perform checks or reordering logic
+
+THIS WAS SKIPPED!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
