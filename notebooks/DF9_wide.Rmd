@@ -1,0 +1,213 @@
+---
+title: "DF9 Wide"
+author: "Rudolf Cesaretti"
+date: "2025-01-21"
+output: html_document
+---
+
+
+
+# Create DF9 Wide for Cross-Checking the Data
+
+
+### Step 0: Import all excel files from the specified directory
+
+```{r}
+
+file_list <- list.files(
+  path = paste0(DIR, "data/raw/DF9"),
+  pattern = "\\.xlsx$", full.names = TRUE
+)
+file_names <- tools::file_path_sans_ext(basename(file_list))
+data_list <- map(file_list, read_excel)
+names(data_list) <- file_names
+#list2env(data_list, envir = .GlobalEnv)
+
+```
+"admin" is the base table
+
+-- 5050-row tables --
+
+WorkingHierarchy
+`a_FuncInterp1 for digitization`
+archInterp
+archMaterial
+
+
+
+
+```{r}
+
+ceramics = cerPhTot %>% 
+  left_join(cerVessel, by = "ID") %>% 
+  left_join(cerNonVessel, by = "ID")
+
+lithics = lithicFlaked %>% 
+  left_join(lithicGround, by = "ID")
+
+artifactOther
+
+```
+
+
+
+
+
+
+complexData
+complexMacroData
+
+condition
+description
+
+location
+
+Plazas
+workshop
+
+
+
+materials
+materialsLabel
+
+
+z_archInterp1
+z_archInterp2
+z_funcInterp1
+z_funcInterp2
+z_vegetation
+HierarchyCode
+
+
+
+personnelLabel
+"personnel error check"
+fieldWorkers
+labAnalysts
+
+
+```{r}
+
+
+
+
+colz <- c("fieldWorker1", "fieldWorker2", "fieldWorker3", "fieldWorker4", "fieldWorker5",
+                    "ceramicAnalyst1", "ceramicAnalyst2", "ceramicAnalyst3")
+
+
+personnel <- personnelLabel %>% 
+  mutate(FullName = paste(first_name, last_name, sep = " ")) %>% 
+  select(-last_name, -first_name) %>% 
+  mutate(FullName = stri_trans_general(FullName, "Latin-ASCII")) %>%
+  rename(code = code, FullName = FullName)
+
+code_to_name <- setNames(personnel$FullName, personnel$code)
+
+admin <- admin %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[6:9]
+
+code_to_name <- setNames(DS_ArchInterpPrim$description, DS_ArchInterpPrim$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[10:13]
+
+code_to_name <- setNames(DS_ArchInterpAltern$description, DS_ArchInterpAltern$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[14:17]
+
+code_to_name <- setNames(DS_FuncInterpPrim$description, DS_FuncInterpPrim$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+##########################
+
+colz <- names(archInterp)[18:21]
+
+code_to_name <- setNames(DS_FuncInterpAltern$description, DS_FuncInterpAltern$code)
+
+archInterp <- archInterp %>%
+  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+
+########################
+
+
+
+
+
+
+
+
+
+
+6:21
+
+
+
+#%>%
+  select(-all_of(worker_columns))
+
+
+admin_names <- admin %>%
+  mutate(across(all_of(worker_columns), ~ personnel$FullName[match(., personnel$code)], .names = "name_{col}"))
+
+  
+materials_wide <- materials %>% 
+  left_join(materialsLabel, by = "code") %>% 
+  select(-code) %>% 
+  pivot_wider(id_cols = "ID", names_from = "observation", values_from = "label")
+
+
+
+
+write_csv(ceramics, paste0(DIR, "ceramics.csv"))
+
+write_csv(lithics, paste0(DIR, "lithics.csv"))
+
+write_csv(personnel, paste0(DIR, "personnel.csv"))
+
+
+```
+
+personnel
+
+
+
+
+
+
+
+
+
+
+### Step 6: Check and reorganize totals columns (if necessary)???
+This placeholder is where you'd perform checks or reordering logic
+
+THIS WAS SKIPPED!
+
+
+
+
+
+
+
+
+
+
+
+
+
+

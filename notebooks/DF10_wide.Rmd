@@ -1,0 +1,213 @@
+---
+title: "DF10 Wide"
+author: "Rudolf Cesaretti"
+date: "2024-10-24"
+output: html_document
+---
+
+
+```{r}
+rm(list = ls())
+
+```
+
+
+
+
+# Load Packages
+
+```{r}
+# Load the required package
+library(tidyverse)
+library(readxl)
+library(stringi)
+
+```
+
+
+# Set Working Directory
+
+```{r}
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
+```
+
+
+
+# Creation of DF10 wide-version 
+
+
+
+### Step 1: Import all CSV files from the specified directory
+
+```{r}
+
+file_list <- list.files(
+  path = paste0(DIR, "data/raw/DF10"),
+  pattern = "\\.csv$", full.names = TRUE
+)
+file_names <- tools::file_path_sans_ext(basename(file_list))
+data_list <- map(file_list, ~ read_csv(.x, locale = locale(encoding = "Latin1")))
+names(data_list) <- file_names
+list2env(data_list, envir = .GlobalEnv)
+
+```
+
+
+
+
+
+### Step 2: Format totalsTable
+
+```{r}
+
+totals <- totalsTable %>%
+  mutate(
+    NewCount = ifelse(Where == "M", -9999, Where),
+    NewCount = ifelse(is.na(NewCount), Count, NewCount),
+    NewCount = as.numeric(NewCount)
+  ) %>% # Replace 0 with NA where "Where" == "M"
+  select(-Where, -Count) %>% # Remove "Where" column
+  pivot_wider( # Pivot wider by ID
+    id_cols = SSN,
+    names_from = Variable,
+    values_from = NewCount,
+    values_fill = 0
+  ) %>%
+  mutate(across(everything(), ~ as.numeric(.))) %>%
+  arrange(SSN) %>%
+  mutate(across(everything(), ~ na_if(., -9999)))
+
+```
+
+
+
+
+
+
+### Step 3: Format interpTable
+
+```{r}
+
+interps <- interpTable %>%
+  mutate(
+    NewCode = ifelse(Where == "M", -1, Where), # Replace 0 with -1 where "Where" == "M"
+    NewCode = ifelse(is.na(NewCode), Code, NewCode),
+    NewCode = as.numeric(NewCode)
+  ) %>%
+  left_join(interpCodes, by = join_by("NewCode" == "Code")) %>% # Join with interpCodes
+  select(-Code, -Where) %>% # Remove unneeded columnws
+  pivot_wider(id_cols = SSN, names_from = Variable, values_from = Description) %>% # Pivot wider by ID
+  mutate(SSN = as.numeric(SSN)) %>%
+  arrange(SSN)
+
+```
+
+
+
+
+
+### Step 4: Format codeTable
+
+```{r}
+
+codes <- codeTable %>%
+  mutate(
+    NewCode = ifelse(Where == "M", -1, Where), # Replace 0 with -1 where "Where" == "M"
+    NewCode = ifelse(is.na(NewCode), Code, NewCode),
+    NewCode = as.numeric(NewCode)
+  ) %>%
+  select(-Code, -Where) %>% # Remove unneeded columnws
+  left_join(codeCodes, by = join_by("NewCode" == "Code")) %>% # Join with interpCodes
+  pivot_wider(
+    id_cols = SSN, names_from = Variable,
+    values_from = Description, values_fill = "absent"
+  ) %>% # Pivot wider by SSN
+  mutate(SSN = as.numeric(SSN)) %>%
+  arrange(SSN)
+
+```
+
+
+
+
+
+### Step 5: Format artifactTable
+
+```{r}
+
+artifacts <- artifactTable %>%
+  mutate(
+    NewCount = ifelse(Where == "M", -9999, Where), # Replace 0 with NA where "Where" == "M"
+    NewCount = ifelse(is.na(NewCount), Count, NewCount),
+    NewCount = as.numeric(NewCount)
+  ) %>%
+  select(-Where, -Count) %>%
+  left_join(artifactCodes, by = c("ArtCode1" = "Code")) %>%
+  rename(ArtCode4 = Description) %>%
+  left_join(artifactCodes, by = c("ArtCode2" = "Code")) %>%
+  rename(ArtCode5 = Description) %>%
+  left_join(artifactCodes, by = c("ArtCode3" = "Code")) %>%
+  rename(ArtCode6 = Description) %>%
+  mutate(
+    ArtCode6 = ifelse(ArtCode2 == 12 & ArtCode3 == 46, "figAzte", ArtCode6),
+    ArtCode7 = paste(ArtCode4, ArtCode5, ArtCode6, sep = "_")
+  ) %>%
+  select(SSN, ArtCode7, NewCount) %>%
+  pivot_wider(names_from = ArtCode7, values_from = NewCount, values_fill = 0) %>% # Pivot wider by SSN
+  arrange(SSN) %>%
+  mutate(across(everything(), ~ na_if(., -9999)))
+
+
+```
+
+
+### Step 6: Join formatted tables to provTable
+
+```{r}
+
+DF10_wide <- provTable %>%
+  left_join(interps, by = "SSN") %>%
+  left_join(codes, by = "SSN") %>%
+  left_join(artifacts, by = "SSN") %>%
+  left_join(totals, by = "SSN")
+
+```
+
+
+
+### Step 7 : Reorder Variables to match DF9
+
+```{r}
+
+DF10_wide <- DF10_wide %>%
+  rename(ceramicAnalyst1 = workLab1,
+         ceramicAnalyst2 = workLab2,
+         ceramicAnalyst3 = workLab3,
+         fieldWorker1 = workFie1,
+         fieldWorker2 = workFie2,
+         fieldWorker3 = workFie3,
+         fieldWorker4 = workFie4,
+         fieldWorker5 = workFie5,
+         Ceramic_cerOther_totCuan = Ceramic_cerOther_Cuan,
+         Ceramic_cerOther_totMaza = Ceramic_cerOther_Maza,
+         Ceramic_cerOther_totAzte = Ceramic_cerOther_Azte,
+         Ceramic_cerOther_totPreCl = Ceramic_cerOther_PreCl,
+         Ceramic_cerOther_totTezo = Ceramic_cerOther_Tezo,
+         Ceramic_cerOther_totCoyo = Ceramic_cerOther_Coyotlatelco) %>% 
+  mutate(Northing = Northing*10,
+         Easting = Easting*10,
+         Site = str_replace_all(Site, " ", ""))
+
+```
+
+
+### Step 8: Export the wide-format table as "DF10_wide.csv"
+
+```{r}
+
+write.csv(DF10_wide, paste0(DIR, "data/raw/DF10_wide.csv"), fileEncoding = "Latin1")
+
+write.csv(archToSSN, paste0(DIR, "data/raw/DF10_archToSSN.csv"), fileEncoding = "Latin1")
+
+```
+

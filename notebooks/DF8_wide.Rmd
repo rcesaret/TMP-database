@@ -82,7 +82,7 @@ if (checksum$checksum_SITE == nrow(DF8_wide) & checksum$checksum_UNIT == nrow(DF
 ### Step 4: Save the DF8_wide dataframe to a CSV file
 
 ```{r}
-write_csv(DF8_wide, paste0(DIR, "data/DF8_wide_raw_values.csv"))
+write_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
 ```
 
 
