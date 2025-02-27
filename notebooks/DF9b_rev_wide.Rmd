@@ -167,7 +167,6 @@ Below are eight separate R scripts—one per package—to load your CSV file and
 
 ```{r}
 # Script 1: Dataset Summarization using summarytools
-library(tidyverse)    # For data import and piping
 library(summarytools)
 
 # Read the dataset
@@ -221,23 +220,17 @@ library(codebook)
 codebook(data)
 ```
 
-* * *
-
 ### Script 4: Using **skimr**
 
 ```{r}
 # Script 4: Quick Data Summary using skimr
-library(tidyverse)
 library(skimr)
 
-# Read the dataset
-data <- read_csv("DF9b_raw_data.csv")
 
 # Obtain a comprehensive summary of the dataset (including missing values, distribution, etc.)
 skim(data)
 ```
 
-* * *
 
 ### Script 5: Using **dataMeta**
 
@@ -245,18 +238,25 @@ skim(data)
 
 ```{r}
 # Script 5: Extracting Metadata using dataMeta
-library(tidyverse)
-library(dataMeta)
+library(tableone)
 
-# Read the dataset
-data <- read_csv("DF9b_raw_data.csv")
 
 # Extract metadata information from the dataset
 # (Check your version’s documentation if the function name differs.)
-metadata_info <- create_meta(data)
+tableOne <- CreateTableOne(data=data)
 
-# Print the extracted metadata
-print(metadata_info)
+tableOne
+print(tableOne)
+summary(tableOne)
+
+## See the categorical part only using $ operator
+tableOne$CatTable
+summary(tableOne$CatTable)
+
+## See the continuous part only using $ operator
+tableOne$ContTable
+summary(tableOne$ContTable)
+
 ```
 
 * * *
@@ -265,11 +265,7 @@ print(metadata_info)
 
 ```{r}
 # Script 6: Exploratory Data Analysis Report using DataExplorer
-library(tidyverse)
 library(DataExplorer)
-
-# Read the dataset
-data <- read_csv("DF9b_raw_data.csv")
 
 # Create an automated EDA report in HTML format
 create_report(data, output_file = "DataExplorer_report.html")
@@ -281,11 +277,7 @@ create_report(data, output_file = "DataExplorer_report.html")
 
 ```{r}
 # Script 7: Interactive Data Exploration using explore package
-library(tidyverse)
 library(explore)
-
-# Read the dataset
-data <- read_csv("DF9b_raw_data.csv")
 
 # Launch an interactive exploration of the dataset
 # This typically opens an interactive report in your RStudio viewer or default browser.
@@ -298,11 +290,7 @@ explore(data)
 
 ```{r}
 # Script 8: Automated Exploratory Data Analysis with SmartEDA
-library(tidyverse)
 library(SmartEDA)
-
-# Read the dataset
-data <- read_csv("DF9b_raw_data.csv")
 
 # Generate an EDA report (HTML) using SmartEDA
 ExpReport(data, op_file = "SmartEDA_report.html", op_dir = getwd())
