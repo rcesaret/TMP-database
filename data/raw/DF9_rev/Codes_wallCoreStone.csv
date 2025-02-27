@@ -1,0 +1,8 @@
+"code","description"
+-1,"missing data"
+0,"walls present, but no stone observed in them"
+1,"small stones"
+2,"medium stones"
+3,"stones present, unspecified size"
+4,"stones of mixed sizes"
+5,"large stones"

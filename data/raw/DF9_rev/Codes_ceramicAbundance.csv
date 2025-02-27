@@ -1,0 +1,11 @@
+code,description
+0,Absent
+1,Very Sparse
+2,Very Sparse to Sparse
+3,Sparse
+4,Sparse to Moderate
+5,Moderate
+6,Moderate to Abundant
+7,Abundant
+8,Abundant to Very Abundant
+9,Very Abundant

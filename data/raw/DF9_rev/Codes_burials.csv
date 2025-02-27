@@ -1,0 +1,11 @@
+code,description
+0,None observed
+1,Possibly present; evidence destroyed by looting
+2,"Present, looted; collection not mainly grave material"
+3,"Present, not looted; collection not mainly grave material"
+4,"Present, looted; collection mainly grave material"
+5,"Present, not looted; collection mainly grave material"
+6,"Present, looted; collection entirely grave material"
+7,"Present, not looted; collection entirely grave material"
+8,Burials possibly present
+9,Other
