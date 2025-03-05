@@ -1,0 +1,35 @@
+Variable,Explanation
+VarID,"Variable ID Number. These are ordered according to the numbering in DF8 and DF9, and later modified in DF10. New variables in DF10 are numbered sequentially after the last DF8/DF9 variable (292)"
+varName_DF8,Variable name in DF8
+varName_DF9,Variable (column) name in DF9
+varName_DF10,Variable name in DF10
+varName_DF9b,Variable (column) name in DF9b
+dbTable_DF8,MS Access database table that the variable/column values are stored in for DF8
+dbTable_DF9,MS Access database table that the variable/column values are stored in for DF9
+dbTable_DF9b,MS Access database table that the variable/column values are stored in for DF9b
+codesTable_DF9b,"MS Access Database ""lookup table"" or ""Codes table"" in which coded values are stored in the DF9b database"
+varMacroCategory,"Variable ""Macro-Category"" (org hierarchy Level 1) for purposes of organizing the variables"
+varCategory,"Variable ""Category"" (org hierarchy Level 2) for purposes of organizing the variables"
+varSubCategory,"Variable ""Sub-Category"" (org hierarchy Level 3) for purposes of organizing the variables"
+codedNAValue,"The raw value used for this variable/column (in the database table) that indicates NA values. For most variables, the databases use a value of -1 (int) to indicate NA values."
+CodedVar,"Boolean (True/False). Whether or not the data values represent numbered codes (nominal / ordinal strings for variables with coded values stored in lookup tables) [TRUE], or represent actual numeric values [FALSE]"
+DataType,"The type of raw values stored in the database tables for the variable. Values are either ""Integer"" or ""Character"""
+VarType,"The analytical type of the variable. Final values should take one of the values: ""Nominal"", ""Ordinal"", ""Interval"", ""Ratio"", or ""Count"". At present, there is an additional value, ""Nominal? Ordinal?"", which indicates that there is problem with variable design that needs to be addressed -- i.e. that the variable is somewhere between ""Nominal"" and ""Ordinal"", necessitating redesigning and recalculating the variable (e.g. splitting it into multiple new variables) before this variable can be finalized"
+CovertToFactorVar,Boolean (True/False). Whether or not the data should be converted to a factor variable for analysis
+FactorType,"The type of factor variable to be used if the variable should be converted to a factor variable for analysis (""Unordered"", ""Ordered"" or "
+varCodesValues,"For variables that represent coded values (rather than numeric quantities), this column stores the possible coded values for the variable in the form of a long string taking the form ""<code integer> = <description string >; <code integer> = <description string >; <code integer> = <description string >; [etc. etc.]""."
+accdbMetadata_VarDescription_Short,"DF9 MS Access Database metadata text for ""short variable description"". Although the data here is incomplete and with different levels of detail for different variables, this generally provides a very brief description of what the variable is."
+accdbMetadata_VarDescription_Long,"DF9 MS Access Database metadata text for ""long variable description"". Although the data here is incomplete and with different levels of detail for different variables, this generally provides a slightly longer description of what the variable is."
+accdbMetadata_PriorChangesToVar,"DF9 MS Access Database metadata text for ""Prior changes to variable"", which (briefly) records metadata on earlier changes that were made to the variable at the time that DF9 was created."
+accdbMetadata_Comments,"DF9 MS Access Database metadata text for ""Comments"", which (briefly) records expert comments on the variable by the principal authors of DF8 and DF9. These notes concern various subjects, including (but not limited to) notes about the validity, accuracy and utility of the variable."
+DF8Metadata_Text,"This is an unstructured, long-form text column that includes explanations, clarifications, detailed insights, context and critical evaluation of the variables reported in the final DF8 Metadata Report (Cowgill, 1993)"
+DF9Metadata_VarText,"This is an unstructured, long-form text column that includes explanations, clarifications, detailed insights, context and critical evaluation of the variables reported in the final DF9 Metadata Report (Cowgill et al., 2012). Not all variables are covered in equal amounts."
+DF9Metadata_VarGroupText,"This is an unstructured, long-form text column that conjoins with (is a continuation of) ""DF9Metadata_VarText"". The text of the DF9 Metadata Report (Cowgill et al., 2012) discusses variables in hierarchical groups, with subheadings for individual variables. As such, the long-form text for the variable group being discussed is included here in ""DF9Metadata_VarGroupText"" --  and thus should be read and analyzed alongside the information for specific variables included in ""DF9Metadata_VarTex"". Frequently, the text in ""DF9Metadata_VarGroupText"" directly pertains to individual variables in addition to the group as a whole. In some cases most of the info is in ""DF9Metadata_VarGroupText"", while in others most of the info is in ""DF9Metadata_VarGroupText"". As such, ""DF9Metadata_VarGroupText"" and ""DF9Metadata_VarText"" should always be consulted together."
+DF10Metadata_Text,"This is an unstructured text column that includes long-form explanations, clarifications, insights, context and critical evaluation of the variables reported in the final DF10 Metadata Report (Sherfield, 2023). Only variables modified by DF10 have entires (all others are blank), explaining what was changed from DF9 to DF10 and why."
+DF10_Removed,Boolean (True/False). Whether the variable was removed from DF9 in Sherfield's construction of DF10 [TRUE] or not [FALSE]
+DF10_Aggregated,Boolean (True/False). Whether the DF9 variable was aggregated together with additional DF9 variables Sherfield's construction of DF10 [TRUE] or not [FALSE]
+DF10_Renamed,Boolean (True/False). Whether the variable was renamed from DF9 in Sherfield's construction of DF10 [TRUE] or not [FALSE]
+DF10_Changed,Boolean (True/False). Whether the variable was changed from DF9 in Sherfield's construction of DF10 [TRUE] or not [FALSE]
+DF10_NewVar,Boolean (True/False). Whether the variable is a newly added variable in Sherfield's construction of DF10 (i.e. not included in DF9) [TRUE] or if the variable was inherited from DF9 [FALSE]
+RC_VarDesignProblem,"Boolean (True/False). Whether Rudolf Cesaretti'spreliminary analysis of DF8-DF9-DF10 identified a variable design problem [TRUE] or not [FALSE]. NOTE that this field constitutes a first-pass preliminary assessment! A value of FALSE does NOT mean that there are no design problems with the variable, NOR does it mean that the variable is optimal for the final database."
+RC_VarDesignProblem_Comments,Rudolf Cesaretti's preliminary notes on variable design problems and suggested solutions for the DF8-DF9-DF10 variables
