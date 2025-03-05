@@ -4,6 +4,43 @@ author: "Rudolf Cesaretti"
 date: "2025-01-21"
 output: html_document
 ---
+
+Double-check codes tables for coded variables!! If Annie was wrong in her metadata, write a paragraph about it here.
+
+Double-check NA Values for all variables
+
+Fix the stone quantity variable in DF9b using the data from DF8
+
+Make a checklist for variables -- problems and change/transformations needed. Add these as columns to the metadata. Color code rows based on their status (e.g. you can basically make all of the count data green)
+
+Remove spaces and manually edit the site and subsite variables in DF9b
+
+Add variable for L1, L2, L3 etc site names indicating that the collection unit is not primarily Classic Period
+
+Hierarchical classification schema for architectural and functional interps!
+
+
+Nominal vs Ordinal fields
+--Ordinal fields text as "1. X", "2. Y", "3. Z" etc. AND conversion to an ordered factor variable
+--Nominal fields text as "X", "Y", "Z" etc. AND conversion to an unordered factor variable
+
+make processing script generalized
+
+convert entire processing script to a function
+
+Process DF8,DF9,DF10,DF9b
+
+Cross-check values!!
+
+Then, you need to connect the dataframe to the (millon space) collection unit polygons
+
+Using the the final corrected geospatial dataset (millon space), see if you can predict architectural and functional classifications using ML methods 
+Also perform a pattern recognition analysis in the dataset!!
+
+
+
+
+
 read_csv(paste0(DIR, "data/raw/DF9b_rev_metadata_to_assemble.csv"))
 DF9b_rev_metadata_to_assemble.csv
 read_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
@@ -14,7 +51,7 @@ read_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
 
 ```{r}
 
-DF9_metadata <- read_csv(paste0(DIR, "data/raw/DF9b_rev_metadata_to_assemble.csv"), locale = locale(encoding = "Latin1"))
+DF9_metadata <- read_csv(paste0(DIR, "data/raw/Metadata.csv"), locale = locale(encoding = "Latin1"))
 
 file_list <- list.files(
   path = paste0(DIR, "data/raw/DF9_rev"),
@@ -48,25 +85,37 @@ data <- data_list %>%
          wallFixSurf = wallFixtures.y,
          jagueyArch = jagueys,
          jagueyMod = jaguey) %>% 
-  select(DF9_metadata$DF9b_VarName)
+  select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
 
-write.csv(data, paste0(DIR, "data/raw/DF9b_raw_data.csv"), fileEncoding = "Latin1")
+write.csv(data, paste0(DIR, "data/raw/DF9b_raw_data_v2.csv"), fileEncoding = "Latin1")
   
-
+DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)]
 ```
 
 
 Step 2: Replace Values with NA
 
 ```{r}
+
 na_replacements <- DF9_metadata %>%
-  filter(!is.na(NAValue)) %>%
-  select(DF9b_VarName, NAValue)
+  filter(!is.na(codedNAValue)) %>%
+  select(varName_DF9b, codedNAValue)
+
+
+convert_if_numeric <- function(x) {
+  temp <- suppressWarnings(as.numeric(x))
+  if (all(is.na(temp) == is.na(x))) {
+    return(temp)
+  } else {
+    return(x)
+  }
+}
+
 
 # Convert specified values to NA
 for (i in seq_len(nrow(na_replacements))) {
-  col <- na_replacements$DF9b_VarName[i]
-  na_val <- na_replacements$NAValue[i]
+  col <- na_replacements$varName_DF9b[i]
+  na_val <- convert_if_numeric(na_replacements$codedNAValue[i])
   
   data[[col]][data[[col]] == na_val] <- NA
 }
@@ -80,11 +129,11 @@ Step 3: Replace Coded Values with Descriptions
 # (e.g., "Codes_A.csv") for variables that need recoding.
 
 coded_vars <- DF9_metadata %>% 
-  filter(!is.na(CodesTable) & CodesTable != "")
+  filter(!is.na(codesTable_DF9b) & codesTable_DF9b != "")
 
 for(i in seq_len(nrow(coded_vars))) {
-  var_name <- coded_vars$DF9b_VarName[i]
-  codes_table <- coded_vars$CodesTable[i]
+  var_name <- coded_vars$varName_DF9b[i]
+  codes_table <- coded_vars$codesTable_DF9b[i]
   
   # Read in the appropriate codes mapping.
   # Assumes each codes file has at least two columns: 
@@ -104,6 +153,55 @@ data_fct <- data
 
 data_char <- data %>% mutate(across(where(is.factor), as.character))
 ```
+
+
+```{r}
+DF8_wide %>% select(SSN, FLDWRK1, FLDWRK2, FLDWRK3, FLDWRK4, FLDWRK5, CERANWK1, CERANWK2, CERANWK3) %>% 
+  rename(fieldWorker1 = FLDWRK1,
+         fieldWorker2 = FLDWRK2,
+         fieldWorker3 = FLDWRK3,
+         fieldWorker4 = FLDWRK4,
+         fieldWorker5 = FLDWRK5,
+         ceramicAnalyst1 = CERANWK1,
+         ceramicAnalyst2 = CERANWK2,
+         ceramicAnalyst3 = CERANWK3) %>% 
+  mutate(across(everything(), ~ ifelse(. == -1, NA, .)))-> personnel
+
+recode_vector <- setNames(codes_list[["Codes_personnel"]]$description, codes_list[["Codes_personnel"]]$code)
+
+recode_column <- function(column, recode_vector) {
+  factor(column, levels = as.numeric(names(recode_vector)), labels = recode_vector[as.numeric(names(recode_vector))])
+}
+
+personnel <- personnel %>%
+  mutate(
+    across(
+      c(fieldWorker1, fieldWorker2, fieldWorker3, fieldWorker4, fieldWorker5,
+        ceramicAnalyst1, ceramicAnalyst2, ceramicAnalyst3),
+      recode_column, recode_vector = recode_vector
+    )
+  )
+
+personnel_char <- personnel %>% mutate(across(where(is.factor), as.character)) %>% 
+  rename(labAnalyst1 = ceramicAnalyst1, 
+         labAnalyst2 = ceramicAnalyst2, 
+         labAnalyst3 = ceramicAnalyst3)
+
+write.csv(personnel_char, paste0(DIR, "data/raw/personnel.csv"), fileEncoding = "Latin1")
+
+data_char <- data_char %>%
+  select(-c(fieldWorker1, fieldWorker2, fieldWorker3, fieldWorker4, fieldWorker5,
+            labAnalyst1, labAnalyst2, labAnalyst3)) %>% 
+  left_join(personnel_char, by = "SSN") %>%
+  select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
+
+write.csv(data_char, paste0(DIR, "data/raw/data_char.csv"), fileEncoding = "Latin1")
+```
+CERANWK1
+CERANWK2
+CERANWK3
+
+
 
 ```{r}
 write.csv(data_char, paste0(DIR, "data/raw/DF9b_data_char.csv"), fileEncoding = "Latin1")

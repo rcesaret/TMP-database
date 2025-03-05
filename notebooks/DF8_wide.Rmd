@@ -41,6 +41,8 @@ file_names <- tools::file_path_sans_ext(basename(file_list))
 data_list <- map(file_list, read_excel)
 names(data_list) <- file_names
 
+metadata <- read_csv(paste0(DIR, "data/raw/Metadata.csv"), locale = locale(encoding = "Latin1"))
+
 ```
 
 ### Step 2: Rearrange the list so the last dataframe is first, then join all
@@ -79,10 +81,43 @@ if (checksum$checksum_SITE == nrow(DF8_wide) & checksum$checksum_UNIT == nrow(DF
 
 ```
 
-### Step 4: Save the DF8_wide dataframe to a CSV file
+### Step 4: Reorder variables according to Variable ID
 
 ```{r}
-write_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
+df8_names <- metadata$varName_DF8[!is.na(metadata$varName_DF8)]
+
+DF8_wide_names <- data.frame(JOIN = colnames(DF8_wide), DF8_wide_names = colnames(DF8_wide), ID = c(1:length(df8_names)))
+
+
+df8_names <- data.frame(varID = c(1:length(df8_names)), df8_names = df8_names,JOIN = df8_names)
+
+#xy = df8_names %>% 
+#  full_join(DF8_wide_names, by = c("JOIN" = "JOIN")) %>% 
+#  select(-JOIN)
+
+df8_names <- df8_names %>% 
+  mutate(
+    NewNamesJoin = df8_names,
+    NewNamesJoin = case_when(
+      varID == 256 ~ "APETNUBB",
+      varID == 258 ~ "FLSHNUBB",
+      varID == 111 ~ "QURRYING",
+      varID == 33 ~ "DRAINS_ARCH",
+      varID == 145 ~ "DRAINS_MODERN",
+      .default = NewNamesJoin
+      
+    )
+  )
+
+DF8_wide <- DF8_wide %>%
+  select(df8_names$NewNamesJoin)
+```
+
+
+### Step 5: Save the DF8_wide dataframe to a CSV file
+
+```{r}
+write_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide_raw.csv"))
 ```
 
 
