@@ -1,0 +1,197 @@
+"archInterp","funcInterp","count"
+"access-way (alley, street, avenue, etc.)","other",1
+"access-way (alley, street, avenue, etc.)","plaza",3
+"access-way (alley, street, avenue, etc.)","street or avenue",220
+"access-way (alley, street, avenue, etc.)","unoccupied, not clear if cultivated or not",1
+"access-way (alley, street, avenue, etc.)",NA,3
+"apartment compound","\""civic\"" structure, but not a temple",4
+"apartment compound","high status residence",501
+"apartment compound","intermediate status residence",3662
+"apartment compound","low status residential, no obvious occupational specialization",5
+"apartment compound","no plausible alternative to the pirmary interpretation",12
+"apartment compound","obsidian workshop",52
+"apartment compound","other",8
+"apartment compound","other type of workshop or craft production area",8
+"apartment compound","pottery workshop",8
+"apartment compound","primary interpretation is the best assessment of a very ambiguous situation",8
+"apartment compound","residence of uncertain status",253
+"apartment compound","residential workshop",130
+"apartment compound",NA,54
+"avenue divider or possible avenue divider","avenue divider",24
+"casa humilde","cultivated field",2
+"casa humilde","intermediate status residence",8
+"casa humilde","low status residential, no obvious occupational specialization",2168
+"casa humilde","market or part of a market",6
+"casa humilde","no plausible alternative to the pirmary interpretation",18
+"casa humilde","obsidian workshop",19
+"casa humilde","other type of workshop or craft production area",3
+"casa humilde","platform of probable religious significance",2
+"casa humilde","pottery workshop",2
+"casa humilde","primary interpretation is the best assessment of a very ambiguous situation",15
+"casa humilde","residence of uncertain status",62
+"casa humilde","residential workshop",4
+"casa humilde","unoccupied, not clear if cultivated or not",5
+"casa humilde","wall or segment of a wall",2
+"casa humilde",NA,42
+"cave","no plausible alternative to the pirmary interpretation",3
+"cave","other",16
+"cave",NA,12
+"cemetery","cemetery",28
+"cemetery","market or part of a market",3
+"cemetery","obsidian workshop",6
+"cemetery","primary interpretation is the best assessment of a very ambiguous situation",7
+"cemetery","street or avenue",1
+"free-standing wall or segment of wall","other",16
+"free-standing wall or segment of wall","wall or segment of a wall",105
+"no plausible alternative to the primary interpretation","\""civic\"" structure, but not a temple",39
+"no plausible alternative to the primary interpretation","cultivated field",4
+"no plausible alternative to the primary interpretation","high status residence",46
+"no plausible alternative to the primary interpretation","intermediate status residence",105
+"no plausible alternative to the primary interpretation","low status residential, no obvious occupational specialization",7
+"no plausible alternative to the primary interpretation","no plausible alternative to the pirmary interpretation",13239
+"no plausible alternative to the primary interpretation","obsidian workshop",71
+"no plausible alternative to the primary interpretation","other",17
+"no plausible alternative to the primary interpretation","other type of workshop or craft production area",24
+"no plausible alternative to the primary interpretation","plaza",6
+"no plausible alternative to the primary interpretation","possible ball court",2
+"no plausible alternative to the primary interpretation","pottery workshop",12
+"no plausible alternative to the primary interpretation","primary interpretation is the best assessment of a very ambiguous situation",906
+"no plausible alternative to the primary interpretation","puesto",2
+"no plausible alternative to the primary interpretation","residence of uncertain status",44
+"no plausible alternative to the primary interpretation","residential workshop",42
+"no plausible alternative to the primary interpretation","street or avenue",1
+"no plausible alternative to the primary interpretation","temple",1
+"no plausible alternative to the primary interpretation","temple platform",11
+"no plausible alternative to the primary interpretation","unoccupied, not clear if cultivated or not",4
+"occupation without durable structures","cultivated field",38
+"occupation without durable structures","low status residential, no obvious occupational specialization",81
+"occupation without durable structures","market or part of a market",6
+"occupation without durable structures","no plausible alternative to the pirmary interpretation",4
+"occupation without durable structures","obsidian workshop",53
+"occupation without durable structures","other",10
+"occupation without durable structures","other type of workshop or craft production area",6
+"occupation without durable structures","platform of probable religious significance",1
+"occupation without durable structures","plaza",6
+"occupation without durable structures","pottery workshop",2
+"occupation without durable structures","primary interpretation is the best assessment of a very ambiguous situation",60
+"occupation without durable structures","puesto",6
+"occupation without durable structures","residence of uncertain status",49
+"occupation without durable structures","temple platform",2
+"occupation without durable structures","unoccupied, not clear if cultivated or not",29
+"occupation without durable structures",NA,812
+"other","\""civic\"" structure, but not a temple",2
+"other","no plausible alternative to the pirmary interpretation",6
+"other","obsidian workshop",3
+"other","other",77
+"other","platform of probable religious significance",3
+"other","possible ball court",3
+"other","primary interpretation is the best assessment of a very ambiguous situation",3
+"other","temple platform",2
+"other","unoccupied, not clear if cultivated or not",4
+"other",NA,23
+"platform in plaza (momoztli)","\""civic\"" structure, but not a temple",2
+"platform in plaza (momoztli)","momoztli (platform in plaza)",20
+"platform in plaza (momoztli)","plaza",1
+"platform with other structures on it","high status residence",10
+"platform with other structures on it","intermediate status residence",12
+"platform with other structures on it","no plausible alternative to the pirmary interpretation",19
+"platform with other structures on it","other",32
+"platform with other structures on it","platform of probable religious significance",330
+"platform with other structures on it","plaza",3
+"platform with other structures on it","primary interpretation is the best assessment of a very ambiguous situation",4
+"platform with other structures on it","probably temple, hard to fit into any of the above categories",2
+"platform with other structures on it","residence of uncertain status",8
+"platform with other structures on it","temple platform",19
+"platform with other structures on it",NA,12
+"plaza","cultivated field",3
+"plaza","market or part of a market",25
+"plaza","momoztli (platform in plaza)",1
+"plaza","no plausible alternative to the pirmary interpretation",3
+"plaza","obsidian workshop",14
+"plaza","other",10
+"plaza","plaza",1100
+"plaza","possible ball court",15
+"plaza","pottery workshop",2
+"plaza","primary interpretation is the best assessment of a very ambiguous situation",4
+"plaza","residence of uncertain status",1
+"plaza","street or avenue",6
+"plaza","unoccupied, not clear if cultivated or not",2
+"plaza",NA,32
+"primary interpretation is the best assessment of a very ambiguous situation","\""civic\"" structure, but not a temple",2
+"primary interpretation is the best assessment of a very ambiguous situation","cemetery",3
+"primary interpretation is the best assessment of a very ambiguous situation","cultivated field",13
+"primary interpretation is the best assessment of a very ambiguous situation","high status residence",8
+"primary interpretation is the best assessment of a very ambiguous situation","intermediate status residence",10
+"primary interpretation is the best assessment of a very ambiguous situation","low status residential, no obvious occupational specialization",2
+"primary interpretation is the best assessment of a very ambiguous situation","momoztli (platform in plaza)",3
+"primary interpretation is the best assessment of a very ambiguous situation","no plausible alternative to the pirmary interpretation",309
+"primary interpretation is the best assessment of a very ambiguous situation","obsidian workshop",13
+"primary interpretation is the best assessment of a very ambiguous situation","other",3
+"primary interpretation is the best assessment of a very ambiguous situation","platform of probable religious significance",1
+"primary interpretation is the best assessment of a very ambiguous situation","plaza",6
+"primary interpretation is the best assessment of a very ambiguous situation","possible ball court",4
+"primary interpretation is the best assessment of a very ambiguous situation","primary interpretation is the best assessment of a very ambiguous situation",4256
+"primary interpretation is the best assessment of a very ambiguous situation","puesto",2
+"primary interpretation is the best assessment of a very ambiguous situation","residence of uncertain status",11
+"primary interpretation is the best assessment of a very ambiguous situation","residential workshop",6
+"primary interpretation is the best assessment of a very ambiguous situation","unoccupied, not clear if cultivated or not",3
+"probably not occupied or utilized in this period","\""civic\"" structure, but not a temple",11
+"probably not occupied or utilized in this period","altar",1
+"probably not occupied or utilized in this period","avenue divider",1
+"probably not occupied or utilized in this period","cultivated field",52
+"probably not occupied or utilized in this period","high status residence",1
+"probably not occupied or utilized in this period","intermediate status residence",3
+"probably not occupied or utilized in this period","low status residential, no obvious occupational specialization",17
+"probably not occupied or utilized in this period","no plausible alternative to the pirmary interpretation",4
+"probably not occupied or utilized in this period","other",1
+"probably not occupied or utilized in this period","plaza",5
+"probably not occupied or utilized in this period","primary interpretation is the best assessment of a very ambiguous situation",14
+"probably not occupied or utilized in this period","residence of uncertain status",14
+"probably not occupied or utilized in this period","residential workshop",2
+"probably not occupied or utilized in this period","uncultivated open area",3
+"probably not occupied or utilized in this period","unoccupied, not clear if cultivated or not",4725
+"probably not occupied or utilized in this period",NA,1875
+"pyramid (more than ca. 10m high)","no plausible alternative to the pirmary interpretation",2
+"pyramid (more than ca. 10m high)","pyramid temple (over 10 m high)",27
+"room group","high status residence",70
+"room group","intermediate status residence",123
+"room group","low status residential, no obvious occupational specialization",7
+"room group","no plausible alternative to the pirmary interpretation",10
+"room group","obsidian workshop",27
+"room group","other",2
+"room group","platform of probable religious significance",3
+"room group","pottery workshop",2
+"room group","primary interpretation is the best assessment of a very ambiguous situation",15
+"room group","residence of uncertain status",2086
+"room group","residential workshop",60
+"room group","temple platform",3
+"room group","unoccupied, not clear if cultivated or not",1
+"room group",NA,49
+"simple platform","\""civic\"" structure, but not a temple",2
+"simple platform","altar",2
+"simple platform","intermediate status residence",1
+"simple platform","momoztli (platform in plaza)",3
+"simple platform","no plausible alternative to the pirmary interpretation",13
+"simple platform","other",21
+"simple platform","platform of probable religious significance",535
+"simple platform","plaza",9
+"simple platform","primary interpretation is the best assessment of a very ambiguous situation",7
+"simple platform","probably temple, hard to fit into any of the above categories",1
+"simple platform","residence of uncertain status",3
+"simple platform","temple platform",19
+"simple platform","unoccupied, not clear if cultivated or not",2
+"simple platform",NA,5
+"temple base (incl. platforms & multi-tiered platforms)","no plausible alternative to the pirmary interpretation",2
+"temple base (incl. platforms & multi-tiered platforms)","other",6
+"temple base (incl. platforms & multi-tiered platforms)","platform of probable religious significance",3
+"temple base (incl. platforms & multi-tiered platforms)","primary interpretation is the best assessment of a very ambiguous situation",6
+"temple base (incl. platforms & multi-tiered platforms)","probably temple, hard to fit into any of the above categories",47
+"temple base (incl. platforms & multi-tiered platforms)","residence of uncertain status",1
+"temple base (incl. platforms & multi-tiered platforms)","temple",18
+"temple base (incl. platforms & multi-tiered platforms)","temple platform",530
+"temple base (incl. platforms & multi-tiered platforms)","unoccupied, not clear if cultivated or not",1
+NA,"cultivated field",1
+NA,"platform of probable religious significance",1
+NA,"residence of uncertain status",1
+NA,"unoccupied, not clear if cultivated or not",2
+NA,NA,209
