@@ -39,6 +39,10 @@ DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/
 ```{r}
 DF9b_data_char <- read_csv(paste0(DIR, "data/raw/DF9b_data_char.csv"), locale = locale(encoding = "Latin1")) 
 ```
+
+
+
+
 ```{r}
 archInterp <- DF9b_data_char %>% 
   select(SSN, arch1PMic, arch1McTl, arch1XlMe, arch1Oxto, arch2PMic, arch2McTl, 
@@ -50,16 +54,114 @@ colnames(archInterp) <- c("SSN", "archInterp1_PMic", "archInterp1_McTl", "archIn
 archInterp_long <- archInterp %>%
   pivot_longer(
     cols = -SSN,  # Keep SSN as an identifier column
-    names_to = c(".value", "Period"),  # Extract variable names and period
+    names_to = c(".value", "PhaseAbbr"),  # Extract variable names and period
     names_sep = "_"
+  ) %>% 
+  rowid_to_column(var = "ID") %>% 
+  mutate(Period = ifelse(PhaseAbbr == "PMic", "EC", 
+                         ifelse(PhaseAbbr == "McTl", "MC", 
+                                ifelse(PhaseAbbr == "XlMe", "LC", "ET"))),
+         Phase = ifelse(PhaseAbbr == "PMic", "Patlachique-Tzacualli", 
+                         ifelse(PhaseAbbr == "McTl", "Miccaotli-Tlamimilolpa", 
+                                ifelse(PhaseAbbr == "XlMe", "Xolalpan-Metepec", "Oxtoticpac")))) %>% 
+  select(ID,SSN,Phase,PhaseAbbr,Period,archInterp1,funcInterp1,archInterp2,funcInterp2) %>% 
+  rename(
+    archInterp_1 = archInterp1,
+    archInterp_2 = archInterp2,
+    funcInterp_1 = funcInterp1,
+    funcInterp_2 = funcInterp2
   )
 
-archInterp_long2 <- archInterp_long %>% 
-  rowid_to_column(var = "ID") %>% 
-  mutate(Period = ifelse(Period == "PMic", "EC", 
-                         ifelse(Period == "McTl", "MC", 
-                                ifelse(Period == "XlMe", "LC", "ET"))))
 
+
+
+archInterp_long2 <- archInterp_long %>% 
+  pivot_longer(
+    cols = c(archInterp_1, archInterp_2, funcInterp_1, funcInterp_2),
+    names_to = c(".value", "InterpNum"),
+    names_sep = "_"
+  ) %>% 
+  mutate(
+    InterpNum = as.numeric(InterpNum),
+    Interp = ifelse(InterpNum == 1, "Primary", "Secondary")
+  ) %>% 
+  select(ID,SSN,Phase,PhaseAbbr,Period,Interp,InterpNum,archInterp,funcInterp)
+
+archInterp_summary1 <- archInterp_long2 %>% 
+  mutate(count = 1) %>%
+  group_by(archInterp, funcInterp) %>%
+  summarize(count = sum(count, na.rm = T)) %>% 
+  ungroup() %>%
+  group_by(archInterp) %>%
+  mutate(arch_total = sum(count, na.rm = T),
+         arch_pct = count/arch_total) %>% 
+  ungroup() %>%
+  group_by(funcInterp) %>%
+  mutate(func_total = sum(count, na.rm = T),
+         func_pct = count/func_total) %>%
+  ungroup() %>%
+  arrange(funcInterp, -count) %>%
+  rowid_to_column(var = "ORD_F") %>% 
+  arrange(archInterp, -count) %>%
+  rowid_to_column(var = "ORD_A")
+
+archInterp_summary1b <- archInterp_summary1 %>% 
+  mutate(PairIndex = arch_pct + func_pct) %>% 
+  arrange(-PairIndex)
+
+archInterp_summary1_LC <- archInterp_long2 %>% 
+  filter(Period == "LC") %>%
+  mutate(count = 1) %>%
+  group_by(archInterp, funcInterp) %>%
+  summarize(count = sum(count, na.rm = T)) %>% 
+  ungroup() %>%
+  group_by(archInterp) %>%
+  mutate(arch_total = sum(count, na.rm = T),
+         arch_pct = count/arch_total) %>% 
+  ungroup() %>%
+  group_by(funcInterp) %>%
+  mutate(func_total = sum(count, na.rm = T),
+         func_pct = count/func_total) %>%
+  ungroup() %>%
+  arrange(funcInterp, -count) %>%
+  rowid_to_column(var = "ORD_F") %>% 
+  arrange(archInterp, -count) %>%
+  rowid_to_column(var = "ORD_A")
+
+archInterp_summary1b_LC <- archInterp_summary1_LC %>% 
+  mutate(PairIndex = arch_pct + func_pct) %>% 
+  arrange(-PairIndex)
+
+join <- archInterp_summary1b_LC %>% 
+  mutate(JOIN = paste(archInterp, funcInterp, sep = "; ")) %>% 
+  select(JOIN, count, arch_pct, func_pct, PairIndex) %>%
+  rename(count_LC = count, arch_pct_LC = arch_pct, func_pct_LC = func_pct, PairIndex_LC = PairIndex)
+
+
+archInterp_summary1c <- archInterp_summary1b %>% 
+  mutate(JOIN = paste(archInterp, funcInterp, sep = "; ")) %>% 
+  left_join(join, by = "JOIN") %>% 
+  select(-JOIN)
+
+
+
+
+archInterp_summary2 <- archInterp_long2 %>% 
+  filter(Period == "LC") %>%
+  mutate(count = 1) %>%
+  group_by(archInterp, funcInterp) %>%
+  summarize(count = sum(count, na.rm = T))
+
+write.csv(archInterp_summary1c, paste0(DIR, "data/raw/archInterp_summary1c.csv"), row.names = F, fileEncoding = "Latin1")
+
+```
+
+
+
+
+
+
+```{r}
 
 archInterp_long3 <- archInterp_long2 %>% 
   mutate(count = 1) %>%
@@ -77,6 +179,8 @@ archInterp_long5 <- archInterp_long2 %>%
   summarize(count = sum(count, na.rm = T))
 ```
 
+
+
 SSN, arch1PMic, arch1McTl, arch1XlMe, arch1Oxto, arch2PMic, arch2McTl, arch2XlMe, arch2Oxto, func1PMic, func1McTl, func1XlMe, func1Oxto, func2PMic, func2McTl, func2XlMe, func2Oxto
 
 
@@ -92,6 +196,207 @@ write.csv(archInterp_long4, paste0(DIR, "data/raw/ArchFuncInterps2.csv"), row.na
 write.csv(archInterp_long5, paste0(DIR, "data/raw/ArchFuncInterps3.csv"), row.names = F, fileEncoding = "Latin1")
 
 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cultivated field
+residence of uncertain status
+unoccupied, not clear if cultivated or not
+platform of probable religious significance
+platform with other structures on it
+# Occupational Vars
+
+```{r}
+OccuVarsCalc = archInterp_long %>% 
+  mutate(xxx = ifelse(is.na(archInterp_1) & !is.na(funcInterp_1), T, F),
+         archInterp_1 = case_when(
+           xxx == T & funcInterp_1 == "cultivated field" ~ "probably not occupied or utilized in this period",
+           xxx == T & funcInterp_1 == "unoccupied, not clear if cultivated or not" ~ "probably not occupied or utilized in this period",
+           xxx == T & funcInterp_1 == "residence of uncertain status" ~ "room group",
+           xxx == T & funcInterp_1 == "platform of probable religious significance" ~ "platform with other structures on it",
+           .default = archInterp_1),
+         Occu_1 = archInterp_1,
+         Occu_2 = archInterp_2,
+         Occu_2 = case_when(
+           Occu_2 == "no plausible alternative to the primary interpretation" ~ Occu_1,
+           Occu_2 == "primary interpretation is the best assessment of a very ambiguous situation" ~ Occu_1,
+           .default = Occu_2
+         ),
+         Occu_2 = case_when(
+           Occu_2 == "room group" ~ "2",
+           Occu_2 == "casa humilde" ~ "2",
+           Occu_2 == "apartment compound" ~ "2",
+           Occu_2 == "temple base (incl. platforms & multi-tiered platforms)" ~ "2",
+           Occu_2 == "pyramid (more than ca. 10m high)" ~ "2",
+           Occu_2 == "simple platform" ~ "2",
+           Occu_2 == "platform with other structures on it" ~ "2",
+           Occu_2 == "platform in plaza (momoztli)" ~ "1",
+           Occu_2 == "plaza" ~ "1",
+           Occu_2 == "free-standing wall or segment of wall" ~ "1",
+           Occu_2 == "access-way (alley, street, avenue, etc.)" ~ "1",
+           Occu_2 == "avenue divider or possible avenue divider" ~ "1",
+           Occu_2 == "cemetery" ~ "1",
+           Occu_2 == "dam" ~ "1",
+           Occu_2 == "occupation without durable structures" ~ "1",
+           Occu_2 == "probably not occupied or utilized in this period" ~ "0",
+           Occu_2 == "cave" ~ "0",
+           Occu_2 == "other" ~ "1"),
+         Occu_2 = as.numeric(Occu_2),
+         Occu_1 = case_when(
+           Occu_1 == "room group" ~ "2",
+           Occu_1 == "casa humilde" ~ "2",
+           Occu_1 == "apartment compound" ~ "2",
+           Occu_1 == "temple base (incl. platforms & multi-tiered platforms)" ~ "2",
+           Occu_1 == "pyramid (more than ca. 10m high)" ~ "2",
+           Occu_1 == "simple platform" ~ "2",
+           Occu_1 == "platform with other structures on it" ~ "2",
+           Occu_1 == "platform in plaza (momoztli)" ~ "1",
+           Occu_1 == "plaza" ~ "1",
+           Occu_1 == "free-standing wall or segment of wall" ~ "1",
+           Occu_1 == "access-way (alley, street, avenue, etc.)" ~ "1",
+           Occu_1 == "avenue divider or possible avenue divider" ~ "1",
+           Occu_1 == "cemetery" ~ "1",
+           Occu_1 == "dam" ~ "1",
+           Occu_1 == "occupation without durable structures" ~ "1",
+           Occu_1 == "probably not occupied or utilized in this period" ~ "0",
+           Occu_1 == "cave" ~ "0",
+           Occu_1 == "other" ~ "1"),
+         Occu_1 = as.numeric(Occu_1),
+         #Occu = if_else(is.na(Occu_1) & is.na(Occu_2),
+         #                  NA_real_,
+         #                  coalesce(Occu_1, 0) + coalesce(Occu_2, 0)),
+         Occu = case_when(
+           is.na(Occu_1) & is.na(Occu_2) ~ NA_character_,
+           is.na(Occu_1) & Occu_2 == 0 ~ "0. No evidence for occupation",
+           is.na(Occu_1) & Occu_2 == 1 ~ "1. Likely either less intensive or archaeologically ephemeral occupation",
+           is.na(Occu_1) & Occu_2 == 2 ~ "2. Evidence for permanent occupation of some form",
+           Occu_1 == 0 & is.na(Occu_2) ~ "0. No evidence for occupation",
+           Occu_1 == 0 & Occu_2 == 0 ~ "0. No evidence for occupation",
+           Occu_1 == 0 & Occu_2 == 1 ~ "1. Likely either less intensive or archaeologically ephemeral occupation",
+           Occu_1 == 0 & Occu_2 == 2 ~ "1. Likely either less intensive or archaeologically ephemeral occupation",
+           Occu_1 == 1 & is.na(Occu_2) ~ "1. Likely either less intensive or archaeologically ephemeral occupation",
+           Occu_1 == 1 & Occu_2 == 0 ~ "1. Likely either less intensive or archaeologically ephemeral occupation",
+           Occu_1 == 1 & Occu_2 == 1 ~ "1. Likely either less intensive or archaeologically ephemeral occupation",
+           Occu_1 == 1 & Occu_2 == 2 ~ "2. Evidence for permanent occupation of some form",
+           Occu_1 == 2 & is.na(Occu_2) ~ "3. Permanent occupation likely in the form of domestic structures or public buildings",
+           Occu_1 == 2 & Occu_2 == 0 ~ "2. Evidence for permanent occupation of some form",
+           Occu_1 == 2 & Occu_2 == 1 ~ "3. Permanent occupation likely in the form of domestic structures or public buildings",
+           Occu_1 == 2 & Occu_2 == 2 ~ "3. Permanent occupation likely in the form of domestic structures or public buildings"))
+
+
+OccuVars <- OccuVarsCalc %>% 
+  pivot_wider(
+    id_cols = SSN,
+    names_from = Period,
+    names_prefix = "Occu_",
+    values_from = Occu
+  )
+
+write.csv(OccuVarsCalc, paste0(DIR, "data/raw/OccuVarsCalc.csv"), row.names = F, fileEncoding = "Latin1")
+write.csv(OccuVars, paste0(DIR, "data/raw/OccuVars.csv"), row.names = F, fileEncoding = "Latin1")
+  
+```
+
+"totAll"               "totPrec"              "totCuan"              "totTezo"              ""              ""             
+[211] "totMicc"              "totTlam"              "totXola"              "totMete"              "totOxto"              "totXome"             
+[217] "totMaza"              "totAzte"
+
+
+```{r}
+cer = DF9b_data_char[,c(1,194,204:218,290)]
+
+cer=cer %>% 
+  mutate(
+    cerAbundNum = case_when(
+      ceramicAbundance == "Absent" ~ 0,
+      ceramicAbundance == "Very Sparse" ~ 1,
+      ceramicAbundance == "Very Sparse to Sparse" ~ 2,
+      ceramicAbundance == "Sparse" ~ 3,
+      ceramicAbundance == "Sparse to Moderate" ~ 4,
+      ceramicAbundance == "Moderate" ~ 5,
+      ceramicAbundance == "Moderate to Abundant" ~ 6,
+      ceramicAbundance == "Abundant" ~ 7,
+      ceramicAbundance == "Abundant to Very Abundant" ~ 8,
+      ceramicAbundance == "Very Abundant" ~ 9,
+      TRUE ~ NA_real_),
+    cerAbund_DensEst = case_when(
+      ceramicAbundance == "Absent" ~ 0,
+      ceramicAbundance == "Very Sparse" ~ 2,
+      ceramicAbundance == "Very Sparse to Sparse" ~ 5,
+      ceramicAbundance == "Sparse" ~ 10,
+      ceramicAbundance == "Sparse to Moderate" ~ 25,
+      ceramicAbundance == "Moderate" ~ 50,
+      ceramicAbundance == "Moderate to Abundant" ~ 100,
+      ceramicAbundance == "Abundant" ~ 200,
+      ceramicAbundance == "Abundant to Very Abundant" ~ 350,
+      ceramicAbundance == "Very Abundant" ~ 500,
+      TRUE ~ NA_real_),
+    areaSite= areaSite*10,
+    cerCollectAreaDens = totAll/areaSite,
+    EC = totPatl + totTzac,
+    MC = totMicc + totTlam,
+    LC = totXola + totMete,
+    ET = totOxto + totXome,
+    pctEC = EC/totAll,
+    pctMC = MC/totAll,
+    pctLC = LC/totAll,
+    pctET = ET/totAll,
+    densEC = cerAbund_DensEst*pctEC,
+    densMC = cerAbund_DensEst*pctMC,
+    densLC = cerAbund_DensEst*pctLC,
+    densET = cerAbund_DensEst*pctET,
+    areaDensEC = EC/areaSite,
+    areaDensMC = MC/areaSite,
+    areaDensLC = LC/areaSite,
+    areaDensET = ET/areaSite)
+
+OccuVars2 = OccuVars %>% 
+  mutate(
+    OccuNum_EC = case_when(
+      Occu_EC == "0. No evidence for occupation" ~ 0,
+      Occu_EC == "1. Likely either less intensive or archaeologically ephemeral occupation" ~ 1,
+      Occu_EC == "2. Evidence for permanent occupation of some form" ~ 2,
+      Occu_EC == "3. Permanent occupation likely in the form of domestic structures or public buildings" ~ 3),
+    OccuNum_MC = case_when(
+      Occu_MC == "0. No evidence for occupation" ~ 0,
+      Occu_MC == "1. Likely either less intensive or archaeologically ephemeral occupation" ~ 1,
+      Occu_MC == "2. Evidence for permanent occupation of some form" ~ 2,
+      Occu_MC == "3. Permanent occupation likely in the form of domestic structures or public buildings" ~ 3),
+    OccuNum_LC = case_when(
+      Occu_LC == "0. No evidence for occupation" ~ 0,
+      Occu_LC == "1. Likely either less intensive or archaeologically ephemeral occupation" ~ 1,
+      Occu_LC == "2. Evidence for permanent occupation of some form" ~ 2,
+      Occu_LC == "3. Permanent occupation likely in the form of domestic structures or public buildings" ~ 3),
+    OccuNum_ET = case_when(
+      Occu_ET == "0. No evidence for occupation" ~ 0,
+      Occu_ET == "1. Likely either less intensive or archaeologically ephemeral occupation" ~ 1,
+      Occu_ET == "2. Evidence for permanent occupation of some form" ~ 2,
+      Occu_ET == "3. Permanent occupation likely in the form of domestic structures or public buildings" ~ 3),
+    OccuNum_Total = OccuNum_EC + OccuNum_MC + OccuNum_LC + OccuNum_ET,
+    OccuNum_Max = pmax(OccuNum_EC, OccuNum_MC, OccuNum_LC, OccuNum_ET),
+    OccuBool_EC = ifelse(OccuNum_EC > 0, 1, 0),
+    OccuBool_MC = ifelse(OccuNum_MC > 0, 1, 0),
+    OccuBool_LC = ifelse(OccuNum_LC > 0, 1, 0),
+    OccuBool_ET = ifelse(OccuNum_ET > 0, 1, 0),
+    OccuBool_Total = OccuBool_EC + OccuBool_MC + OccuBool_LC + OccuBool_ET) %>% 
+  left_join(cer, by = "SSN")
+
+    "1. Likely either less intensive or archaeologically ephemeral occupation"
+plot(OccuVars2$OccuBool_ET, OccuVars2$ET)
+> plot(log(cer$cerCollectAreaDens), cer$cerAbund_DensEst)
+> plot(log(cer$cerCollectAreaDens), log(cer$cerAbund_DensEst))
 ```
 
 
