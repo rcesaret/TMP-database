@@ -118,6 +118,7 @@ DF8_wide <- DF8_wide %>%
 
 ```{r}
 write_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide_raw.csv"))
+write_csv(df8_names, paste0(DIR, "data/raw/df8_names.csv"))
 ```
 
 

@@ -44,10 +44,37 @@ Also perform a pattern recognition analysis in the dataset!!
 read_csv(paste0(DIR, "data/raw/DF9b_rev_metadata_to_assemble.csv"))
 DF9b_rev_metadata_to_assemble.csv
 read_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
+
+
 # Create DF9 Wide for Cross-Checking the Data
 
 
-### Step 0: Import all excel files from the specified directory
+```{r}
+rm(list = ls())
+
+```
+
+# Load Packages
+
+```{r}
+# Load the required package
+library(tidyverse)
+library(readxl)
+library(stringi)
+library(arrow)
+
+```
+
+
+# Set Working Directory
+
+```{r}
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
+```
+
+
+
+### Step 0: Import and organize all excel files from the specified directory
 
 ```{r}
 
@@ -62,9 +89,13 @@ df_list <- map(file_list, read_csv, locale = locale(encoding = "Latin1"))
 names(df_list) <- file_names
 #list2env(data_list, envir = .GlobalEnv)
 
-# Assuming your list of dataframes is stored in `df_list`
 data_list  <- df_list[grepl("^Data_", names(df_list))]
 codes_list <- df_list[grepl("^Codes_", names(df_list))]
+```
+
+### Step 1: Merge and Clean-Up Data
+
+```{r}
 
 data <- data_list %>%
   discard(names(.) %in% c("Data_fieldWorkers", "Data_labAnalysts", "Data_fieldWorkers_bool_wide", "Data_labWorkers_bool_wide", "Data_Plazas")) %>%
@@ -87,13 +118,41 @@ data <- data_list %>%
          jagueyMod = jaguey) %>% 
   select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
 
-write.csv(data, paste0(DIR, "data/raw/DF9b_raw_data_v2.csv"), fileEncoding = "Latin1")
-  
-DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)]
+#DF8_wide_raw
+
+#DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)]
 ```
 
 
-Step 2: Replace Values with NA
+### Step 2: Replace stoneCut Values with those of DF8
+
+```{r}
+
+DF8_stoneCut <- read_csv(paste0(DIR, "data/raw/DF8_wide_raw.csv")) %>% 
+  select(SSN, CUTSTONE) %>%
+  rename(stoneCut = CUTSTONE)
+
+data <- data %>%
+  select(-stoneCut) %>%
+  left_join(DF8_stoneCut, by = "SSN") %>%
+  select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
+
+```
+
+
+### Step 2.5: Stopgap Export/Import of Raw Data
+
+```{r}
+write.csv(data, paste0(DIR, "data/raw/DF9b_raw_data_v2.csv"), row.names = F, fileEncoding = "Latin1")
+```
+
+```{r}
+data <- read_csv(paste0(DIR, "data/raw/DF9b_raw_data_v2.csv"), locale = locale(encoding = "Latin1")) 
+```
+
+
+
+### Step 3: Replace Coded Values with NA
 
 ```{r}
 
@@ -121,7 +180,7 @@ for (i in seq_len(nrow(na_replacements))) {
 }
 ```
 
-Step 3: Replace Coded Values with Descriptions
+### Step 4: Replace Coded Values with Descriptions
 
 ```{r}
 # Recode numeric coded variables to factors using corresponding Codes_ tables.
@@ -155,7 +214,12 @@ data_char <- data %>% mutate(across(where(is.factor), as.character))
 ```
 
 
+### Step 5: Revert Personnel Variables to original DF9 Form
+
 ```{r}
+
+DF8_wide <- read_csv(paste0(DIR, "data/raw/DF8_wide_raw.csv"))
+
 DF8_wide %>% select(SSN, FLDWRK1, FLDWRK2, FLDWRK3, FLDWRK4, FLDWRK5, CERANWK1, CERANWK2, CERANWK3) %>% 
   rename(fieldWorker1 = FLDWRK1,
          fieldWorker2 = FLDWRK2,
@@ -195,29 +259,26 @@ data_char <- data_char %>%
   left_join(personnel_char, by = "SSN") %>%
   select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
 
-write.csv(data_char, paste0(DIR, "data/raw/data_char.csv"), fileEncoding = "Latin1")
+write.csv(data_char, paste0(DIR, "data/raw/data_char.csv"), row.names = F, fileEncoding = "Latin1")
 ```
-CERANWK1
-CERANWK2
-CERANWK3
 
+
+### Step 6: Export Data
+
+```{r}
+write.csv(data_char, paste0(DIR, "data/raw/DF9b_data_char.csv"), row.names = F, fileEncoding = "Latin1")
+```
 
 
 ```{r}
-write.csv(data_char, paste0(DIR, "data/raw/DF9b_data_char.csv"), fileEncoding = "Latin1")
+write.csv(data_char, paste0(DIR, "data/raw/DF9b_data_char.csv"), row.names = F, fileEncoding = "Latin1")
 ```
 
 
 
 
 
-
-
-
-
-
-
-
+# UNUSED DRAFTINGS
 
 
 
@@ -297,7 +358,7 @@ str(data)
 
 
 
-
+# EDA and Data Summarization
 
 
 Reasoned about dataset summarization tools for 19 seconds

@@ -1,0 +1,97 @@
+---
+title: "Arch and Func Interps"
+author: "Rudolf Cesaretti"
+date: "2025-03-06"
+output: html_document
+---
+
+
+
+# ArchFuncInterps
+
+
+
+```{r}
+rm(list = ls())
+
+```
+
+# Load Packages
+
+```{r}
+# Load the required package
+library(tidyverse)
+library(readxl)
+library(stringi)
+library(arrow)
+
+```
+
+
+# Set Working Directory
+
+```{r}
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
+```
+
+
+
+```{r}
+DF9b_data_char <- read_csv(paste0(DIR, "data/raw/DF9b_data_char.csv"), locale = locale(encoding = "Latin1")) 
+```
+```{r}
+archInterp <- DF9b_data_char %>% 
+  select(SSN, arch1PMic, arch1McTl, arch1XlMe, arch1Oxto, arch2PMic, arch2McTl, 
+         arch2XlMe, arch2Oxto, func1PMic, func1McTl, func1XlMe, func1Oxto, 
+         func2PMic, func2McTl, func2XlMe, func2Oxto)
+
+colnames(archInterp) <- c("SSN", "archInterp1_PMic", "archInterp1_McTl", "archInterp1_XlMe", "archInterp1_Oxto", "archInterp2_PMic", "archInterp2_McTl", "archInterp2_XlMe", "archInterp2_Oxto", "funcInterp1_PMic", "funcInterp1_McTl", "funcInterp1_XlMe", "funcInterp1_Oxto", "funcInterp2_PMic", "funcInterp2_McTl", "funcInterp2_XlMe", "funcInterp2_Oxto")
+
+archInterp_long <- archInterp %>%
+  pivot_longer(
+    cols = -SSN,  # Keep SSN as an identifier column
+    names_to = c(".value", "Period"),  # Extract variable names and period
+    names_sep = "_"
+  )
+
+archInterp_long2 <- archInterp_long %>% 
+  rowid_to_column(var = "ID") %>% 
+  mutate(Period = ifelse(Period == "PMic", "EC", 
+                         ifelse(Period == "McTl", "MC", 
+                                ifelse(Period == "XlMe", "LC", "ET"))))
+
+
+archInterp_long3 <- archInterp_long2 %>% 
+  mutate(count = 1) %>%
+  group_by(archInterp1, archInterp2, funcInterp1, funcInterp2) %>%
+  summarize(count = sum(count, na.rm = T))
+  
+archInterp_long4 <- archInterp_long2 %>% 
+  mutate(count = 1) %>%
+  group_by(archInterp1, funcInterp1) %>%
+  summarize(count = sum(count, na.rm = T))
+
+archInterp_long5 <- archInterp_long2 %>% 
+  mutate(count = 1) %>%
+  group_by(archInterp2, funcInterp2) %>%
+  summarize(count = sum(count, na.rm = T))
+```
+
+SSN, arch1PMic, arch1McTl, arch1XlMe, arch1Oxto, arch2PMic, arch2McTl, arch2XlMe, arch2Oxto, func1PMic, func1McTl, func1XlMe, func1Oxto, func2PMic, func2McTl, func2XlMe, func2Oxto
+
+
+SSN, arch1_PMic, arch1_McTl, arch1_XlMe, arch1_Oxto, arch2_PMic, arch2_McTl, arch2_XlMe, arch2_Oxto, func1_PMic, func1_McTl, func1_XlMe, func1_Oxto, func2_PMic, func2_McTl, func2_XlMe, func2_Oxto
+
+"SSN", "archInterp1_PMic", "archInterp1_McTl", "archInterp1_XlMe", "archInterp1_Oxto", "archInterp2_PMic", "archInterp2_McTl", "archInterp2_XlMe", "archInterp2_Oxto", "funcInterp1_PMic", "funcInterp1_McTl", "funcInterp1_XlMe", "funcInterp1_Oxto", "funcInterp2_PMic", "funcInterp2_McTl", "funcInterp2_XlMe", "funcInterp2_Oxto"
+
+```{r}
+write.csv(archInterp_long3, paste0(DIR, "data/raw/ArchFuncInterps1.csv"), row.names = F, fileEncoding = "Latin1")
+
+write.csv(archInterp_long4, paste0(DIR, "data/raw/ArchFuncInterps2.csv"), row.names = F, fileEncoding = "Latin1")
+
+write.csv(archInterp_long5, paste0(DIR, "data/raw/ArchFuncInterps3.csv"), row.names = F, fileEncoding = "Latin1")
+
+
+```
+
+
