@@ -1,84 +1,28 @@
 ---
-title: "DF9 Wide"
+title: "EDA and Data Summarization"
 author: "Rudolf Cesaretti"
-date: "2025-01-21"
+date: "2025-03-07"
 output: html_document
 ---
 
-Double-check codes tables for coded variables!! If Annie was wrong in her metadata, write a paragraph about it here.
 
-Double-check NA Values for all variables
+outlier
 
-Fix the stone quantity variable in DF9b using the data from DF8
-
-Make a checklist for variables -- problems and change/transformations needed. Add these as columns to the metadata. Color code rows based on their status (e.g. you can basically make all of the count data green)
-
-Remove spaces and manually edit the site and subsite variables in DF9b
-
-Add variable for L1, L2, L3 etc site names indicating that the collection unit is not primarily Classic Period
-
-Hierarchical classification schema for architectural and functional interps!
+pattern
 
 
-Nominal vs Ordinal fields
---Ordinal fields text as "1. X", "2. Y", "3. Z" etc. AND conversion to an ordered factor variable
---Nominal fields text as "X", "Y", "Z" etc. AND conversion to an unordered factor variable
+exploreR
+funModeling
+xray
 
-make processing script generalized
+https://www.analyticsvidhya.com/blog/2022/10/three-r-libraries-for-automated-eda/
+https://journal.r-project.org/articles/RJ-2019-033/
 
-convert entire processing script to a function
-
-Process DF8,DF9,DF10,DF9b
-
-Cross-check values!!
-
-Then, you need to connect the dataframe to the (millon space) collection unit polygons
-
-Using the the final corrected geospatial dataset (millon space), see if you can predict architectural and functional classifications using ML methods 
-Also perform a pattern recognition analysis in the dataset!!
-
-
-
-
-
-read_csv(paste0(DIR, "data/raw/DF9b_rev_metadata_to_assemble.csv"))
-DF9b_rev_metadata_to_assemble.csv
-read_csv(DF8_wide, paste0(DIR, "data/raw/DF8_wide.csv"))
-
-
-# Create DF9 Wide for Cross-Checking the Data
-
+## Setup & Data 
 
 ```{r}
-rm(list = ls())
-
-```
-
-# Load Packages
-
-```{r}
-# Load the required package
-library(tidyverse)
-library(readxl)
-library(stringi)
-library(arrow)
-
-```
-
-
-# Set Working Directory
-
-```{r}
-DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
-```
-
-
-
-### Step 0: Import and organize all excel files from the specified directory
-
-```{r}
-
 DF9_metadata <- read_csv(paste0(DIR, "data/raw/Metadata.csv"), locale = locale(encoding = "Latin1"))
+
 
 file_list <- list.files(
   path = paste0(DIR, "data/raw/DF9_rev"),
@@ -90,284 +34,9 @@ names(df_list) <- file_names
 #list2env(data_list, envir = .GlobalEnv)
 
 data_list  <- df_list[grepl("^Data_", names(df_list))]
-codes_list <- df_list[grepl("^Codes_", names(df_list))]
-```
 
-### Step 1: Merge and Clean-Up Data
+data <- read_csv(paste0(DIR, "data/raw/DF9b_data_char.csv"), locale = locale(encoding = "Latin1"))
 
-```{r}
-
-data <- data_list %>%
-  discard(names(.) %in% c("Data_fieldWorkers", "Data_labAnalysts", "Data_fieldWorkers_bool_wide", "Data_labWorkers_bool_wide", "Data_Plazas")) %>%
-  reduce(full_join, by = "SSN") %>% 
-  mutate(labAnalyst1 = NA,
-         labAnalyst2 = NA,
-         labAnalyst3 = NA,
-         fieldWorker1 = NA,
-         fieldWorker2 = NA,
-         fieldWorker3 = NA,
-         fieldWorker4 = NA,
-         fieldWorker5 = NA
-         ) %>% 
-  select(-unworkedBone) %>% 
-  rename(drainSitu = drains.x,
-         wallFixSitu = wallFixtures.x,
-         drainSurf = drains.y,
-         wallFixSurf = wallFixtures.y,
-         jagueyArch = jagueys,
-         jagueyMod = jaguey) %>% 
-  select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
-
-#DF8_wide_raw
-
-#DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)]
-```
-
-
-### Step 2: Replace stoneCut Values with those of DF8
-
-```{r}
-
-DF8_stoneCut <- read_csv(paste0(DIR, "data/raw/DF8_wide_raw.csv")) %>% 
-  select(SSN, CUTSTONE) %>%
-  rename(stoneCut = CUTSTONE)
-
-data <- data %>%
-  select(-stoneCut) %>%
-  left_join(DF8_stoneCut, by = "SSN") %>%
-  select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
-
-```
-
-
-### Step 2.5: Stopgap Export/Import of Raw Data
-
-```{r}
-write.csv(data, paste0(DIR, "data/raw/DF9b_raw_data_v2.csv"), row.names = F, fileEncoding = "Latin1")
-```
-
-```{r}
-data <- read_csv(paste0(DIR, "data/raw/DF9b_raw_data_v2.csv"), locale = locale(encoding = "Latin1")) 
-```
-
-
-
-### Step 3: Replace Coded Values with NA
-
-```{r}
-
-na_replacements <- DF9_metadata %>%
-  filter(!is.na(codedNAValue)) %>%
-  select(varName_DF9b, codedNAValue)
-
-
-convert_if_numeric <- function(x) {
-  temp <- suppressWarnings(as.numeric(x))
-  if (all(is.na(temp) == is.na(x))) {
-    return(temp)
-  } else {
-    return(x)
-  }
-}
-
-
-# Convert specified values to NA
-for (i in seq_len(nrow(na_replacements))) {
-  col <- na_replacements$varName_DF9b[i]
-  na_val <- convert_if_numeric(na_replacements$codedNAValue[i])
-  
-  data[[col]][data[[col]] == na_val] <- NA
-}
-```
-
-### Step 4: Replace Coded Values with Descriptions
-
-```{r}
-# Recode numeric coded variables to factors using corresponding Codes_ tables.
-# Assumes the metadata has a column "CodesTable" that gives the filename
-# (e.g., "Codes_A.csv") for variables that need recoding.
-
-coded_vars <- DF9_metadata %>% 
-  filter(!is.na(codesTable_DF9b) & codesTable_DF9b != "")
-
-for(i in seq_len(nrow(coded_vars))) {
-  var_name <- coded_vars$varName_DF9b[i]
-  codes_table <- coded_vars$codesTable_DF9b[i]
-  
-  # Read in the appropriate codes mapping.
-  # Assumes each codes file has at least two columns: 
-  # one with the numeric code (named "Code") and one with the description (named "Description").
-  codes_mapping <- codes_list[[codes_table]]
-  
-  # Recode the variable:
-  # Convert the raw numeric codes to factors with levels defined by the "Code" column
-  # and labels from the "Description" column.
-  data <- data %>% 
-    mutate(!!sym(var_name) := factor(!!sym(var_name),
-                                      levels = codes_mapping$code,
-                                      labels = codes_mapping$description))
-}
-
-data_fct <- data
-
-data_char <- data %>% mutate(across(where(is.factor), as.character))
-```
-
-
-### Step 5: Revert Personnel Variables to original DF9 Form
-
-```{r}
-
-DF8_wide <- read_csv(paste0(DIR, "data/raw/DF8_wide_raw.csv"))
-
-DF8_wide %>% select(SSN, FLDWRK1, FLDWRK2, FLDWRK3, FLDWRK4, FLDWRK5, CERANWK1, CERANWK2, CERANWK3) %>% 
-  rename(fieldWorker1 = FLDWRK1,
-         fieldWorker2 = FLDWRK2,
-         fieldWorker3 = FLDWRK3,
-         fieldWorker4 = FLDWRK4,
-         fieldWorker5 = FLDWRK5,
-         ceramicAnalyst1 = CERANWK1,
-         ceramicAnalyst2 = CERANWK2,
-         ceramicAnalyst3 = CERANWK3) %>% 
-  mutate(across(everything(), ~ ifelse(. == -1, NA, .)))-> personnel
-
-recode_vector <- setNames(codes_list[["Codes_personnel"]]$description, codes_list[["Codes_personnel"]]$code)
-
-recode_column <- function(column, recode_vector) {
-  factor(column, levels = as.numeric(names(recode_vector)), labels = recode_vector[as.numeric(names(recode_vector))])
-}
-
-personnel <- personnel %>%
-  mutate(
-    across(
-      c(fieldWorker1, fieldWorker2, fieldWorker3, fieldWorker4, fieldWorker5,
-        ceramicAnalyst1, ceramicAnalyst2, ceramicAnalyst3),
-      recode_column, recode_vector = recode_vector
-    )
-  )
-
-personnel_char <- personnel %>% mutate(across(where(is.factor), as.character)) %>% 
-  rename(labAnalyst1 = ceramicAnalyst1, 
-         labAnalyst2 = ceramicAnalyst2, 
-         labAnalyst3 = ceramicAnalyst3)
-
-write.csv(personnel_char, paste0(DIR, "data/raw/personnel.csv"), fileEncoding = "Latin1")
-
-data_char <- data_char %>%
-  select(-c(fieldWorker1, fieldWorker2, fieldWorker3, fieldWorker4, fieldWorker5,
-            labAnalyst1, labAnalyst2, labAnalyst3)) %>% 
-  left_join(personnel_char, by = "SSN") %>%
-  select(DF9_metadata$varName_DF9b[!is.na(DF9_metadata$varName_DF9b)])
-
-write.csv(data_char, paste0(DIR, "data/raw/data_char.csv"), row.names = F, fileEncoding = "Latin1")
-```
-
-
-### Step 6: Export Data
-
-```{r}
-write.csv(data_char, paste0(DIR, "data/raw/DF9b_data_char.csv"), row.names = F, fileEncoding = "Latin1")
-```
-
-
-```{r}
-write.csv(data_char, paste0(DIR, "data/raw/DF9b_data_char.csv"), row.names = F, fileEncoding = "Latin1")
-```
-
-
-
-
-
-# UNUSED DRAFTINGS
-
-
-
-
-FIRST, CHANGE ORDINAL FACTOR VARIABLE DESCRIPTIONS SO THAT THEY INCLUDE THE NUMBER IN FRONT OF THE DESCRIPTION
-
-We can extend this workflow by incorporating a metadata column (say, `FactorType`) that indicates whether a coded variable should be treated as ordinal (ordered) or nominal (unordered). Then, when you convert the numeric codes to factors, you simply check that metadata value and set the `ordered` argument in the `factor()` function accordingly.
-
-Below is an example that builds on the previous recoding loop. In this snippet, the metadata is assumed to have:
-
-*   A column (e.g., `DF9b_VarName`) with the variable name,
-*   A column `CodesTable` indicating which "Codes\_" table to use,
-*   And a column `FactorType` which holds values like `"ordered"` or `"unordered"`.
-
-```{r}
-
-# Assume DF9_metadata contains columns:
-# DF9b_VarName, CodesTable, and FactorType.
-
-# Filter to only those variables that need recoding.
-coded_vars <- DF9_metadata %>% 
-  filter(!is.na(CodesTable) & CodesTable != "")
-
-for(i in seq_len(nrow(coded_vars))) {
-  var_name   <- coded_vars$DF9b_VarName[i]
-  codes_file <- coded_vars$CodesTable[i]
-  factor_type <- coded_vars$FactorType[i]  # Expected to be "ordered" or "unordered"
-  
-  # Read the corresponding codes mapping
-  codes_mapping <- read_csv(codes_file) %>% 
-    select(Code, Description)
-  
-  # Determine if the factor should be ordered
-  is_ordered <- tolower(factor_type) == "ordered"
-  
-  # Recode the variable using the codes mapping and set factor order accordingly.
-  data <- data %>% 
-    mutate(!!sym(var_name) := factor(!!sym(var_name),
-                                     levels = codes_mapping$Code,
-                                     labels = codes_mapping$Description,
-                                     ordered = is_ordered))
-}
-```
-
-
-
-```{r}
-str(data)
-```
-
-
-```{r}
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# EDA and Data Summarization
-
-
-Reasoned about dataset summarization tools for 19 seconds
-
-Below are eight separate R scripts—one per package—to load your CSV file and generate a data summary or metadata report. In each script, we assume your CSV file is named `"DF9b_raw_data.csv"`. Adjust file paths or function options as needed.
-
-* * *
-
-```{r}
 complexData <- data %>% 
   select(names(data_list[["Data_complexData"]] %>% select(-SSN)))
 
@@ -401,7 +70,19 @@ dataReportData_list_f <- lapply(dataReportData_list, function(df) {
 
 
 
-### Script 1: Using **summarytools**
+
+
+
+## EDA and Data Summarization
+
+
+Reasoned about dataset summarization tools for 19 seconds
+
+Below are eight separate R scripts—one per package—to load your CSV file and generate a data summary or metadata report. In each script, we assume your CSV file is named `"DF9b_raw_data.csv"`. Adjust file paths or function options as needed.
+
+* * *
+
+### summarytools
 
 summarytools: Tools to Quickly and Neatly Summarize Data
 
@@ -444,7 +125,7 @@ view(summary_report)
 
 * * *
 
-### Script 2: Using **dlookr**
+### dlookr
 
 dlookr: Tools for Data Diagnosis, Exploration, Transformation
 
@@ -476,7 +157,7 @@ diagnose_report(
 
 * * *
 
-### Script 3: Using **codebook**
+### Using codebook
 
 codebook: Automatic Codebooks from Metadata Encoded in Dataset Attributes
 
@@ -502,7 +183,7 @@ library(codebook)
 codebook(data)
 ```
 
-### Script 4: Using **skimr**
+### skimr
 
 skimr: Compact and Flexible Summaries of Data
 
@@ -527,7 +208,7 @@ skim(data)
 ```
 
 
-### Script 5: Using **dataMeta**
+### dataMeta
 
 dataMeta: Create and Append a Data Dictionary for an R Dataset
 
@@ -545,7 +226,7 @@ https://dmrodz.r-universe.dev/dataMeta
 
 ```
 
-### Script 6: Using **tableone**
+### tableone
 
 tableone: Create 'Table 1' to Describe Baseline Characteristics with or without Propensity Score Weights
 
@@ -585,7 +266,7 @@ summary(tableOne$ContTable)
 
 * * *
 
-### Script 7: Using **DataExplorer**
+### DataExplorer
 
 DataExplorer: Automate Data Exploration and Treatment
 
@@ -608,7 +289,7 @@ create_report(dataReportData_list[[1]], output_file = "DataExplorer_report.html"
 
 * * *
 
-### Script 8: Using **explore**
+### explore
 
 explore: Simplifies Exploratory Data Analysis
 
@@ -652,7 +333,7 @@ explore(data)
 
 * * *
 
-### Script 9: Using **SmartEDA**
+### SmartEDA
 
 SmartEDA: Summarize and Explore the Data
 
@@ -688,7 +369,7 @@ ExpReport(
 
 * * *
 
-### Script 10: Using **ExPanDaR**
+### ExPanDaR
 
 ExPanDaR: Explore Your Data Interactively
 
@@ -704,7 +385,7 @@ library(ExPanDaR)
 
 
 
-### Script 11: Using **naniar**
+### naniar
 
 naniar: Data Structures, Summaries, and Visualisations for Missing Data
 
@@ -720,7 +401,7 @@ library(naniar)
 ```
 
 
-### Script 12: Using **dataMaid**
+### dataMaid
 
 dataMaid: A Suite of Checks for Identification of Potential Errors in a Data Frame as Part of the Data Screening Process
 
@@ -735,11 +416,11 @@ https://sandsynligvis.dk/2018/03/03/generating-codebooks-in-r/
 https://www.jstatsoft.org/article/view/v090i06
 
 ```{r}
-
+library(dataMaid)
 ```
 
 
-### Script 13: Using **dataReporter**
+### dataReporter
 
 dataReporter: Reproducible Data Screening Checks and Report of Possible Errors
 
@@ -753,11 +434,11 @@ https://rbasics.org/packages/datareporter-package-in-r/
 https://ekstroem.r-universe.dev/dataReporter
 
 ```{r}
-
+library(dataReporter)
 ```
 
 
-### Script 14: Using **correlationfunnel**
+### correlationfunnel
 
 correlationfunnel: Speed Up Exploratory Data Analysis (EDA) with the Correlation Funnel
 Speeds up exploratory data analysis (EDA) by providing a succinct workflow and interactive visualization tools for understanding which features have relationships to target (response). Uses binary correlation analysis to determine relationship. Default correlation method is the Pearson method. Lian Duan, W Nick Street, Yanchi Liu, Songhua Xu, and Brook Wu (2014) <doi:10.1145/2637484>.
@@ -769,11 +450,11 @@ https://cran.r-project.org/web/packages/correlationfunnel/vignettes/key_consider
 https://cran.r-project.org/web/packages/correlationfunnel/correlationfunnel.pdf
 
 ```{r}
-
+library(correlationfunnel)
 ```
 
 
-### Script : Using **janitor**
+### janitor
 
 janitor: Simple Tools for Examining and Cleaning Dirty Data
 
@@ -788,13 +469,13 @@ https://cran.r-project.org/web/packages/janitor/vignettes/janitor.html
 https://cran.r-project.org/web/packages/janitor/vignettes/tabyls.html
 
 ```{r}
-
+library(janitor)
 
 ```
 
 
 
-### Script : Using **data.validator**
+### data.validator
 
 data.validator: Automatic Data Validation and Reporting
 
@@ -807,12 +488,12 @@ https://github.com/Appsilon/data.validator
 
 
 ```{r}
-
+library(data.validator)
 ```
 
 
 
-### Script : Using **pointblank**
+### pointblank
 
 pointblank: Data Validation and Organization of Metadata for Local and Remote Tables
 
@@ -823,11 +504,11 @@ https://rstudio.r-universe.dev/pointblank
 https://cran.r-project.org/package=pointblank
 
 ```{r}
-
+library(pointblank)
 ```
 
 
-### Script : Using **origami**
+### origami
 
 
 origami: Generalized Framework for Cross-Validation
@@ -840,11 +521,11 @@ https://tlverse.r-universe.dev/origami
 https://github.com/tlverse/origami
 
 ```{r}
-
+library(origami)
 ```
 
 
-### Script : Using **extremevalues**
+### extremevalues
 
 
 extremevalues: Univariate Outlier Detection
@@ -857,11 +538,11 @@ https://cran.r-project.org/web/packages/extremevalues/vignettes/SN201003.pdf
 https://markvanderloo.r-universe.dev/extremevalues
 
 ```{r}
-
+library(extremevalues)
 ```
 
 
-### Script : Using **synthesizer**
+### synthesizer
 
 
 synthesizer: Fast, Robust, and High-Quality Synthetic Data Generation with a Tuneable Privacy-Utility Trade-Off
@@ -876,11 +557,11 @@ https://cran.r-project.org/web/packages/synthesizer/synthesizer.pdf
 
 
 ```{r}
-
+library(synthesizer)
 ```
 
 
-### Script : Using **lumberjack**
+### lumberjack
 
 lumberjack: Track Changes in Data
 
@@ -894,11 +575,11 @@ https://cran.r-project.org/web/packages/lumberjack/lumberjack.pdf
 https://github.com/markvanderloo/lumberjack
 
 ```{r}
-
+library(lumberjack)
 ```
 
 
-### Script : Using **mde**
+### mde
 
 mde: Missing Data Explorer
 Correct identification and handling of missing data is one of the most important steps in any analysis. To aid this process, 'mde' provides a very easy to use yet robust framework to quickly get an idea of where the missing data lies and therefore find the most appropriate action to take. Graham WJ (2009) <doi:10.1146/annurev.psych.58.110405.085530>.
@@ -908,11 +589,11 @@ https://cran.r-project.org/package=mde
 https://github.com/nelson-gon/mde
 
 ```{r}
-
+library(mde)
 ```
 
 
-### Script : Using **loon**
+### loon
 
 loon: Interactive Statistical Data Visualization
 An extendable toolkit for interactive data visualization and exploration.
@@ -923,12 +604,12 @@ https://cran.r-project.org/package=loon
 https://github.com/great-northern-diver/loon
 
 ```{r}
-
+library(loon)
 ```
 
 
 
-### Script : Using **tldr**
+### tldr
 
 tldr: T Loux Doing R: Functions to Simplify Data Analysis and Reporting
 Gives a number of functions to aid common data analysis processes and reporting statistical results in an 'RMarkdown' file. Data analysis functions combine multiple base R functions used to describe simple bivariate relationships into a single, easy to use function. Reporting functions will return character strings to report p-values, confidence intervals, and hypothesis test and regression results. Strings will be LaTeX-formatted as necessary and will knit pretty in an 'RMarkdown' document. The package also provides wrappers function in the 'tableone' package to make the results knit-able.
@@ -937,11 +618,11 @@ https://tloux.r-universe.dev/tldr
 https://cran.r-project.org/package=tldr
 https://github.com/tloux/tldr
 ```{r}
-
+library(tldr)
 ```
 
 
-### Script : Using **Hmisc**
+### Hmisc
 
 Hmisc: Harrell Miscellaneous
 Contains many functions useful for data analysis, high-level graphics, utility operations, functions for computing sample size and power, simulation, importing and annotating datasets, imputing missing values, advanced table making, variable clustering, character string manipulation, conversion of R objects to LaTeX and html code, recoding variables, caching, simplified parallel computing, encrypting and decrypting data using a safe workflow, general moving window statistical estimation, and assistance in interpreting principal component analysis.
@@ -953,12 +634,28 @@ https://github.com/harrelfe/Hmisc
 describe, from the Hmisc package
 
 ```{r}
-
+library(Hmisc)
 ```
 
 
+### arsenal
 
-### Script : Using **dataCompareR**
+arsenal: An Arsenal of 'R' Functions for Large-Scale Statistical Summaries
+
+An Arsenal of 'R' functions for large-scale statistical summaries, which are streamlined to work within the latest reporting tools in 'R' and 'RStudio' and which use formulas and versatile summary statistics for summary tables and models. The primary functions include tableby(), a Table-1-like summary of multiple variable types 'by' the levels of one or more categorical variables; paired(), a Table-1-like summary of multiple variable types paired across two time points; modelsum(), which performs simple model fits on one or more endpoints for many variables (univariate or adjusted for covariates); freqlist(), a powerful frequency table across many categorical variables; comparedf(), a function for comparing data.frames; and write2(), a function to output tables to a document.
+
+https://mayoverse.r-universe.dev/arsenal
+https://mayoverse.github.io/arsenal/
+https://github.com/mayoverse/arsenal
+https://cran.r-project.org/package=arsenal
+
+
+```{r}
+library(arsenal)
+```
+
+
+### dataCompareR
 
 dataCompareR: Compare Two Data Frames and Summarise the Difference
 
@@ -970,11 +667,11 @@ https://capitalone.r-universe.dev/dataCompareR
 https://github.com/capitalone/dataCompareR
 
 ```{r}
-
+library(dataCompareR)
 ```
 
 
-### Script : Using **forcats**
+### forcats
 
 forcats: Tools for Working with Categorical Variables (Factors)
 
@@ -986,12 +683,12 @@ https://tidyverse.r-universe.dev/forcats
 https://cran.r-project.org/package=forcats
 
 ```{r}
-
+library(forcats)
 ```
 
 
 
-### Script : Using **BeeBDC**
+### BeeBDC
 
 BeeBDC: Occurrence Data Cleaning
 Flags and checks occurrence data that are in Darwin Core format. The package includes generic functions and data as well as some that are specific to bees. This package is meant to build upon and be complimentary to other excellent occurrence cleaning packages, including 'bdc' and 'CoordinateCleaner'. This package uses datasets from several sources and particularly from the Discover Life Website, created by Ascher and Pickering (2020). For further information, please see the original publication and package website. Publication - Dorey et al. (2023) <doi:10.1101/2023.06.30.547152> and package website - Dorey et al. (2023) <https://github.com/jbdorey/BeeBDC>.
@@ -1000,11 +697,11 @@ https://jbdorey.github.io/BeeBDC/
 
 
 ```{r}
-
+library(BeeBDC)
 ```
 
 
-### Script : Using **dbc**
+### dbc
 
 dbc: Dictionary-Based Cleaning
 
@@ -1015,13 +712,13 @@ https://github.com/epicentre-msf/dbc
 NOT ON CRAN
 
 ```{r}
-
+library(dbc)
 ```
 
 
 
 
-### Script : Using **dataspice**
+### dataspice
 
 dataspice: Create Lightweight Schema.org Descriptions of Data
 
@@ -1033,13 +730,13 @@ https://github.com/ropensci/dataspice
 https://cran.r-project.org/package=dataspice
 
 ```{r}
-
+library(dataspice)
 ```
 
 
 
 
-### Script : Using **labelmachine**
+### labelmachine
 
 labelmachine: Make Labeling of R Data Sets Easy
 
@@ -1052,11 +749,11 @@ https://github.com/a-maldet/labelmachine
 
 
 ```{r}
-
+library(labelmachine)
 ```
 
 
-### Script : Using **libr**
+### libr
 
 libr: Libraries, Data Dictionaries, and a Data Step for R
 https://dbosak01.r-universe.dev/libr
@@ -1066,12 +763,12 @@ Contains a set of functions to create data libraries, generate data dictionaries
 
 
 ```{r}
-
+library(libr)
 ```
 
 
 
-### Script : Using **fctutils**
+### fctutils
 
 fctutils: Advanced Factor Manipulation Utilities
 https://guokai8.r-universe.dev/fctutils
@@ -1081,11 +778,11 @@ Provides a collection of utility functions for manipulating and analyzing factor
 
 
 ```{r}
-
+library(fctutils)
 ```
 
 
-### Script : Using **Amelia**
+### Amelia
 
 Amelia: A Program for Missing Data
 
@@ -1095,13 +792,13 @@ https://matthewblackwell.r-universe.dev/Amelia
 
 
 ```{r}
-
+library(Amelia)
 ```
 
 
 
 
-### Script : Using **inspectdf**
+### inspectdf
 
 inspectdf: Inspection, Comparison and Visualisation of Data Frames
 
@@ -1110,13 +807,23 @@ A collection of utilities for columnwise summary, comparison and visualisation o
 https://alastairrushworth.r-universe.dev/inspectdf
 
 ```{r}
-
+library(inspectdf)
 ```
 
 
 
 
-### Script : Using **surveyexplorer**
+### esquisse
+esquisse
+https://dreamrs.github.io/esquisse/
+
+```{r}
+library(esquisse)
+```
+
+
+
+### surveyexplorer
 
 
 surveyexplorer: Quickly Explore Complex Survey Data
@@ -1129,241 +836,357 @@ https://cran.r-project.org/web/packages/surveyexplorer/surveyexplorer.pdf
 https://liamhaller.r-universe.dev/surveyexplorer
 
 ```{r}
-
+library(surveyexplorer)
 ```
 
-### Script : Using **GGally**
+### gtsummary
 
-ggpairs, from the GGally package
+gtsummary: Presentation-Ready Data Summary and Analytic Result Tables
+
+Creates presentation-ready tables summarizing data sets, regression models, and more. The code to create the tables is concise and highly customizable. Data frames can be summarized with any function, e.g. mean(), median(), even user-written functions. Regression models are summarized and include the reference rows for categorical variables. Common regression models, such as logistic regression and Cox proportional hazards regression, are automatically identified and the tables are pre-filled with appropriate column headers.
+
+https://cran.r-project.org/web/packages/gtsummary/index.html
+https://www.danieldsjoberg.com/gtsummary/
+https://github.com/ddsjoberg/gtsummary/
+https://ddsjoberg.r-universe.dev/gtsummary
+
+```{r}
+library(gtsummary)
+```
 
 
+### descriptr
 
-### Script : Using **descriptr**
+descriptr: Generate Descriptive Statistics
+
+Generate descriptive statistics such as measures of location, dispersion, frequency tables, cross tables, group summaries and multiple one/two way tables.
+
+https://rsquaredacademy.r-universe.dev/descriptr
+https://descriptr.rsquaredacademy.com/
+https://cran.r-project.org/package=descriptr
+https://github.com/rsquaredacademy/descriptr/
 
 ds_summary_stats from descriptr
 
-### Script : Using **Desctable**
+```{r}
+library(Desctable)
+```
 
-Desctable
+
+### Desctable
+
+desctable: Produce Descriptive and Comparative Tables Easily
+
+Easily create descriptive and comparative tables. It makes use and integrates directly with the tidyverse family of packages, and pipes. Tables are produced as (nested) dataframes for easy manipulation.
+
 https://desctable.github.io/index.html
+https://cran.r-project.org/package=desctable
+https://github.com/desctable/desctable/
+https://desctable.r-universe.dev/desctable
+
+```{r}
+install.packages("desctable")
+library(Desctable)
+```
 
 
-### Script : Using **stargazer**
+
+### stargazer
 https://cloud.r-project.org/web/packages/stargazer/index.html
 
+```{r}
+library(stargazer)
+```
 
-### Script : Using **psych**
+
+### psych
 describe and describeBy, from the psych package
 
+```{r}
+library(psych)
+```
 
 
-### Script : Using **desctable**
+### desctable
 
 install.packages("desctable")
 
-
-### Script : Using **esquisse**
-esquisse
-https://dreamrs.github.io/esquisse/
-
+```{r}
+library(desctable)
+```
 
 
-### Script : Using **pastecs**
+### pastecs
 
 stat.desc, from the pastecs package
 
+```{r}
+library(pastecs)
+```
 
 
+### nomclust
 
+nomclust: Hierarchical Cluster Analysis of Nominal Data
+Similarity measures for hierarchical clustering of objects characterized by nominal (categorical) variables. Evaluation criteria for nominal data clustering.
 
+https://zdeneksulc.r-universe.dev/nomclust
+https://cran.r-project.org/package=nomclust
 
+### ordinal
 
+ordinal: Regression Models for Ordinal Data
+Implementation of cumulative link (mixed) models also known as ordered regression models, proportional odds models, proportional hazards models for grouped survival times and ordered logit/probit/... models. Estimation is via maximum likelihood and mixed models are fitted with the Laplace approximation and adaptive Gauss-Hermite quadrature. Multiple random effect terms are allowed and they may be nested, crossed or partially nested/crossed. Restrictions of symmetry and equidistance can be imposed on the thresholds (cut-points/intercepts). Standard model methods are available (summary, anova, drop-methods, step, confint, predict etc.) in addition to profile methods and slice methods for visualizing the likelihood function and checking convergence.
 
-
-
-
--- 5050-row tables --
-
-WorkingHierarchy
-`a_FuncInterp1 for digitization`
-archInterp
-archMaterial
-
-
-
+https://runehaubo.r-universe.dev/ordinal
+https://cran.r-project.org/package=ordinal
+https://github.com/runehaubo/ordinal
 
 ```{r}
-
-ceramics = cerPhTot %>% 
-  left_join(cerVessel, by = "ID") %>% 
-  left_join(cerNonVessel, by = "ID")
-
-lithics = lithicFlaked %>% 
-  left_join(lithicGround, by = "ID")
-
-artifactOther
 
 ```
 
 
 
+### classInt
 
+classInt: Choose Univariate Class Intervals
 
+Selected commonly used methods for choosing univariate class intervals for mapping or other graphics purposes.
 
-complexData
-complexMacroData
-
-condition
-description
-
-location
-
-Plazas
-workshop
-
-
-
-materials
-materialsLabel
-
-
-z_archInterp1
-z_archInterp2
-z_funcInterp1
-z_funcInterp2
-z_vegetation
-HierarchyCode
-
-
-
-personnelLabel
-"personnel error check"
-fieldWorkers
-labAnalysts
-
+https://r-spatial.r-universe.dev/classInt
+https://r-spatial.github.io/classInt/
+https://cran.r-project.org/package=classInt
+https://github.com/r-spatial/classint
 
 ```{r}
 
+```
 
 
-
-colz <- c("fieldWorker1", "fieldWorker2", "fieldWorker3", "fieldWorker4", "fieldWorker5",
-                    "ceramicAnalyst1", "ceramicAnalyst2", "ceramicAnalyst3")
+#### Examples
 
 
-personnel <- personnelLabel %>% 
-  mutate(FullName = paste(first_name, last_name, sep = " ")) %>% 
-  select(-last_name, -first_name) %>% 
-  mutate(FullName = stri_trans_general(FullName, "Latin-ASCII")) %>%
-  rename(code = code, FullName = FullName)
+##### Settlement Hierarchy Levels
 
-code_to_name <- setNames(personnel$FullName, personnel$code)
+Classifying the hierarchical levels of settlement systems from archaeological data can be notoriously arbitrary without more contextual information. The main issues are why one set of size breaks is better than another, how many levels to include, and the temptation to ideosyncratic/unsystematic/non-reproducible human choices that vary between periods/cases/regions.
 
-admin <- admin %>%
-  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
+##### Number of Classes for Each Period
 
-##########################
+To get around these issues, I employ a systematic and reproducible two-part methodology. First, the number of hierarchical levels is chosen as the rounded mean of several different established methods of computing the **number of classes** (as opposed to partitioning the class intervals themselves) for a univariate distribution such as settlement population sizes. The methods that performed the best on our right-skew city size distributions are:
 
-colz <- names(archInterp)[6:9]
-
-code_to_name <- setNames(DS_ArchInterpPrim$description, DS_ArchInterpPrim$code)
-
-archInterp <- archInterp %>%
-  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
-
-##########################
-
-colz <- names(archInterp)[10:13]
-
-code_to_name <- setNames(DS_ArchInterpAltern$description, DS_ArchInterpAltern$code)
-
-archInterp <- archInterp %>%
-  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
-
-##########################
-
-colz <- names(archInterp)[14:17]
-
-code_to_name <- setNames(DS_FuncInterpPrim$description, DS_FuncInterpPrim$code)
-
-archInterp <- archInterp %>%
-  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
-
-##########################
-
-colz <- names(archInterp)[18:21]
-
-code_to_name <- setNames(DS_FuncInterpAltern$description, DS_FuncInterpAltern$code)
-
-archInterp <- archInterp %>%
-  mutate(across(all_of(colz), ~ code_to_name[as.character(.)])) 
-
-########################
-
-
-
-
-
-
-
-
-
-
-6:21
-
-
-
-#%>%
-  select(-all_of(worker_columns))
-
-
-admin_names <- admin %>%
-  mutate(across(all_of(worker_columns), ~ personnel$FullName[match(., personnel$code)], .names = "name_{col}"))
-
+  1. **Sturges' formula** where bin sizes are based on the range of the data [@Sturges1926], calculated using the "grDevices::nclass" function [@R2022]
+  2. **Scott's method** based on the standard error of a Gaussian distribution fitted to the data [@Scott1992]. To make estimates of this method valid, Log Population was used instead of population. Scott's classes were calculated using the "grDevices::nclass" function [@R2022]
+  3. **Jiang's Head/Tail method**, designed for heavy-tailed distributions, partitioning the distribution by the mean until the head-tail ratio is deskewed beyond a threshold level [@Jiang2013]. Jiang's method was calculated using the "classInt" R package [@Bivand2022].
+  4. **Manually** via the traditional archaeological method of locating gaps in the distribution through close visual inspection of histograms and ECDFs (and a mind towards contextually-likely settlement hierarchy size classes). These are as follows:
   
-materials_wide <- materials %>% 
-  left_join(materialsLabel, by = "code") %>% 
-  select(-code) %>% 
-  pivot_wider(id_cols = "ID", names_from = "observation", values_from = "label")
+```{r, 'Manual Method Settlement Hierarchy Classes', echo=FALSE,message=FALSE,warning=FALSE}
+m = All_AggPoly@data %>% 
+          group_by(PeriodNum) %>% 
+          summarise(
+              MinPop = min(Population.s2, na.rm=T),
+              MaxPop = max(Population.s2, na.rm=T))
+
+m$brks <- rev(c(", 250, 750, 2000, 4000, 8000, ",
+            ", 200, 650, 2000, 10000, 20000, ",
+            ", 150, 600, 1250, 3000, 8000, ",
+            ", 100, 500, 2000, 7000, 12500, ",
+            ", 200, 500, 1250, 2500, 7500, ",
+            ", 100, 300, 600, 2000, ",
+            ", 125, 350, 1250, 3000, 7500, ",
+            ", 300, 2500, ",
+            ", 100, 300, 600, 1500, ",
+            ", 100, 200, 400, ",
+            ", 250, 1000, 2000, 5000, ",
+            ", 200, 1000, 2500, 6000, ",
+            ", 100, 800, 3500, 7000, ",
+            ", 150, 400, 800, ",
+            ", 100, 300, 1000, 3000, ",
+            ", 120, ",
+            ", 200, "))
+
+ManualHierClasses <- data.frame(
+        PeriodNum = as.character(c(1:17)),
+        Period = c("EF", "EF_MF", "MF", "MF_LF", "LF", "LF_TF", "TF", "TF_CL", "CL", "CL_ET", "ET", "ET_LTAzI", "LTAzI", "LTAzI_EA", "EA", "EA_LA", "LA"),
+        Breaks = paste0(round(m$MinPop-1,0),m$brks,round(m$MaxPop+1,0)),
+        NumClasses = c(2,2,5,4,5,5,5,4,5,3,6,5,6,6,6,6,6))
+
+knitr::kable(ManualHierClasses, "pipe")
+
+rm(m)
+```
+  
+All four of these were performed on the population data of each period, and the row-wise mean and median (rounded to the nearest integer) were calculated.
+
+```{r, 'Number of Settlement Hierarchy Classes', message=FALSE,warning=FALSE}
+Manual <- ManualHierClasses$NumClasses
+Sturges <- NA
+Scott <- NA
+HeadTails <- NA
+
+for (i in 1:length(Poly_List)){
+  Sturges[i] <- nclass.Sturges(Poly_List[[i]]$Population.s2)
+  Scott[i] <- nclass.scott(Poly_List[[i]]$Log_Population.s2)
+  HTbreaks <- classIntervals(Poly_List[[i]]$Population.s2, style = "headtails")
+  HeadTails[i] <- length(HTbreaks$brks) - 1
+}
+
+levels <- data.frame(PeriodNum=ManualHierClasses$PeriodNum, 
+                     Period=ManualHierClasses$Period, 
+                     Sturges=Sturges, Scott=Scott, 
+                     HeadTails=HeadTails, Manual=Manual)
+
+levels <- levels %>% rowwise() %>% mutate(
+  Median = round(median(c(Sturges,HeadTails,Manual)),0),
+  Mean = round(mean(c(Sturges,HeadTails,Manual)),0),
+) %>% ungroup()
+
+knitr::kable(levels, "pipe" ,align="c")
+
+rm(Manual, Sturges, Scott, HeadTails, HTbreaks)
+```
+
+Surprisingly, the _median_ of the four methods is **_very_** close to the "Manual" archaeological reasoning method undertaken by myself -- only differing by 1 for a single period (otherwise identical). The difference between the mean and the median is also quite small. More specifically, the mean is higher than the median by 1 for four periods (otherwise identical).
+
+The Heads/Tails method has a very low sensitivity to such changes overall by design. Because Heads/Tails splits progressively down the distribution by cutting at the mean of the left tail, the increasing number of classes only reflects the magnitude of right-skew (completely insensitive to the number + variability of cases in the left tail). By contrast, Sturges' and Scott's methods are especially responsive to the growing ranges of the distributions, estimating systematically much higher numbers of classes for periods with a large number+range of settlements in a wide-ranging hierarchy (and vice versa). As such, they are both very sensitive to changes in the distribution as a whole. 
+
+In this sense, the mean and median central tendencies nicely balance the extremes of the three systematic methods. The near identity of the mean and median, and their close similarity to the independently estimated "Manual archaeological breaks reasoning" method, both reccomend this middling set of metrics. I think that the mean performs the best because it rounds upwards for periods where there is a high right-skew. Whereas my manual classifications were cautious not to over-split the settlements in the fat right tail, the higher mean seems to indicate that my right tail bin sizes were too wide (i.e. they deserved to be subdivided in some cases, which is being picked up in the mean because of the suystematic shifts in the other metrics). I have therefore chosen to use the mean as the number of hierarchical levels to classify for each period.
 
 
+##### Classification Method
 
+The ["classInt" R Package](https://cran.r-project.org/web/packages/classInt) [@Bivand2022] provides a number of functions for classifying the univariate settlement size (population) hierarchy into the number of groups specified above (i.e. the integer-rounded mean of the four methods). Of these methods, some are not appropriate for a right-skew distribution, and others don't enable us to specify the number of classes. The best performing methods are kmeans, fisher and jenks. All others leave almost the entire fat left tail of the distribution unpartitioned. 
 
-write_csv(ceramics, paste0(DIR, "ceramics.csv"))
+  * kmeans
+  * fisher
+  * jenks
+When the settlement size distribution is not heavily right-skew, all three methods perform about the same. However, with greater degrees of right-skew, Fisher's and Jenks' methods leave most of the left-tail unpartitioned. As seen below, only kmeans provides a partitioning method robust to higher levels of right-skew, creating size classes quite similar to the Manual Archy method. (Note that the intervals are calculated on unlogged data, while the x-axes are logged to make the groups clearer.) As such, Kmeans seems to provide a systematic means of partitioning the settlement distributions.
 
-write_csv(lithics, paste0(DIR, "lithics.csv"))
+```{r, 'Hierarchy Classes Example 1', echo=FALSE, message=FALSE,warning=FALSE}
+p=15
+x=Poly_List[[p]]$Population.s2
+nc=levels$Mean[p]
+pal1=brewer.pal(nc,"Set2")
+fb=as.numeric(unlist(strsplit(ManualHierClasses$Breaks[p], split=", ")))
 
-write_csv(personnel, paste0(DIR, "personnel.csv"))
+kmbrks <- classIntervals(x, style = "kmeans", n=nc)
+hcbrks <- classIntervals(x, style = "hclust", n=nc)
+bcbrks <- classIntervals(x, style = "bclust", n=nc)
+fbrks <- classIntervals(x, style = "fisher", n=nc)
+jbrks <- classIntervals(x, style = "jenks", n=nc)
+maxbrks <- classIntervals(x, style = "maximum", n=nc)
+fixbrks <- classIntervals(x, style = "fixed", fixedBreaks=fb)
 
+par(mfrow = c(2, 2))
+plot(fbrks, pal = pal1, main = paste0("Fisher, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+plot(jbrks, pal = pal1, main = paste0("Jenks, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+plot(kmbrks, pal = pal1, main = paste0("Kmeans, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+plot(fixbrks, pal = pal1, main = paste0("Manual, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+par(mfrow = c(1, 1))
 
 ```
 
-personnel
+```{r, 'Hierarchy Classes Example 2', echo=FALSE, message=FALSE,warning=FALSE}
+p=5
+x=Poly_List[[p]]$Population.s2
+nc=levels$Mean[p]
+pal1=brewer.pal(nc,"Set2")
+fb=as.numeric(unlist(strsplit(ManualHierClasses$Breaks[p], split=", ")))
+
+kmbrks <- classIntervals(x, style = "kmeans", n=nc)
+hcbrks <- classIntervals(x, style = "hclust", n=nc)
+bcbrks <- classIntervals(x, style = "bclust", n=nc)
+fbrks <- classIntervals(x, style = "fisher", n=nc)
+jbrks <- classIntervals(x, style = "jenks", n=nc)
+maxbrks <- classIntervals(x, style = "maximum", n=nc)
+fixbrks <- classIntervals(x, style = "fixed", fixedBreaks=fb)
+
+par(mfrow = c(2, 2))
+plot(fbrks, pal = pal1, main = paste0("Fisher, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+plot(jbrks, pal = pal1, main = paste0("Jenks, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+plot(kmbrks, pal = pal1, main = paste0("Kmeans, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+plot(fixbrks, pal = pal1, main = paste0("Manual, ",levels$Period[p]," ",levels$PeriodNum[p]),log = 'x',xlim=c(min(x)-1, max(x)+5), xlab="Log Population", ylab="ECDF(Population)")
+par(mfrow = c(1, 1))
+
+```
+
+These two periods are also representative in terms of their mixed geographical distribution of size classes across the region, further cross-validating the Kmeans settlement hierarchy class intervals. 
+
+##### Classifying All Periods
+
+Now we can classify all periods using this method
+
+```{r, 'Calculate Hierarchy Classes for all Periods', message=FALSE,warning=FALSE}
+
+for (i in 1:length(Poly_List)){
+  
+  nc=levels$Mean[i]
+  
+  kmbrks <- classIntervals(Poly_List[[i]]$Population.s2, style = "kmeans", n=nc)
+  
+  Poly_List[[i]]$SetHierLevel <-  cut(Poly_List[[i]]$Population.s2, 
+                                      kmbrks$brks, labels = FALSE, 
+                                      include.lowest = TRUE)
+}
+
+```
 
 
 
 
+## Data cleaning for statistical purpose: Software for cleaning data
+
+Mark van der Loo
+Edwin de Jonge
+
+https://data-cleaning.r-universe.dev/packages
+
+### validate
+
+validate: Data Validation Infrastructure
+Declare data validation rules and data quality indicators; confront data with them and analyze or visualize the results. The package supports rules that are per-field, in-record, cross-record or cross-dataset. Rules can be automatically analyzed for rule type and connectivity. Supports checks implied by an SDMX DSD file as well. See also Van der Loo and De Jonge (2018) <doi:10.1002/9781118897126>, Chapter 6 and the JSS paper (2021) <doi:10.18637/jss.v097.i10>.
+
+https://data-cleaning.r-universe.dev/validate
+https://cran.r-project.org/package=validate
+https://github.com/data-cleaning/validate
 
 
 
 
+### validatetools
 
 
-### Step 6: Check and reorganize totals columns (if necessary)???
-This placeholder is where you'd perform checks or reordering logic
-
-THIS WAS SKIPPED!
+### validatesuggest
 
 
+### deductive
 
 
+### deducorrect
 
 
+### lintools
 
 
+### errorlocate
 
 
+### dcmodify
 
 
+### editrules
 
+https://data-cleaning.r-universe.dev/editrules
+https://data-cleaning.r-universe.dev/dcmodify
+https://data-cleaning.r-universe.dev/errorlocate
+https://data-cleaning.r-universe.dev/lintools
+https://data-cleaning.r-universe.dev/validatetools
+https://data-cleaning.r-universe.dev/validatesuggest
+https://data-cleaning.r-universe.dev/deductive
+https://data-cleaning.r-universe.dev/deducorrect
+https://markvanderloo.r-universe.dev/rspa
 
+Mark van der Loo
+Edwin de Jonge
+
+https://data-cleaning.r-universe.dev/packages
