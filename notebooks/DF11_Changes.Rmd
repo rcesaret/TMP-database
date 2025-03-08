@@ -1,0 +1,326 @@
+---
+title: "DF11 Changes Explanation: RC Changes"
+subtitle: "Modifications, Removals and Additions to DF9-DF10"
+author: "Rudolf Cesaretti"
+date: "2025-03-08"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+    number_sections: false
+    code_download: true
+---
+
+```{css, echo=FALSE}
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 400px;
+}
+```
+
+## Variable Changes in DF11
+
+
+
+
+
+
+
+
+```{r setup_and_load_data, echo=FALSE, results=FALSE, message=FALSE}
+# Load required packages
+library(tidyverse)
+library(readxl)
+library(stringi)
+library(knitr)
+library(kableExtra)
+
+# Set directory path
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
+
+# Read the raw data
+data <- read_csv(paste0(DIR, "data/raw/DF9b_data_char.csv"), locale = locale(encoding = "Latin1"))
+
+```
+
+
+
+
+### 1-2. `site` & `subsite`
+
+  At present, `subsite` is treated as an overflow bin for `site` in SSNs with more than one site. This is done very haphazardly, with numerous different formatting styles across rows: 
+
+* There are sometimes spaces between the letter and number in “location” sites (e.g. “L 4”) and sometimes not (e.g. “L4”)   
+* Additional sites are listed in the `subsite` column, and indicated as such using “+” and “&”. 
+* Ranges of site and subsite names/numbers are specified using “-”, often across columns (e.g. when `site` = L2 and `subsite` = -L3). 
+    + This can be especially problematic when the end of the range is abbreviated like in row `SSN` = 2865, where `site` = "106" `and` subsite = "-08", which should be read as "sites 106 to 108", not "sites 106 to 08". 
+    + In certain cases, ranges are even specified with "to" instead of a dash “-“ (e.g. "LtoQ"; should be “L-Q”)   
+* Multiple subsites (including sequential alphanumeric ranges) are often listed together without anything dividing their individual designations (e.g. “ABC” for A, B and C; or “AD” for A and D.
+    + Sometimes subsites are designated by a letter following a number (e.g. "X13" or "C1"; see row 1957)  
+
+These issues in DF9 are illustrated in **Table X1**, below:  
+
+
+**Table X1. Selected Rows from DF9 showing the range of different notation used in the `site` and `subsite` variables**
+```{r Table_X1, echo=FALSE}
+data.frame(
+  SSN = c(1679,  480, 3767, 2131, 2581, 4267, 1367, 512, 3168, 2865, 777, 588, 2189, 1957),
+  site = c("11",  "L2", "41", "19",  "79",  "6",   "12",  "L11", "L2",   "106",  "12",  "8",   "114", "25"),
+  subsite = c("+12", "&L7", "+L1", "A-D", "A&D", "ABC", "AD", "-12", "-L3", "-08", "LtoQ", "NONE", "ETC", "C1")
+) %>%
+  kbl(
+    caption = NULL,
+    #caption = "Table X1. Selected Rows from DF9 showing the range of different notation used in the site and subsite variables",
+    booktabs = TRUE,
+    align = "l"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = T
+  ) %>%
+  row_spec(0, bold = TRUE, font_size = 16)
+```
+
+
+  These haphazard conventions must be replaced with a set of rules for recording these variables:
+
+* Multiple entries for `site` and `subsite` names will be listed in full, with names separated by   
+semicolons   
+* Spillovers from the `site` column to the `subsite` column must be moved back to the `site` column   
+* The `subsite` designation "ETC" (see e.g. row 2189) indicates "etcetera", not subsites E, T and C. If   `subsite` reads "ETC" it should be changed to "Etc." 
+* Replacing “NONE” with `NA`   
+* Removing spaces in location names (e.g. “L 1” becomes “L1”)  
+
+
+
+**Table X2. Proposed DF11 revisions to the same rows from DF9**
+```{r Table_X2, echo=FALSE}
+data.frame(
+  SSN = c(1679, 480, 3767, 2131, 2581, 4267, 1367, 512, 3168, 2865, 777, 588, 2189, 1957),
+  site = c("11;12", "L2;L7", "41;L1", "19", "79", "6", "12", "L11;L12", "L2;L3", "106;107;108", 
+           "12", "8", "114", "25"),
+  subsite = c("", "", "", "A;B;C;D", "A;D", "A;B;C", "A;D", "", "", "", "L;M;N;O;P;Q", "", "Etc.", "C1"),
+  numSites = c(2, 0, 1, 1, 1, 1, 1, 0, 0, 3, 1, 1, 1, 1),
+  numLocs = c(0, 2, 1, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0),
+  numSubsites = c(0, 0, 0, 4, 2, 3, 2, 0, 0, 0, 6, 0, NA, 1)
+) %>%
+  kbl(
+    caption = NULL,
+    #ccaption = "Table X2. Proposed DF11 revisions to the same rows from DF9",
+    booktabs = TRUE,
+    align = "l"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = T
+  ) %>%
+  row_spec(0, bold = TRUE, font_size = 16)
+
+```
+
+
+  In addition, the designation of a “site” vs a “location” have substantive meaning in the TMP. Whereas sites are areas with substantial Terminal Formative and Classic period occupations, locations are dominated by archaeological remains from other (usually later) periods. This information is relevant to both Teotihuacan period site taphonomy and the proportions of surface remains from Teo vs post-Teo ceramic phases. This information is especially important given the non-systematic nature of the TMP surface collections, which gave overwhelming preference to collecting Teotihuacan period remains. As such, we lack a clear picture of the relative proportions of surface remains (and chronologically nondiagnostic artifacts collected by the surveyors) belonging to the other major (non-Teo) chronological phases of the Prehispanic Teo Valley. Without a systematic sample, this is one of the few means by which we can assess the magnitude of post-Teotihuacan occupation—and thus its impact on Classic and Terminal Formative surface remains, in addition to being important cultural information its own right.  
+
+  For these reasons, I have added variables for counts of the number of sites and locations in each collection unit. A final additional variable is the number of “subsites”, which may also have relevance to the magnitude and complexity of Teo-period surface remains.  
+
+
+```{r v1_v2_site_subsite}
+
+# create new df for transformed variables
+df <- data %>% select(SSN,site,subsite)
+
+# --- Helper functions ---
+
+# Vectorized function to remove spaces (e.g., "L 2" becomes "L2")
+remove_spaces <- function(x) {
+  ifelse(is.na(x), NA_character_, str_replace_all(x, " ", ""))
+}
+
+# Expand a letter range (e.g., "A-D" or "LtoQ") into a semicolon-separated string
+expand_letter_range <- function(x) {
+  if (str_detect(x, "to")) {
+    parts <- str_match(x, "([A-Z])to([A-Z])")
+  } else if (str_detect(x, "-")) {
+    parts <- str_match(x, "([A-Z])\\-([A-Z])")
+  } else {
+    return(x)
+  }
+  if (any(is.na(parts))) return(x)
+  start <- parts[1,2]
+  end <- parts[1,3]
+  paste(LETTERS[match(start, LETTERS):match(end, LETTERS)], collapse = ";")
+}
+
+# Expand a numeric range where the subsite is given as an abbreviated end value.
+# For example, site "106" and subsite "-08" become "106;107;108"
+expand_numeric_range <- function(site_val, subsite_val) {
+  subsite_num <- str_remove(subsite_val, "^-")
+  site_str <- as.character(site_val)
+  if(nchar(subsite_num) < nchar(site_str)){
+    prefix <- substr(site_str, 1, nchar(site_str) - nchar(subsite_num))
+    end_val <- as.numeric(paste0(prefix, subsite_num))
+  } else {
+    end_val <- as.numeric(subsite_num)
+  }
+  start_val <- as.numeric(site_str)
+  paste(as.character(seq(start_val, end_val)), collapse = ";")
+}
+
+# Process the subsite field given the original (or first) site value.
+process_subsite <- function(subsite, site_val) {
+  if (is.na(subsite)) return(NA_character_)
+  subsite <- remove_spaces(subsite)
+  
+  # Replace "NONE" with NA
+  if (toupper(subsite) == "NONE") return(NA_character_)
+  
+  # "ETC" should become "Etc."
+  if (toupper(subsite) == "ETC") return("Etc.")
+  
+  # If the value begins with spillover markers (+ or &), it's been moved already
+  if (str_detect(subsite, "^[+&]")) return(NA_character_)
+  
+  # If subsite starts with "-" (indicating a range meant for site), we leave it for site processing.
+  if (str_detect(subsite, "^-")) return(NA_character_)
+  
+  # Expand letter ranges specified with "-" or "to" (e.g. "A-D" or "LtoQ")
+  if (str_detect(subsite, "^[A-Z](\\-|to)[A-Z]$")) {
+    return(expand_letter_range(subsite))
+  }
+  
+  # Split on "&" if multiple subsites are listed (e.g. "A&D")
+  if (str_detect(subsite, "&")) {
+    parts <- str_split(subsite, "&")[[1]] %>% str_trim()
+    return(paste(parts, collapse = ";"))
+  }
+  
+  # If composed only of letters and length > 1, split them (e.g. "ABC" -> "A;B;C")
+  if (str_detect(subsite, "^[A-Za-z]+$") && nchar(subsite) > 1) {
+    letters_split <- str_split(subsite, "")[[1]]
+    return(paste(letters_split, collapse = ";"))
+  }
+  
+  # Otherwise, return the cleaned subsite unchanged (e.g. "C1")
+  return(subsite)
+}
+
+# Process the site field by removing spaces and handling spillover markers and ranges.
+process_site <- function(site, subsite) {
+  site <- remove_spaces(site)
+  
+  # If subsite begins with + or & (spillover), remove the marker and append to site.
+  if (!is.na(subsite) & str_detect(subsite, "^[+&]")) {
+    spill <- remove_spaces(str_remove(subsite, "^[+&]"))
+    site <- paste(site, spill, sep = ";")
+  }
+  
+  # If subsite starts with "-" indicating a range continuation, expand and append.
+  if (!is.na(subsite) & str_detect(subsite, "^-")) {
+    if (str_detect(subsite, "^-\\d+$") && str_detect(site, "^\\d+$")) {
+      site <- expand_numeric_range(site, subsite)
+    } else if (str_detect(subsite, "^-\\d+$") && str_detect(site, "^[A-Za-z]+\\d+$")) {
+      # For cases like "L11" and "-12"
+      prefix <- str_extract(site, "^[A-Za-z]+")
+      new_val <- paste0(prefix, str_remove(subsite, "^-"))
+      site <- paste(site, new_val, sep = ";")
+    } else if (str_detect(subsite, "^-\\D.*")) {
+      # For cases like "L2" and "-L3"
+      cleaned <- str_remove(subsite, "^-")
+      site <- paste(site, cleaned, sep = ";")
+    }
+  }
+  
+  return(site)
+}
+
+# Vectorize the non-vectorized functions so they work element-wise
+process_site_vec <- Vectorize(process_site, vectorize.args = c("site", "subsite"))
+process_subsite_vec <- Vectorize(process_subsite, vectorize.args = c("subsite", "site_val"))
+
+# --- Main processing pipeline ---
+
+df_clean <- df %>%
+  # Remove spaces from site and subsite columns
+  mutate(
+    site = remove_spaces(site),
+    subsite = remove_spaces(subsite)
+  ) %>%
+  # Step 1: Move spillover entries (those beginning with + or & in subsite) into site
+  mutate(
+    spill = if_else(!is.na(subsite) & str_detect(subsite, "^[+&]"),
+                    remove_spaces(str_remove(subsite, "^[+&]")),
+                    NA_character_),
+    site = if_else(!is.na(spill), paste(site, spill, sep = ";"), site),
+    subsite = if_else(!is.na(spill), NA_character_, subsite)
+  ) %>%
+  # Step 2: Handle subsite values that start with "-" (range continuations)
+  mutate(
+    site = if_else(!is.na(subsite) & str_detect(subsite, "^-"),
+                   process_site_vec(site, subsite),
+                   site),
+    subsite = if_else(!is.na(subsite) & str_detect(subsite, "^-"),
+                      NA_character_,
+                      subsite)
+  ) %>%
+  # Step 3: Process any remaining subsite values (e.g. expand letter ranges, split concatenated letters)
+  mutate(
+    site_first = word(site, 1, sep = fixed(";")),
+    subsite = if_else(!is.na(subsite), process_subsite_vec(subsite, site_first), subsite)
+  ) %>%
+  # Step 4: Compute counts for sites, locations, and subsites
+  mutate(
+    site_list = str_split(site, ";"),
+    numSites = map_int(site_list, ~ sum(str_detect(.x, "^\\d+$"))),
+    numLocs = map_int(site_list, ~ sum(str_detect(.x, "^[A-Za-z]"))),
+    numSubsites = case_when(
+      is.na(subsite) ~ 0L,
+      toupper(subsite) == "ETC" ~ NA_integer_,  # record as NA if Etc.
+      TRUE ~ str_count(subsite, ";") + 1L
+    )
+  ) %>%
+  select(-spill, -site_first, -site_list)
+
+# --- Compare Cleaned Data with Original Manually ---
+
+#compared <- df %>% 
+#  rename(site_orig = site, subsite_orig = subsite) %>% 
+#  left_join(df_clean, by = "SSN")
+
+# --- Final Manual Corrections ---
+
+# dataframe of manually looked-up corrections to specific rows using the TMP map
+corrected_cases <- tibble(
+  SSN = c(150, 454, 664, 1125, 1159, 1198, 1654, 2562, 2744, 3271, 3472, 3622),
+  site = c("8;9;10", "9;10;13", "18;L10", "5;23;L3", "27;42", "L1;L4;L6", "58;59;61",
+           "78", "19", "2", "1", "5"),
+  subsite = c(NA, NA, NA, NA, NA, NA, NA, "73-J", "20-A", "E;N;NE", "W", "S;SW"),
+  numSites = c(3, 3, 1, 2, 2, 0, 3, 1, 1, 1, 1, 1),
+  numLocs = c(0, 0, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0),
+  numSubsites = c(0, 0, 0, 0, 0, 0, 0, 1, 1, 3, 1, 2)
+)
+
+# Replace these rows in the cleaned data with the manually corrected cases
+df_clean <- df_clean %>%
+  anti_join(corrected_cases, by = "SSN") %>%  # Remove existing rows with these SSNs
+  bind_rows(corrected_cases) %>%              # Add the corrected rows
+  arrange(SSN)  # Arrange to keep order consistent
+
+# Remove the original site and subsite columns from the main dataset
+data <- data %>% select(-site,-subsite)
+
+# Merge the manually corrected rows back into the main dataset
+data <- df_clean %>% 
+  left_join(data, by = "SSN")
+
+# Remove unnecessary objects from workspace
+rm(df, df_clean, corrected_cases)
+
+```
+
+
+

@@ -21,52 +21,76 @@ https://journal.r-project.org/articles/RJ-2019-033/
 ## Setup & Data 
 
 ```{r}
-DF9_metadata <- read_csv(paste0(DIR, "data/raw/Metadata.csv"), locale = locale(encoding = "Latin1"))
+rm(list = ls())
+```
+
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(stringi)
+```
+
+```{r}
+DIR = "C:/Users/TJ McMote/ASU Dropbox/Rudolf Cesaretti/GitHubRepos/TMP-database/"
+
+```
+
+
+```{r}
+metadata <- read_csv(paste0(DIR, "data/raw/Metadata.csv"), locale = locale(encoding = "Latin1"))
 
 
 file_list <- list.files(
   path = paste0(DIR, "data/raw/DF9_rev"),
-  pattern = "\\.csv$", full.names = TRUE
+  pattern = "^Data_.*\\.csv$", 
+  full.names = TRUE
 )
 file_names <- tools::file_path_sans_ext(basename(file_list))
-df_list <- map(file_list, read_csv, locale = locale(encoding = "Latin1"))
-names(df_list) <- file_names
+data_list <- map(file_list, read_csv, locale = locale(encoding = "Latin1"))
+names(data_list) <- file_names
 #list2env(data_list, envir = .GlobalEnv)
 
-data_list  <- df_list[grepl("^Data_", names(df_list))]
-
 data <- read_csv(paste0(DIR, "data/raw/DF9b_data_char.csv"), locale = locale(encoding = "Latin1"))
+```
 
-complexData <- data %>% 
-  select(names(data_list[["Data_complexData"]] %>% select(-SSN)))
 
-complexMacroData <- data %>% 
-  select(names(data_list[["Data_complexMacroData"]] %>% select(-SSN)))
+```{r}
 
-archInterp <- data %>% 
-  select(names(data_list[["Data_archInterp"]] %>% select(-SSN)))
+dataReportData_list <- list()
 
-archMaterial <- data %>% 
-  select(DF9_metadata %>% filter(dbTable_DF9b == "Data_archMaterial") %>% select(varName_DF9b) %>% pull())
+NOM <- c("complexData", "complexMacroData", "archInterp", "archMaterial", "condition", "description", "workshop", "admin", "location","lithicGround","lithicFlaked", "cerVessel", "cerPhTot", "cerNonVessel", "artifactOther")
 
-description <- data %>% 
-  select(names(data_list[["Data_description"]] %>% select(-SSN)))
+for (i in NOM) {
+  #nom2 <- paste0("Data_", i)
+  dataReportData_list[[i]] <- data %>% 
+    select(metadata %>% filter(dbTable_DF9b == paste0("Data_", i)) %>% select(varName_DF9b) %>% pull())
+  
+}
 
-workshop <- data %>% 
-  select(names(data_list[["Data_workshop"]] %>% select(-SSN)))
+dataReportData_list[["Plazas"]] <- data_list[["Data_Plazas"]] %>% 
+  select(-SSN) %>% 
+  mutate(NorwoodPlazas = ifelse(PlazaNo < 0, FALSE, TRUE),
+         PlazaNo = ifelse(PlazaNo == -1, NA, PlazaNo)) %>% 
+  rename(PlazaNum = PlazaNo)
 
-admin <- data %>% 
-  select(names(data_list[["Data_admin"]] %>% select(-SSN)))
+SSN <- data.frame(SSN = data$SSN)
 
-dataReportData_list <- list(complexData = complexData, complexMacroData = complexMacroData, archInterp = archInterp, archMaterial = archMaterial, description = description, workshop = workshop, admin = admin)
+dataReportData_list[["labWorkers"]] <- SSN %>% 
+  left_join(data_list[["Data_labWorkers_bool_wide"]], by = "SSN") %>% 
+  select(-SSN)
 
-dataReportData_list_f <- lapply(dataReportData_list, function(df) {
-  df %>% mutate(across(where(is.character), as.factor))
-})
-
+dataReportData_list[["fieldWorkers"]] <- SSN %>% 
+  left_join(data_list[["Data_fieldWorkers_bool_wide"]], by = "SSN") %>% 
+  select(-SSN)
 
 ```
 
+```{r}
+data_list <- dataReportData_list
+
+rm(dataReportData_list, file_names, file_list, NOM, i, SSN)
+```
 
 
 
@@ -102,7 +126,7 @@ https://dcomtois.r-universe.dev/summarytools
 library(summarytools)
 
 # dataset
-DAT <- complexData
+DAT <- data_list[[1]]
 
 # Generate a detailed summary report of the dataset
 summary_report <- dfSummary(
@@ -115,7 +139,7 @@ summary_report <- dfSummary(
   max.distinct.values = 50,
   max.string.width = 50,
 )
-
+summary_report
 # Print the summary to the console
 print(summary_report)
 
@@ -131,6 +155,7 @@ dlookr: Tools for Data Diagnosis, Exploration, Transformation
 
 A collection of tools that support data diagnosis, exploration, and transformation. Data diagnostics provides information and visualization of missing values, outliers, and unique and negative values to help you understand the distribution and quality of your data. Data exploration provides information and visualization of the descriptive statistics of univariate variables, normality tests and outliers, correlation of two variables, and the relationship between the target variable and predictor. Data transformation supports binning for categorizing continuous variables, imputes missing values and outliers, and resolves skewness. And it creates automated reports that support these three tasks.
 
+https://choonghyunryu.github.io/dlookr/
 https://choonghyunryu.r-universe.dev/dlookr
 https://github.com/choonghyunryu/dlookr
 https://cran.r-project.org/web/packages/dlookr/index.html
@@ -145,6 +170,9 @@ https://cran.r-project.org/web/packages/dlookr/vignettes/transformation.html
 # Script 2: Dataset Diagnosis using dlookr
 library(dlookr)
 
+
+# dataset
+DAT <- data_list[[1]]
 # Read the dataset
 # Generate a diagnostic report (includes missing values, distributions, outliers, etc.)
 # The report is exported as an HTML file.
@@ -153,6 +181,10 @@ diagnose_report(
   output_format = "html", 
   output_file = "dlookr_report.html"
 )
+
+diagnose_category(DAT)
+diagnose_outlier()
+plot_outlier()
 ```
 
 * * *
