@@ -96,8 +96,6 @@ semicolons
 * Replacing “NONE” with `NA`   
 * Removing spaces in location names (e.g. “L 1” becomes “L1”)  
 
-
-
 **Table X2. Proposed DF11 revisions to the same rows from DF9**
 ```{r Table_X2, echo=FALSE}
 data.frame(
@@ -321,6 +319,897 @@ data <- df_clean %>%
 rm(df, df_clean, corrected_cases)
 
 ```
+
+
+### 4-5. northing & easting
+In the interem, vars 4 and 5 need to be multiplied by 10. 
+Following the spatial integration, they should be replaced by double-precision Millon Space coordinates of the centroid of the collection unit polygon.
+In addition to these Millon Space centroid coordinates, two additional spatial coordinate variables must be added – Lat and Lon – using the georeferenced transformation of Millon Space into well-known coordinate reference systems
+
+### 6-10. Field Workers and Vars 187-189. Lab Analysts
+These variables are utterly useless for analysis in their present form. To remedy this, they need to take the form of binary presence/absence variables for each personell member – just like those featured in the REANs personnel metadata.
+For the field worker variables, we thus need to transform these 5 variables (vars. 6-10) into 29 boolean (Presence/Absence) variables -- i.e. one for each field worker that worked on at least one collection unit (excluding the 3 of 32 personnel that are not present in any row)
+In like manner, the 3 lab analyst variables must be converted into into 24 boolean (Presence/Absence) variables, with one variable for each lab worker that worked on at least one analysis (i.e. excluding the 8 of 32 personnel that are not present in any row)
+
+
+### 11-12 & 190-191. The Year and Quarter of Collection and Analysis
+•	Year variables 11 and 190 should specify the full year (e.g. 1966 instead of “66”)
+•	Quarter variables 12 and 191 should be nominal unordered factor variables
+•	Add a Year-Quarter variable to capture the temporal progression of collections and analyses at quarterly resolution, with formal date formatting for optimal machine readability to facilitate temporal analysis
+
+
+### 13. Last build Phase (lastBuildPhase)
+Following Cowgill (1993), Cowgill et al (2012) and Sherfield (2023), this variable is inaccurate and invalid and has been deleted. Only a more systematic analysis of the will be deleted
+
+Changes from Sherfield DF10
+
+“Variable 13, last major Teotihuacan building phase (lastBuildPhase) was removed from DF10. According to Robertson and Cowgill 2012, this field was supposed to have been based on a sensitive reading of the SSRs. However, few SSRs discussed this question explicitly, and in practice coders relied almost entirely on a very mechanical interpretation of sherd counts, which could have been done as well or better by looking at data fields 205-217, and still better by looking at the “interpretations” maps of Millon et al. (1973). In addition, a programming error in creating DF8 (the predecessor to DF9) changed all the “missing data” values for data field 13 to zeros, thereby losing the few (if any) sites judged to have no major Teotihuacan building phase later than Patlachique.”
+
+
+### 14. Burials
+SPLIT
+Separate: 
+•	burial presence/absence ordinal scale 
+•	burial looting presence/absence
+•	burial collection characteristics
+
+Burials. This is an example of bad variable design. It tries to capture three things at once: evidence of burials, evidence of looted burials, and whether the collection is mainly burial material. The result is too complex to have been used much by the coders. We can be certain that burials would be found in a very high proportion of the sites coded "0," if they were excavated. Var.107 is a better indicator of looting. Perhaps the main value of var.14 is that it identifies 7 sites from which the collections may be mostly or entirely remnants of burial offerings. However, this needs to be checked by referring to the original site records!
+Burials. The main value of this data field is to identify 21 cases where remains indicative of burials were visible on the surface (Figure 3.x), sometimes as a result of recent looting, including 7 cases where the collection may consist mostly or entirely of burial offerings (but the SSRs must be checked to see if this is really the case) and another 84 cases where burials were judged possibly present.  However, the vast majority of substantial Teotihuacan Period structures have proven to include burials when excavated.
+
+
+### 15. Middens
+Very limited utility for analysis. This field is not very useful for judging where middens might be encountered upon excavation. Almost all cases were recorded as "middens not observed", indicating that surface evidence for middens is very rare at Teotihuacan.
+Midden deposits on site. Var.15 is nearly useless for judging where middens might be found upon excavation. It does reflect the fact that obvious surface evidence of large middens is very rare at Teo.
+Midden deposits on site. At the outset of the TMP it was hoped that stratified middens could be found that would be strategic for excavations that could help refine the ceramic chronology. Disappointingly, very little evidence of such middens was visible on the surface and only 11 possible or definite middens are coded in DF9 (Figure 3.x). It seems likely that most midden material was recycled for use in later structures. There were a few exceptions, such as a midden deposit in site 39:N6W3 into which TMP excavation E12 was dug. The excavation spot is actually in the part of 39:N6W3 that is in sector N6W4 (Millon et al. 1973:6). Some other TMP excavations encountered deep layers of refuse, such as E23, in the Tepantitla apartment compound, 1:N4E2 (Millon 1992:346-47, Fig. 2).
+
+
+### 17. stoneDist Distribution of stone
+“Relatively uniform stone distributions versus concentrations were probably among the data used in judging whether it was likely that ancient structures occupied most of a site or only a specific part.”
+Var 17 is currently a nominal variable, but it has the potential to be an ordinal variable with greater utility for analysis. Its coded values are as follows:
+1=relatively uniform
+2=localized
+3=variable; 
+4=heavily modified due to clearing
+If we reorder the first three values to be
+1=relatively uniform
+2=variable; 
+3=localized
+then the variable ordinally measures the distribution of stone along an axis that stretches between an even spatial distribution on one end, and a concentrated spatial distribution on the other.
+
+This ordinal scale is muddied by the inclusion of a value for cases where clearing was thought likely to have altered the original spatial distribution of stone. Yet the magnitude and impact of stone clearing is already captured in much greater detail by var 111 (“stoneClearing”), making the coded value “4. heavily modified due to clearing” redundant. As such, we can remove “4. heavily modified due to clearing” from variable 17 and replace it with NA values (indicating missing data for the spatial distribution of stone due to the impact of intensive stone clearing), and rearrange it into an ordinal variable as proposed above
+
+In doing so, we might consider renaming var 17 something along the lines of “spatial concentration of stone” given that higher values indicate greater levels of spatial concentration. [This is the inverse of the concept of spatial entropy, with a relatively uniform distribution of stone representing high spatial entropy, and localized concentrations of stone indicating low entropy (i.e. providing information that betrays higher levels of order/structure in the system flows that generated the distribution)]. 
+Also need to reword the codes?
+
+
+
+
+### 18. stoneCut Cut Stone observed
+Variable 18 was removed by Sherfield in DF10 because all values were NA (-1= missing data =NA)
+However, the data is preserved in DF8. I have therefore re-integrated the stoneCut data from DF8 and retained var 18 in its original form
+
+
+
+### 29. burnedStruct Evidence of burned ancient structure
+The codes for var 29 should be reordered to make it ordinal.
+
+Currently they are:
+0=absent
+1=present
+2=strong
+3=possible
+
+But if we reorder “possible” between “absent” and “present”, then the variable ordinally captures the magnitude of evidence for burned structures:
+0=absent
+1=possible
+2=present
+3=strong
+
+### 30-37. Ancient architectural features found in situ.
+The following variables record the presence/absence and frequency of architectural features found in situ by the TMP survey. These are 
+30. Floors 
+31. Walls 
+32. Drains 
+33. Wall Fixtures 
+34. Murals 
+35. Columns 
+36. Taludes (sloping staircase aprons) 
+37. Tableros (recessed vertical panels typically set above taludes)
+
+These variables are coded problematically with nominal values that are *almost* ordinal, and conflate presence/absence with an ordinal scale of magnitude. The cause of this was (other than a lack of forethought for future analysis of the data) due to ambiguities in the recorded data.
+The possible values for these variables are as follows:
+0=not observed; 
+1=problematic object that could be part of floor; 
+2=possible floor, evidence indirect or ambiguous; 
+3=one floor; 
+4=two or three floors; 
+5=four or more floors; 
+6=floor present, count unspecified; 
+9=other
+
+The frequencies of the values for each of these variables in the dataset are as follows:
+
+SEE TABLE
+
+On the one hand, I could convert the variables to present/absent or absent/possibly-present/present. On the other hand, this would waste the ordinal information on observed frequency/abundance. Yet, at the same time, there are categories that do not fit into the ordinal structure. If I were to go the ordinal direction, "Other" is always a very low frequency, so I could convert this meaningless value to NA. In this case, I might also consider merging the "problematic object that could be part of one" category with either "possible one, evidence indirect or ambiguous" or "not observed". But the real problematic category is "present in unspecified quantity", which cannot be easily fit into the ordinal scale, and constitutes a sizable chunk of the non-absent values.
+
+
+Recommended Recoding Approach
+I propose recoding each variable into two separate variables:
+1.	Presence certainty (nominal scale, indicating confidence in presence): appending suffix “_pres” to variable names
+o	0 = Absent
+o	1 = Possible but uncertain evidence for presence (combining "problematic object" and "possible one")
+o	2 = Confirmed presence
+2.	Observed frequency (ordinal scale from zero to 4+, NA otherwise); appending suffix “_freq” to variable names
+o	0 = Zero
+o	1 = One present
+o	2 = Two or three present
+o	3 = Four or more present
+
+How This Helps
+•	Better statistical usability:
+o	The presence/certainty variable allows for clear presence/absence testing while acknowledging ambiguity.
+o	The frequency variable preserves ordinal data without conflating uncertain cases.
+•	Logical separation of information:
+o	Presence and quantity are distinct concepts in archaeological observations.
+o	A structure that explicitly separates these dimensions is more interpretable in analysis.
+•	Handling ambiguous cases effectively:
+o	"Problematic" and "possible" objects are not included in frequency counts, reducing noise in ordinal analyses.
+the low frequencies of non-absent values do impact this strategy in a few ways, particularly in terms of statistical power and interpretability. Let’s consider the key challenges and adjustments:
+
+1. Impact on Ordinal Modeling
+•	Since the majority of observations fall into the "not observed" (absent) category (e.g., 79.9% for floors, 98.9% for drains), the low frequency of non-absent values means: 
+o	Any ordinal regression model might struggle due to sparse data in some categories.
+o	Certain levels of the ordinal frequency scale (e.g., "four or more" or "two or three") have small counts, which could lead to unstable estimates.
+Adjustment Strategy:
+•	Consider collapsing some ordinal categories to avoid sparsely populated levels.
+o	For example, "one" and "two or three" could be merged into a "few present" category.
+o	"Four or more" and "present in unspecified quantity" could be combined into a "many present" category.
+Revised Ordinal Frequency Scale:
+o	1 = Few (1–3 observed)
+o	2 = Many (4+ or unspecified quantity)
+This helps maintain the ordinal distinction while ensuring no category is overly sparse.
+________________________________________
+2. Impact on Presence Certainty Variable
+•	For some variables (e.g., wall fixtures, drains, columns), the "problematic" or "possible one" categories have tiny counts (≤5 cases).
+•	This means that treating them as a separate category might not be useful because: 
+o	There’s too little data to support meaningful analysis of these cases.
+o	Statistical models might drop or merge these categories automatically.
+Adjustment Strategy:
+•	Instead of keeping "ambiguous" (problematic and possible cases) as a separate category, consider merging them into "Absent" unless they are notably frequent.
+•	If keeping ambiguity is important, use a binary approach for presence (ignoring ambiguity):
+o	0 = Absent (including "problematic" and "possible one" if counts are very low)
+o	1 = Present (any confirmed evidence)
+•	However, if ambiguous cases are still numerous in some variables (e.g., walls: 56 cases of "possible one"), keeping them as a separate category might be justifiable.
+
+
+Final Recommendation
+Given the frequency distribution, a two-variable approach (presence certainty + ordinal frequency) is still valid, but collapsing sparse categories is necessary to avoid statistical issues.
+
+
+### 39. Size of stones (including tezontli) in cores of walls or taludes
+The metadata notes that "Var.39 is probably of little value. Site records only sporadically record information about stones in walls. The dominant coding is NA.”
+
+Indeed, only some ~325 of 5050 SSNs have non-NA values, and of these, the stones are of unspecified size.
+
+wallCoreStone (%)                                                                                                                    
+     large stones                   4 ( 1.1) 
+     medium stones              3 ( 0.8) 
+     small stones                    9 ( 2.5) 
+     stones of mixed sizes              4 ( 1.1) 
+     stones present, unspecified size              253 (70.7) 
+     walls present, but no stone observed in them           85 (23.7)
+
+Moreover, we again have the ordinal/nominal conflation issue.
+0=walls present, but no stone observed in them; 
+1=small stones; 
+2=medium stones; 
+3=stones present, unspecified size; 
+4=stones of mixed sizes; 
+5=large stones
+
+Moreover, it should be noted that these construction materials are handled with greater detail on construction material abundance and with more non-NA observations in vars 19-28
+
+Thus, this variable will be deleted.
+
+### 40. wallCoreOthMat Materials in cores of walls, instead of or in addition to stone.
+Other materials in cores of walls. Var.40 refers to materials that may be present in walls instead of or in addition to stone (var.39).
+
+This is the exact same as for var 39, above. Most of the values are NA, and the remaining nominal categories will be of little use in analysis
+
+wallCoreOthMat (%)                                                                                                                   
+     adobes present, plus possibly other materials                  		25 ( 0.5) 
+     no walls, or walls but no data on this                                                      4656 (92.2) 
+     other, including xalnene or tepetate and xalnene, but not adobes           19 ( 0.4) 
+     tepetate is the only recorded additional material                                     113 ( 2.2) 
+     walls present but nothing except stone and/or tezontli observed             237 ( 4.7) 
+
+Moreover, it should be noted that these construction materials are handled with greater detail on construction material abundance and with more non-NA observations in vars 19-28
+
+Thus, this variable will be deleted.
+
+
+
+
+
+
+### 41. wallFacing 
+This nominal variable with mostly NAs will be retained in modified form as a supplement to the other (often sparse) construction materials and architectural quality/features variables. If used together, these sparse variables may together statistically inform statistical or ML inferences about construction/architectural quality
+The following changes will be made to make the variable an ordinal measure of architectural quality:
+•	the “Other” and “facing material lost or uncertain” categories will be deleted and changed to NA
+•	The new coded values will be as follows:
+o	1=Wall facings lack plaster
+o	2=Plaster wall facings without paint
+o	3= Plaster wall facings with paint
+
+wallFacing (%)                                                                                                                       
+     apparently had no facing                                                                                                42 ( 7.8) 
+     concrete                                                                                                               310 (57.7) 
+     concrete plus painted plaster                                                                                           72 (13.4) 
+     concrete plus plaster                                                                                                   87 (16.2) 
+     facing material lost or uncertain                                                                                        4 ( 0.7) 
+     mud                                                                                                                     16 ( 3.0) 
+     other                                                                                                                    1 ( 0.2) 
+     plaster on mud                                                                                                           5 ( 0.9) 
+
+
+
+
+
+
+
+### 42. intrusiveSherd
+Here we just need to remove the “Other” category (with only 1 of 5050 observations) and re-arrange the order of the coded values to change this variable from nominal to an ordinal variable that measures the level of intrusive mixing
+
+intrusiveSherd (%)                                                                                                                   
+     Average level of intrusive sherd mixing                                                                               4556 (94.5) 
+     Isolated site                                                                                                           81 ( 1.7) 
+     Other                                                                                                                    1 ( 0.0) 
+     Probably considerable intrusive sherd mixing                                                                           171 ( 3.5) 
+     Probably primarily intrusive material                                                                                   12 ( 0.2) 
+
+New ordinal values:
+1.	Isolated site with low levels of intrusive sherd mixing
+2.	Average level of intrusive sherd mixing
+3.	High or above average levels of intrusive sherd mixing
+
+Here, the last value (3) combines “Probably primarily intrusive material” and “Probably considerable intrusive sherd mixing” because the former has only 12 observations
+
+
+
+
+
+
+
+
+### 43. height
+Height of site to nearest decameter.
+Values:
+•	0-98=height to nearest multiple of 10cm; 
+•	99=over 9.85m high
+Multiply by 10 to get an estimate of the height of the site, plus or minus 5cm. Ex. "5" indicates a height estimate between 45 and 55 cm.
+Height of site. For example, "5" means 50 plus or minus 5 cm (i.e., 45 to 55 cm).
+Height of site. This refers to average height above surrounding terrain, and was generally estimated somewhat subjectively, especially where the terrain was sloping. Many height estimates were probably rounded to the nearest half meter or so. This data field is rather useful for distinguishing cases with no appreciable mounding, low mounding, moderate mounding, or considerable mounding such as is typical of pyramids. It can be used in conjunction with the 1-meter contours shown in Millon et al. (1973) [and an electronic layer showing contours?]. Height ranges reported include “flat” (1,997), 0.1-0.95 m (1,102), 1.0-1.95m (770), 2.0-2.95 m (250), 3.0-9.85 m (289), and 10 over 9.5 m. Figure 3.x show sites more than a meter high [four categories].
+
+Split into 4 vars:
+•	Height (orig var; a power law distribution)
+•	Log height (natural log; approx. gaussian dist)
+•	Ordinal height (split into 5 evenly-spaced intervals)
+•	Quantile Ordinal height (split into 5 categories based on quantiles of distribution)
+
+
+**HISTOGRAMS HERE**
+
+Handling the Height Variable (Var. 43)
+The height variable is a continuous ratio variable, but it has:
+1.	Integer-coded height values (0–98) that represent decimeters 
+o	These can be converted into meters directly (e.g., 5 → 0.5m, 10 → 1.0m).
+2.	An upper threshold category (99 = over 9.85m high) 
+o	This introduces a censoring effect, meaning we don’t know the exact height beyond 9.85m.
+3.	Measurement uncertainty 
+o	Heights were estimated and possibly rounded (subjectivity in measurement).
+________________________________________
+Options for Recoding
+1. Convert to Continuous Metric Height with Censored Upper Value
+•	Convert the coded values (0-98) to meters: 
+o	New Value = Old Value × 0.1
+o	E.g., 5 → 0.5m, 10 → 1.0m
+•	Assign a lower-bound value for 99: 
+o	99 → 9.85m+ (or treated as right-censored)
+👉 Best if you plan to use this as a continuous variable with censoring techniques (e.g., Tobit regression or survival analysis).
+________________________________________
+2. Categorize into Discrete Height Classes
+Given that the metadata suggests interpretation based on mounding, a categorized version can be useful:
+
+
+**TABLE**
+
+👉 Best if you plan to use this for categorical analysis (e.g., ordinal logistic regression, classification models).
+________________________________________
+Final Recommendation
+•	If you need precise height information, convert it to meters (option 1).
+•	If you want analytical categories for mounding, use option 2.
+Would you like me to check your dataset’s height distribution and apply one of these transformations?
+
+Updated Strategy for Transforming the Height Variable
+1. Log Transformation (for modeling)
+•	Apply ln(height + 0.1) to all height values (to avoid issues with ln(0), a small positive shift is added).
+•	This will normalize the right-skewed power-law distribution.
+2. Discretization (for classification/mapping)
+Since your data is fairly continuous, the previously suggested discrete binning may lose information. A better alternative could be percentile-based binning after log transformation:
+
+**TABLE**
+
+How This Helps
+•	Log transformation keeps continuous data usable for modeling.
+•	Percentile-based bins ensure more balanced category distribution (avoiding bins with almost no values).
+•	Maintains interpretability (flat vs. low vs. high mound structures) while avoiding artificial breaks in data.
+
+
+### 44-51 & 53-60. archInterp and funcInterp variables
+
+
+
+Occupational Presence/Absence for Classic Teo Ceramic Phase Intervals AND OVERALL FOR CLASSIC PERIOD AND OVERALL FOR PREHISPANIC
+
+Cowgill et al (2012) make clear that only the Xolalpan-Metepec phase architectural and functional interpretations are valid:
+“There is a great deal of ceramic evidence for pre-Miccaotli (i.e., Patlachique and/or Tzacualli, very rarely also Cuanalan phase) occupation at or near the sites of later structures but virtually no evidence about pre-Miccaotli structures in terms of their architectural features or likely uses. Any inferences about Miccaotli-Tlamimilolpa phase structures or uses simply assume that they were the same as in the Xolalpan-Metepec phases, except in rare cases where there did not seem to have been a post-Tlamimilolpa occupation. Very few, if any, structures were judged to date to the Oxtoticpac phase and, as of 2002, the very existence of an identifiable Oxtoticpac phase within the city of Teotihuacan was in question. For these reasons, DATA FIELDS 44, 45, 47, 48, 49, 51, 53, 54, 56, 57, 58, and 60 ARE OF EXTREMELY LIMITED OR NO VALUE. [Just get rid of them in the version for distribution, and simplify the discussion?]”
+Basically, the visible architecture (belonging to the terminal phase of occupation) is the main indicator of form and function, and for most collection units this is the Xolalpan-Metepec phase. As such, ceramic evidence for occupation of sites in the other three ceramic phase intervals (Patlachique-Tzacualli, Miccaotli-Tlamimilolpa and Oxtoticpac) merely extended these Xolalpan-Metepec architectural interpretations into other phases. This means that the architectural and functional interpretations for the other periods are largely invalid, and should be eliminated.
+However, these variables still contain valuable information on the presence/absence of occupation in the other three phases. Assuming that architectural interpretations were made for a phase when the site/collection unit exhibited ceramic evidence for occupation during that phase, then we can
+While there is an overall ceramic abundance variable, this is not explicitly recorded for specific phases. We are only left with the non-systematic collections. But presumably this was observed in the field and also supplemented with other contextual archy info to understand the occupational chronology of each site. As such, we can extract the occupational presence/absence information from the Archinterp variable.
+This can be cross-checked and supplemented by the ceramic phase evidence
+Density (calc 2 ways)
+Rel abundance (%)
+Total count
+Such that 
+when occupational Archinterp data indicates presence but not the ceramics  present (due to field obs and other contextual info)
+when ceramics indicate presence but not the Archinterp data  present (probably due to overlooking sites with poorly-defined or ephemeral structures in conjunction with poor site preservation)
+when both indicate presence  presence
+
+
+For sake of convenience, these ceramic phase temporal intervals
+•	Patlachique-Tzacualli
+•	Miccaotli-Tlamimilolpa
+•	Xolalpan-Metepec
+Will be renamed
+•	Early Classic (EC)
+•	Middle Classic (MC)
+•	Late Classic (LC)
+
+However, Need to eliminate Oxtoticpac phase entirely from the Occu variables. Oxtoticpac presence/absence of occupation for Archinterp and Funcinterp variables was made based on Oxtoticpac phase ceramics rather than ET ceramics. Since more recent work has demonstrated that Oxtoticpac is NOT a chronological phase by itself (when excluding other ET ceramics), assessments of presence/absence of ET occupation for Archinterp and Funcinterp variables will be invalid/inaccurate. As such, the occupational information contained in the Oxtoticpac Archinterp and Funcinterp variables is meaningless and will not be used (must be discarded).
+This is demonstrated by the correlation between phases’ ceramic abundance/density and Occu variables. Whereas the relative abundance/density of EC, MC and LC ceramics map nicely onto the presence/absence of occupation (the mean values of freq, % and density are very low for lower Occu values and much higher for high Occu values), this is not the case for ET ceramics (Oxto + Xometla). It IS the case for Oxtoticpac ceramics, however. Since Oxtoticpac ceramics are not a chronological phase, the coded Occu info is meaningless.
+
+•	For the ordinal Occu variables, you NEED TO EITHER 
+o	Merge codes 1 & 2 
+o	OR
+o	Make binary (presence/absence)
+
+CURRENTLY THE VAR IS CODED AS FOLLOWS
+0. No evidence for occupation
+1. Likely either less intensive or archaeologically ephemeral occupation
+2. Evidence for permanent occupation of some form
+3. Permanent occupation likely in the form of domestic structures or public buildings
+
+IT SHOULD BE CHANGED TO:
+0. No evidence for occupation
+1. Evidence for occupation of some form
+2. Evidence for permanent occupation in the form of domestic structures or public buildings
+OR
+0. Little-to-no evidence for occupation
+1. Evidence for occupation of some form
+
+ALSO NEED TO CALCULATE THESE FOR OVERALL FOR CLASSIC PERIOD AND OVERALL FOR PREHISPANIC
+
+
+
+Expansion and Refinement of Xolalpan-Metepec Archinterp and Funcinterp variables to reflect hierarchical categories 
+
+•	Certainty level in architectural and functional interps (Xolalpan-Metepec)
+•	
+•	Nominal or ordinal variables for (survey evidence of) the presence/absence of Prehispanic structures
+•	Nominal or ordinal variables for (survey evidence of) the presence/absence of Prehispanic artifacts
+•	Nominal or ordinal variables for (survey evidence of) the presence/absence of Prehispanic occupation
+•	Nominal or ordinal variables for the presence/absence of structures, artifacts, and/or occupation in a SSN by ceramic phase
+o	Ordinal if we use degrees of certainty to code this; e.g. 0 = absent, 1=probably absent; 2=prob present; 3 = present
+o	Possibly also another ordinal variable for the density/magnitude of archaeological remains by phase
+o	“Phases” are TBD… we should probably use conservative intervals (e.g. Xolalpan-Metepec)
+
+Multilevel Hierarchy Implementation  expand to funcInterp levels 1,2,3
+
+Separate and Remove Workshops favoring the Spence, Krotser and Barbour variables
+
+Only Xolalpan-Metepec should have archInterp and funcInterp variables
+
+For the other periods, there should be only nominal or ordinal variables for the magnitude of evidence for the presence/absence and intensity of occupation
+-1 = missing data
+0 = no evidence for occupation
+1 = Likely either less intensive or archaeologically ephemeral occupation
+2 = Likely substantial permanent occupation in the form of domestic structures or public buildings
+This gets coded from Archinterp1 and Archinterp2 for each period (including Xolalpan-Metepec)
+
+
+
+
+
+
+
+
+
+
+
+
+### 61-81. Complexes archInterp and funcInterp variables
+
+
+
+
+
+
+
+
+
+
+### 82-89. Macro-Complexes presence and funcInterp variables
+
+
+
+### 90. neighborhoodChar Neighbourhood character of site
+NEEDS HELP;; Ordinal scale from isolated to compacted … What to do with "Other"? What does "Other" signify?? Also, do the range of values [1,6] have an ordinal meaning??
+1=other sites arranged more or less compactly in neighbourhood; 2=other sites arranged more or less compactly in neighbourhood; 3=other sites arranged more or less compactly in neighbourhood; 4=other sites arranged more or less compactly in neighbourhood; 5=other sites arranged more or less compactly in neighbourhood; 6=other sites arranged more or less compactly in neighbourhood; 7=part of isolated site cluster; 8=isolated site; 9=other
+
+Character of neighborhood of site. This data field may be somewhat useful for selecting cases that are isolated or members of isolated clusters, perhaps to see if there is anything distinctive about them. However, one might do better to select such cases by simply looking at the relevant maps. Some 4,744 cases are coded as within a more or less compact neighborhood, 131 as within an isolated site cluster, 81 as isolated sites (cf. data field 42), and 51 as "other" (Figure 3.x).
+
+
+
+
+
+
+### 91-94. In-Situ Archaeological Features
+Free-standing walls in site. This data field can be useful for helping to locate definite or possible free-standing walls, which often enclose or partially enclose large precincts of Teotihuacan. None were observed in 4,728 sites, while they were present in 159 cases and possibly present or "other" in 98 cases (Figure 3.x).
+Prehispanic wells in site. Millon (1973:__) discusses the effort to locate prehispanic wells. At least until very recently, the water table in most of Teotihuacan was only a few meters below ground level – well within the depth that could be dug into the tepetate subsoil with the technology available to Teotihuacanos. In fact, the springs and marshy area in and around sectors S1W4 and S1W5 and extending to the southwest are essentially where the water table reached the level of the ground surface. In several cases, these wells, typically circular and somewhat more than a meter in diameter, with footholds cut at intervals into their sides, were found sealed under Teotihuacan-period floors. In other cases, it may be less certain that they are not post-Teotihuacan in origin, and some Teotihuacan wells may have continued in use up to recent times. They are coded as present or possibly present in 24 DF9 cases (Figure 3.x). Millon and Cowgill suspect that many more Teotihuacan wells existed than were located by the TMP survey. These wells are important evidence of one source of water for the Teotihuacanos, especially during the dry season.
+Prehispanic jaguey in site. Jagueys are artificial reservoirs. Only three likely to have been prehispanic were identified by the TMP (Figure 3.x)), and it is not clear that any of these really date to the Teotihuacan Period.
+Prehispanic puesto in site. Puestos are market stalls, frequently insubstantial or perishable. Only three cases of possible puestos were identified by the TMP survey (Figure 3.x). However, evidence of an ancient puesto would very rarely survive on the surface, so this data field tells us virtually nothing about their possible prevalence in ancient Teotihuacan.
+91. freeStandWall
+92. wells
+93. jagueyArch
+94. puestos
+
+Values:
+0=none observed in site; 
+8=present in site; 
+9=other, including possibly present
+
+REORDER;; Reorder values as 0 --> 9 --> 8 for ordinal scale
+
+Treating 9 as possibly present
+
+
+
+
+
+
+
+### 95-103. Vegetation cover at the time of collection
+
+If this field is coded "3" and all of the related (vegetative cover) fields are coded "2", then it is probably pretty safe to assume that this category was dominant on the site.
+Vegetation cover at the time the collection was made. Presence is indicated when coded "1" or higher for each category. Since the categories are not mutually exclusive, the numbers across categories add to more than 5046. If one category is coded "3" for a given site and all other categories are coded "2" or lower, it is probably pretty safe to assume that the category coded "3" was dominant on the site. This is important because "3" is a far more common coding than "4."
+Vegetation cover at the time the collection was made. These data fields are important for information about land use in the 1960s and, especially, for information bearing on the ease or difficulty of spotting objects during surface survey. Milpa (maize field), barley, beans, cut alfalfa, uncut alfalfa, nopales, fallow land, and uncultivated are all explicit categories on the SSR, while magueyes, if present, were routinely noted in the "other vegetation" space on the SSR. "Fallow" refers to cases where no crop was growing at the time of survey but there was evidence that the tract had been cultivated in the recent past. "Uncultivated" refers to land that may have been cultivated in the remote past, but not recently. Collections from uncut alfalfa were particularly difficult to make because of the very dense ground cover, and cut alfalfa was only slightly less difficult. Moreover, alfalfa fields have often been leveled (data field 112) to make irrigation possible, in the process destroying ancient mounds and other features. Mature barley also made collection difficult. Uncultivated tracts also often yielded sparse collections, partly because many were covered with grass and partly because they did not have the benefit of recent plowing, which tends to bring objects to the surface. Closely-planted nopal orchards offered challenges to surveyors but the ground surface was often not greatly obscured. Magueyes leave the ground quite open and the pits for planting magueyes may bring up material from some depth. Quite often more than one type of vegetation was noted for a single case. If one type was noted as present but the extent not recorded, and all other types present at all were noted present only in a small or moderate proportion of the site or only scattered across the site, it is likely that the type recorded merely as "present" was the dominant type on that site
+Alfalfa cut at the time of survey was found on part or all of 94 DF9 units, and uncut alfalfa on 162 units. As can be seen in Figure 3.x, most alfalfa, which is highly dependent on irrigation, was concentrated in an area of about 2000 by 2000 m, running from the N2 to the S2 row and the W4 to W1 column. Much of the irrigation water for alfalfa comes from deep drilled wells. Another district with considerable alfalfa was in the same north-south rows, from E3 to E4, and extending into sectors S1E5 and S1E6. Alfalfa fields in southwestern sectors S2W8 and S2W7 were probably watered by canals from the permanent springs in and near S1W4. There were also a number of alfalfa fields in far southern sectors S5W1 and S5E1.
+95. milpa
+96. barley
+97. beans
+98. alfalfaCut
+99. alfalfaUncut
+100. nopales
+101. magueys
+102. fallow
+103. uncultivated
+
+0=this kind of vegetation absent; 
+1=present in a small portion of site or very scattered; 
+2=present over a moderate part of site, or moderately thick; 
+3=present but extent or density not recorded; 
+4=abundant or dense on all or most of site
+
+
+
+
+
+
+### 104. cropWater Type of water for crops at the time of the survey.
+
+SPLIT;; INTRODUCE HIERARCHY
+Type of water for crops at the time of the survey. The four categories for this data field derive directly from the SSR, so they were routinely reported (Figure 3.x). Humedad (138 cases) refers to naturally moist land, essentially limited to the area of chinampa-like cultivation in the southwest part of the survey area (check!). Temporal (3,822 cases) refers to dry farming. Riego (used if any part of the site was in riego, 366 cases) refers to irrigation, using water supplied by canals or pumps. Floodwater (28 cases) refers to plots dependent on systems of catching and channeling rainwater.
+0=humedad; 
+1=temporal; 
+2=reigo (used if any part of site in riego); 
+3=flood water
+
+
+
+
+
+
+
+### 105. plowing
+
+Status of plowing when the collection was made. It is possible that a significant number of sites coded "0" should have been coded "1." I don't believe this has been carefully checked.
+Status of plowing when the collection was made. Plowing, with the relatively shallow plows in use at the time of the TMP survey, disturbs the upper 15-20 cm or so of sites, brings much material to the surface, and kills much of the ground cover, facilitating the making of relatively large collections. Plowing followed by rain increases visibility of objects even more. This was probably the case for most of the 1,868 DF9 cases coded as plowed but not freshly plowed. Only in 11 cases was part or all of the site freshly plowed at the time the collection was made. There were 435 sites coded as probably plowed in the past but not recently (Figure 3.x). Among the 2,429 coded as probably never plowed, many may have been plowed at some time in the remote past, although those on steeper ground were probably never plowed at all. Upon excavation, it is not uncommon to see plow marks on the latest well-preserved floors, and even shallow plowing has often destroyed the very latest floors (often but not always post-Teotihuacan).
+
+0=there is reason to think the site was never plowed; 
+1=probably plowed in the past, but not in recent years; 
+2=part of site in plow cultivation, but much not; 
+3=most or all in plow cultivation, but not freshly plowed; 
+4=part of site freshly plowed; 
+5=most or all of site freshly plowed
+
+
+
+
+
+
+
+
+### 106-122. Survey Modern Surface Conditions & Land Use Disturbances
+SPLIT??? If "present but unspecified magnitude" has many values;; Split presence/absence from magnitude
+
+106. pitCultivate: Presence and effects of cultivation pits.
+107. pitLoot: Presence and effects of looter pits.
+108. archaeoExcRest: Presence and effects of archaeological restoration or excavation.
+109. pitMisc: Presence and effects of miscellaneous pits.
+110. quarrying: Presence and effects of quarrying.
+111. stoneClearing: Presence and effects of stone clearing.
+112. landLeveling: Presence and effects of land levelling.
+113. terracing: Presence and effects of terracing.
+114. ditching: Presence and effects of ditching.
+115. roadOrRail: Presence and effects of road or railroad construction.
+116. recentWall: Presence and effects of recent walls.
+117. stoneRows: Presence and effects of stone rows and rock piles.
+-118. recentBuild: Presence and effects of recent buildings.
+119. dam: Presence and effects of dam construction.
+120. jagueyMod: Presence and effects of jaguey.
+121. erosion: Presence and effects of erosion.
+122. silting: Presence and effects of silting.
+
+0=absent or virtually absent; 
+1=present, but sparse or limited in effects; 
+2=present in sufficient degree to have considerable effect; 
+3=present, but degree unspecified; 
+4=present in sufficient degree to have a very strong effect; 
+5=present in a degree that amounts to total destruction
+
+Features affecting the condition of site when collection made.  Many of these features, especially any kinds of pits, would tend to make more information about sites visible, including traces of exposed in situ architectural features. Others, such as land leveling, recent buildings, and silting, tend to obscure features. A moderate amount of erosion tends to reveal features, while strong erosion is more apt to destroy them. The numbers below refer to the total number of cases in which the relevant feature or condition was present to some degree. DF9 includes ordinal scales for intensity of the effects, ranging from limited to total destruction
+
+
+
+
+
+
+
+
+
+### 53-60, 125-126, 192, 285-288. Workshops
+
+MERGE AND SPLIT;; Split observation of concentration from functional interps
+
+WORKSHOPS
+INSTEAD OF RECORDING WORKSHOPS AS A FUNCTIONAL INTERPRETATION OF SPECIALIZED SOCIOECONOMIC ACTIVITY, WE CAN ACCUMULATE AND REFORMULATE ALL OF THE WORKSHOPS VARIABLES DATA INTO DATA ON SPECIFIC ARTIFACT TYPE CONCENTRATIONS
+
+53-60. workshops coded in the primary and alternative functional interpretations by phase
+
+125. groundstoneField
+126. obsidianField
+192. ceramicField
+285. obsidianSpencePhase1
+286. obsidianSpencePhase2
+287. ceramicKrotser
+288. figurineConcBarbour
+53. func1PMic
+54. func1McTl
+55. func1XlMe
+56. func1Oxto
+57. func2PMic
+58. func2McTl
+59. func2XlMe
+60. func2Oxto
+
+
+53-60. workshops coded in the primary and alternative functional interpretations by phase
+FIND METADATA COMMENTARY ON WORKSHOP CODES HERE
+24 = obsidian workshop
+25 = pottery workshop
+42 = residential workshop
+
+125. groundstoneField
+Field judgment about whether the site was a pecked, ground, or polished stone workshop.
+Field judgments about whether the site was a workshop. Var.125 probably tells us little except that fieldworkers had an impression there was something unusual about the worked stone remains. For obsidian workshops, **DO NOT USE VAR.126; USE VARS.285-286.** (But var.126 may be of historical interest.)
+Field judgments about whether the site was a workshop for pecked, ground, or polished stone. This data field probably tells us little except to identify cases where field crews had the impression that there was something unusual about the stone artifact remains. It should not be used as a basis for making inferences about ground stone industries at Teotihuacan. However, it is probably of value in planning future field studies of this industry at Teotihuacan.
+
+0=nothing special noted in the field; 
+1=considered an area of concentration, of unspecified character; 
+2=judged to be a workshop area; 
+3=some sort of specialized concentration but not a workshop; 
+4=possible workshop area
+
+126. obsidianField
+Field judgment about whether the site was an obsidian workshop.
+Field judgments about whether the site was a workshop. Var.125 probably tells us little except that fieldworkers had an impression there was something unusual about the worked stone remains. For obsidian workshops, **DO NOT USE VAR.126; USE VARS.285-286.** (But var.126 may be of historical interest.)
+Field judgments about whether the site was an obsidian workshop. This data field is of some value for identifying sites where field crews thought there was an unusual concentration of obsidian objects (Figure 3.x). DON’T TRUST IT FOR ANYTHING MORE THAN THAT! Data fields 285-286 are better, but they should not be trusted either.
+0=nothing special noted in the field; 
+1=considered an area of concentration, of unspecified character; 
+2=judged to be a workshop area; 
+3=some sort of specialized concentration but not a workshop; 
+4=possible workshop area
+
+192. ceramicField
+Field judgement about whether the site was a ceramic workshop
+Coding is the same as for vars.125-126, but it is SUPERSEDED by var.287.
+Field judgment about whether the site was a ceramic workshop. Coding is the same as for vars.125-126, but it is **SUPERSEDED BY VAR.287**.
+Field judgment about whether the site was a ceramic workshop. This is extremely unreliable and should not be used! Data field 287 is somewhat better but should be used with great caution.
+0=nothing special noted in the field; 
+1=considered an area of concentration, of unspecified character; 
+2=judged to be a workshop area; 
+3=some sort of specialized concentration but not a workshop; 
+4=possible workshop area
+
+285. obsidianSpencePhase1
+Michael Spence identification of obsidian workshops by phase
+These data fields are probably useful indicators of obsidian concentrations (especially those likely to be pre-Miccaotli or Aztec) but otherwise should by used with great caution.
+Michael Spence identification of obsidian workshops by phase. Since providing the above information (in the early 80s), Spence has sharply reduced the number of sites he feels certain contained obsidian workshops.
+Michael Spence identifications of obsidian workshops by phase. Spence identification of obsidian workshop by interval. Since providing this information in the early 1980s Spence has sharply reduced the number of TMP cases that he feels certain included obsidian workshops (refs). These data fields are probably useful indicators of obsidian concentrations (especially those likely to be pre-Miccaotli or Aztec) but otherwise should by used with great caution. [[Data fields added to DF8 after the code sheets had been filled out. These were not in DF6 and earlier versions of the datafile. They have been carried over from DF8 into DF9.]]
+Merge and split;; Merge Spence Obsidian vars 1 and2, then SPLIT into presence/absence by phase
+0=not believed a workshop; 
+1=present, Patlachique phase; 
+2=present, Tzacualli phase; 
+3=present, Miccaotli-Metepec phase; 
+4=present, Aztec phase
+
+286. obsidianSpencePhase2
+Additional phase for multiphase obsidian workshops (Spence)
+Spence obsidianworkshopidentification: Additional interval for multi-interval obsidian workshops (spillover variable for sites with obsidian workshops in more than one phase)
+These data fields are probably useful indicators of obsidian concentrations (especially those likely to be pre-Miccaotli or Aztec) but otherwise should by used with great caution.
+Additional phase for multiphase obsidian workshops (Spence). Since providing the above information (in the early 80s), Spence has sharply reduced the number of sites he feels certain contained obsidian workshops.
+Michael Spence identifications of obsidian workshops by phase. Additional interval for multi-interval obsidian workshops. Since providing this information in the early 1980s Spence has sharply reduced the number of TMP cases that he feels certain included obsidian workshops (refs). These data fields are probably useful indicators of obsidian concentrations (especially those likely to be pre-Miccaotli or Aztec) but otherwise should by used with great caution. [[Data fields added to DF8 after the code sheets had been filled out. These were not in DF6 and earlier versions of the datafile. They have been carried over from DF8 into DF9.]]
+Merge and split;; Merge Spence Obsidian vars 1 and2, then SPLIT into presence/absence by phase
+0=not a workshop in more than one phase; 
+1=Patlachique phase; 
+2=Tzacualli phase; 
+3=Miccaotli-Metepec phase; 
+4=Aztec phase
+
+287. ceramicKrotser
+Paula Krotser's classification of ceramic workshops
+Paula Krotser's classification of ceramic workshops. Paula was never able to complete examination of all collections for evidence of workshops, so there are probably some not coded as such in DF8. On the other hand, some of those she did identify may need re-evaluation.
+Paula Krotser's identifications of ceramic workshops. Krotser was never able to complete her examination of all TMP collections for evidence of workshops, and many of the 210 she did propose as likely workshops (Krotser 1987) need to be re-evaluated. This data field must be used with great caution and only as a guide in further studies of Teotihuacan ceramic industries. [[Data fields added to DF8 after the code sheets had been filled out. These were not in DF6 and earlier versions of the datafile. They have been carried over from DF8 into DF9.]]
+0=not identified as a workshop; 
+1=probably or surely a ceramic workshop
+
+288. figurineConcBarbour
+Figurine concentrations identified by Warren Barbour
+Figurine concentrations identified by Warren Barbour. DF9 records 125 cases (Figure 3.x). This is probably quite good, if understood as referring to concentrations, which may often prove to be workshops upon further investigation. For later phases in which figurines were often mold-made, concentrations of fragments of molds are one potential clue for the likely existence of a workshop nearby. However, figurines are so easily produced by molds that finds of one or two molds might reflect only part-time household production. [[Data fields added to DF8 after the code sheets had been filled out. These were not in DF6 and earlier versions of the datafile. They have been carried over from DF8 into DF9.]]
+0=not identified as a figurine concentration; 
+1=identified as a figurine concentration
+
+
+
+
+
+
+
+
+
+### 151 & 153. obsidianPoints and obisidianKnives
+
+Changes from Sherfield DF10
+
+A new variable titled ‘obisidianBifaces’ was generated. This variable is the result of a merge of two original variables: ‘obsidianPoints’ and ‘obisidianKnives.’ This change was suggested in Cowgill and Robertson’s Electronic File Guide for DF9 in 2012 because the point/knife distinction is “probably not very accurately reflected in DF9 counts.”
+151. obsidianPoints
+153. obisidianKnives
+
+
+
+
+
+
+
+
+### 150 & 155. obsidianScrapers and obsidianMagueyS
+MERGE
+
+Obsidian Scrapers. Mike feels that the field analyses tended to miss quite a few scrapers and put them into "waste." This is especially true of what he calls "amorphous scrapers." **Vars.149, 150+155, and 157** should be pretty good if used with caution.
+Obsidian "Maguey scrapers". Almost never coded. The few exceptions are supposed to have been added to var.150. Mike feels that the field analyses tended to miss quite a few scrapers and put them into "waste." This is especially true of what he calls "amorphous scrapers." **Vars.149, 150+155, and 157** should be pretty good if used with caution.
+
+150. obsidianScrapers
+155. obsidianMagueyS
+
+
+Obsidian category counts.  DF9 records a total of over 230,293 obsidian objects, of which the most abundant categories are waste, prismatic blades, scrapers, bifacial points/knives, and polyhedral cores. Regrettably and, in retrospect, quite oddly,  the SSRs and DF9 do not include distinctions between green obsidian (mostly from the Cerro de las Navajas source near Pachuca, about 55 km away), gray obsidian (nearly all from the nearby source near Otumba), and any unusual obsidian that might be from other sources. Tabulations making these distinction may exist in the possession of Michael Spence (ask him!). Some other obsidian data missing from earlier versions of DF8 and DF9 was provided by Spence in 1982. Unfortunately, the existing obsidian counts in DF9 are a mix of counts of categories as defined by Spence as of 1982 and tabulations based on category definitions used by various TMP personnel earlier, and it is not easy (impossible?) to tell which criteria are represented in specific DF9 cases. Personal communications from Spence suggest the following: (1) Data fields 151 and 153 ("points" and "knives") are probably best thought of as a combined "bifacial" category (total 16,724, Figure 3.x), because the point/knife distinction is probably not very accurately reflected in DF9 counts. Spence tends to put more bifaces under "knives" than the field crews did. (2) The counts for total obsidian (data field 147, Figure 3.x), prismatic blades (data field 148, 72,351, Figure 3.x)), bifacials (points plus knives), and polyhedral cores (data field 152, 8,598, Figure 3.x) are probably pretty good. (3) Spence feels that field crews tended to miss quite a few scrapers (data field 150, 29,390, Figure 3.x) and put them into "waste" (data field 149, 89,427, Figure 3.x). This is particularly true of what Spence calls "amorphous scrapers." (4) Some prismatic blades were also missed by field crews and counted as "waste" and so were many nodule fragments (data field 157, 2,931, Figure 3.x). Cowgill believes that Spence counts anything still showing some outer cortex under "nodules" rather than "waste." (5) Utilized flakes were handled erratically in the field analyses, and this makes data field 156 pretty useless. Data field 154 (eccentrics, including figurines, 99, Figure 3.x) is probably pretty good, although coders may have missed some cases in going from the SSRs to the code sheets. All the above remarks apply to the success with which DF9 captures the information in the collections actually made by field crews. A separate issue is the extent to which different field crews had differing tendencies to make large or small obsidian collections and the extent to which they collected abundant but perhaps less interesting categories, such as "waste." [Spence may have data bearing on these issues.]
+
+
+
+
+
+
+
+
+### 165-166. serpentine & jade
+MERGE
+
+Changes from Sherfield DF10
+
+A new variable titled ‘fineGreenstone’ was generated. This variable is the result of a merge of two original variables: ‘jade’ and ‘serpentine.’ This is also following the suggestion of Cowgill and Robertson 2012 who state “many, but not all, of the objects coded as jade are more likely serpentine, and…perhaps often fuchsite, pending re-examination.”
+165. serpentine
+166. jade
+Counts of pecked, ground, or polished stone collected. No test has been made to see how uniform practices of field crews were in collecting these frequently heavy and bulky objects. Categories that were recognized by all field crews include manos, metates, mortars (stone molcajetes), pestles (tejolotes), hammer stones (martillos), reworked lajas (fragments of tabular stone, probably originally used in tableros, flaked along one edge to serve as choppers), and "plastersmoothers." Mano, metate, mortar, and pestle counts include some that are pre-Teotihuacan and many that are post-Teotihuacan. Work by Castañeda (1976), Cowgill (unpublished), and Biskowski (1986, 1997), relying in part on Blucher (1971) for pre-Teotihuacan, has identified a number of mano and metate types that can be roughly subdivided into predominantly pre-Teotihuacan, Teotihuacan Period, or post-Teotihuacan (especially Aztec), but finer chronological subdivisions have not been made, and no chronological information on these objects is captured in DF9. Rare categories only recognized and recorded in collections analyzed (in the field and later) by James Bennyhoff before his association with the TMP ended in 1966 are "plumb bobs," sling stones, "whetstones," palettes, and anvils. It is likely that counts of some of these categories would have been considerably higher if more TMP analysts had recognized them. Cowgill directed an extensive restudy of many ground stone categories by technicians Pedro Baños and Zeferino Ortega, beginning in the fall of 1984. Parts of the resulting paper records have been put into an electronic file by Biskowski, but most remain in the form of paper data sheets in the possession of Cowgill at ASU, with copies in the Teotihuacan Archaeological Research Center, awaiting further analysis. We list below the counts of fragments of various kinds of stone objects collected by the TMP.
+
+
+
+
+
+
+### 203. areaSite
+Changes from Sherfield DF10
+
+
+Additionally one variables needed to be updated to reflect the increase storage capacity of modern computers. The old variable areaSite was given in multiples of 10 meters squared, i.e a value of 45 would mean 450 meters squared. The variable has now been changed to no longer be a multiple of ten but just the square meters area of the collection unit.
+
+
+
+
+
+
+### 214-215. Oxtoticpac and Xometla Ceramic Totals
+MERGE
+
+Changes from Sherfield DF10
+
+A new variable called ‘coyotlatelco’ was generated by merging two previous variables: ‘totOxto’ and ‘totXome.’ This change was suggested in Cowgill and Robertson 2012 because “the Oxtoticpac phase is highly controversial and its very existence has been questioned.” Additionally, Huster’s opinion is that the “most successful subdivisions of the epiclassic are based on the proportion of Variables of ceramics not on the presence or absence of diagnostic ceramic Variables. Therefore, assigning ceramics to one period or another is an unreliable practice.”
+
+214. totOxto
+215. totXome
+
+
+
+
+
+
+
+### 226-229. Late Censers
+MERGE
+
+Changes from Sherfield DF10
+A new variable called ‘censerLate’ was generated out of a merge of 4 previous variables: ‘censerOxto,’ ‘censerXome,’ ‘censerMaza,’ and ‘censerAzte.’ Huster advised that “Oxto-Xom-Maza censers are nearly identical so any subdivisions made by early analysts is probably meaningless.”
+
+226. censerOxto
+227. censerXome
+228. censerMaza
+229. censerAzte
+
+
+
+
+
+
+
+
+### 279-283. Granular Ware Subtypes
+MERGE
+
+Changes from Sherfield DF10
+A new variable called ‘granular’ was generated by merging 5 previous variables: ‘granPMic,’ ‘granMicc,’ ‘granTlam,’ ‘granXola,’ and ‘granMete.’ Huster advised that ‘ceramic phasing of granular ware is unreliable today’ so all previous granular ware variables have been merged.
+
+
+
+
+
+
+
+
+### 290. areaStruct
+Multiply by 10
+Changes from Sherfield DF10???
+
+
+
+
+
+
+
+
+
+### 290. insubstantialCount
+
+Changes from Sherfield DF10
+Variable 290, insubstantial structures count (insubstantialCount) was removed from DF10. This field was accidentally added by a research assistant who did not realize that the red rectangles on the TMP map are conventional symbols and not estimates of the number of structures (Robertson and Cowgill 2012).
+
+
+
+
+
+
+
+
+### unworkedBone (DF10 addition)
+
+
+
+
+
+
+
+
+
+
+
+## ADDING TOTALS VARIABLES
+
+
+
+
+
+## ADDING GEOSPATIAL VARIABLES AND VARIABLES DERIVED FROM GIS DATA
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Revised and New Geospatial Variables for the SSN TMP Collection Units
+
+
+
+
+
+
+### New Collection Units Variables Derived from TMP GIS Data
+
+
+
+
+
+
+
+## NAMING AND ORDERING DF11 VARIABLES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Reordering Variables
+
+
+
+
+
+
+
+
+### Renaming Variables
+
+
+
+
+
+
+
+## SUMMARY TABLE OF CHANGES
 
 
 
